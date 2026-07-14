@@ -39,10 +39,6 @@
   }
   nav button:hover { color: var(--ink); }
   nav button.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
-  nav button .badge {
-    display: inline-block; margin-left: 6px; min-width: 8px; height: 8px;
-    border-radius: 50%; background: var(--critical); vertical-align: middle;
-  }
   #lang-toggle { margin-left: auto; border: 1px solid var(--border); background: none;
     color: var(--ink-2); border-radius: 6px; padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12.5px; }
   #lang-toggle:hover { background: var(--surface-2); }
@@ -56,6 +52,8 @@
   .empty { color: var(--ink-3); padding: 32px 0; text-align: center; }
 
   .card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: var(--surface); margin-bottom: 14px; }
+  .card h2 { margin-top: 0; }
+  .card .desc { color: var(--ink-3); font-size: 12.5px; margin: 2px 0 10px; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
 
@@ -64,9 +62,9 @@
     width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px;
     background: var(--surface); color: var(--ink); font: inherit; font-size: 13px;
   }
-  textarea { font-family: var(--mono); font-size: 12.5px; min-height: 74px; resize: vertical; }
+  textarea { font-family: var(--mono); font-size: 12.5px; min-height: 68px; resize: vertical; }
   input:focus, select:focus, textarea:focus { outline: 1.5px solid var(--ink-3); }
-  .row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+  .row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
   .row > div { flex: 1; min-width: 140px; }
   .hint { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
 
@@ -78,20 +76,22 @@
   button.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
   button.btn.danger { color: var(--critical-text); }
   button.btn:disabled { opacity: 0.45; cursor: default; }
-  button.link { border: none; background: none; color: var(--ink-2); cursor: pointer;
-    font: inherit; font-size: 12.5px; text-decoration: underline; padding: 0; }
+  button.btn.small { padding: 4px 10px; font-size: 12px; }
 
-  .tiles { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-  .tile { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 126px; }
+  .tiles { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tile { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 118px;
+          background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+  .tile:hover { background: var(--surface-2); }
+  .tile.on { border-color: var(--ink); }
   .tile .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
     color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
-  .tile .value { font-size: 26px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .tile .value { font-size: 25px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
 
   .verdict { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono);
     font-size: 12px; font-weight: 600; }
   .verdict .dot { width: 7px; height: 7px; }
-  .v-MATCH { color: var(--good-text); }   .v-MATCH .dot { background: var(--good); }
+  .v-MATCH { color: var(--good-text); }    .v-MATCH .dot { background: var(--good); }
   .v-ERROR { color: var(--warning-text); } .v-ERROR .dot { background: var(--warning); }
   .v-NOISE { color: var(--warning-text); } .v-NOISE .dot { background: var(--warning); }
   .v-RESPONSE_DIFF, .v-WRITESET_DIFF, .v-BOTH_DIFF { color: var(--critical-text); }
@@ -132,20 +132,23 @@
   pre { margin: 0; padding: 10px; background: var(--surface); border: 1px solid var(--border);
     border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px;
     line-height: 1.45; max-height: 360px; }
-  details.raw summary { cursor: pointer; color: var(--ink-2); font-size: 12.5px; margin: 10px 0 6px; }
+  details.raw summary, details.adv summary { cursor: pointer; color: var(--ink-2); font-size: 12.5px; margin: 10px 0 6px; }
+  details.adv { margin-top: 6px; }
 
   .progress { height: 8px; border-radius: 999px; background: var(--surface-2);
-    border: 1px solid var(--border); overflow: hidden; margin: 10px 0 6px; }
+    border: 1px solid var(--border); overflow: hidden; margin: 8px 0 4px; }
   .progress > div { height: 100%; background: var(--good); width: 0%; transition: width .3s; }
-  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; flex-wrap: wrap; }
   .pulse { width: 9px; height: 9px; border-radius: 50%; background: var(--good); animation: pulse 1.2s infinite; }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
   .toast { position: fixed; bottom: 18px; right: 18px; background: var(--ink); color: var(--surface);
-    padding: 10px 16px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+    padding: 10px 16px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 10; }
   .toast.show { opacity: 1; }
   .sortrule { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
   .sortrule input { flex: 1; }
   .sortrule .rm { border: none; background: none; color: var(--critical-text); cursor: pointer; font-size: 15px; }
+  .flow { font-family: var(--mono); font-size: 12px; line-height: 1.7; color: var(--ink-2);
+    background: var(--surface-2); border-radius: 8px; padding: 10px 14px; overflow-x: auto; white-space: pre; }
 </style>
 </head>
 <body>
@@ -161,78 +164,123 @@
 /* ------------------------------------------------------------------ i18n */
 const MSG = {
   ko: {
-    tab_dashboard: "대시보드", tab_capture: "수집", tab_replay: "리플레이", tab_settings: "설정",
+    tab_dashboard: "대시보드", tab_capture: "수집 · 녹화본", tab_settings: "설정",
     lang_btn: "English",
-    runs: "실행 이력", no_runs: "아직 리포트가 없습니다 — 수집 후 리플레이를 실행해보세요",
+    /* 개요 */
+    intro_title: "이 콘솔은 무엇인가",
+    intro_body: "mocking-box는 리라이트된 백엔드가 기존과 똑같이 동작하는지 검증하는 도구입니다. 이 화면은 “검증 콘솔” — 검증 환경(로컬/DELL 등)에서 띄우는 mockingbox 프로세스의 UI이고, 아래에서 시작하는 녹화 프록시도 이 프로세스 안에서 뜹니다. 운영 서버에서의 무침투 수집(pcap/VPC 미러)은 CLI(mockingbox sniff/mirror)로 원격에서 돌리고 녹화본 파일만 가져오면 됩니다.",
+    intro_flow: "① 녹화: 트래픽을 프록시에 통과시켜 요청(+정답지) 저장\n② 검증: 녹화본을 서버에 재생하고 응답·DB변경(write-set) 비교\n③ 결과: 대시보드에서 요청 단위로 차이 확인",
+    /* 대시보드 */
+    runs: "실행 이력", no_runs: "아직 결과가 없습니다 — [수집 · 녹화본] 탭에서 녹화 후 검증을 실행하세요",
     requests: "요청", match: "일치", diff: "불일치", error: "오류", noise: "노이즈",
-    noise_diffs: "노이즈 (기준선 셀프체크와 일치 — 수집 아티팩트)",
-    results: "결과", col_name: "이름", col_request: "요청", col_verdict: "판정",
+    filter_all: "전체",
+    results: "요청별 결과", col_name: "이름", col_request: "요청", col_verdict: "판정",
     col_status: "상태코드", col_writes: "쓰기", col_first_diff: "첫 번째 차이",
     differences: "차이점", no_diff: "차이 없음",
-    writeset: "Write-set (구 / 신)", changes: "건의 변경", no_writes: "(쓰기 없음)",
-    response_bodies: "응답 바디", kind: "종류", path: "경로", old: "구(old)", new: "신(new)",
-    capture_title: "트래픽 수집", capture_desc: "녹화 프록시를 앞단에 세워 지나가는 요청을 코퍼스로 저장합니다. 클라이언트(또는 테스트 트래픽)를 프록시 포트로 보내면 업스트림 서버로 그대로 전달되면서 녹화됩니다.",
-    listen_port: "프록시 리슨 포트", upstream: "업스트림 (트래픽을 흘려보낼 서버)",
-    corpus_name: "코퍼스 이름", start_capture: "수집 시작", stop_capture: "수집 중지",
-    capturing: "수집 중", captured_n: "건 녹화됨", proxy_hint: "이 주소로 요청을 보내면 녹화됩니다",
-    use_old: "구 서버로", use_new: "신 서버로",
-    golden_mode: "골든 녹화 (Record & Verify)",
-    golden_hint: "응답과 write-set까지 저장 — 검증 때 구서버가 필요 없어집니다. 요청을 한 건씩 순차 처리하므로 dev/스테이징 수집용.",
-    golden_tag: "골든", verify_mode_hint: "골든 검증 모드 — 신서버에만 재생하고 녹화된 기대값과 비교합니다",
-    corpora: "코퍼스 목록", col_count: "요청 수", col_size: "크기", col_modified: "수정",
-    no_corpora: "코퍼스가 없습니다 — 수집을 시작하거나 .jsonl/.har 파일을 corpus 디렉토리에 넣으세요",
-    replay_this: "리플레이",
-    replay_title: "리플레이 실행", replay_desc: "선택한 코퍼스를 구/신 스택에 순차 재생하고 응답과 write-set을 비교합니다.",
-    select_corpus: "코퍼스 선택", start_replay: "리플레이 시작", replaying: "리플레이 진행 중",
-    replay_done: "리플레이 완료 — 대시보드에서 결과를 확인하세요", view_result: "결과 보기",
-    settings_title: "설정", settings_desc: "저장하면 config 파일에 반영되고 다음 리플레이부터 적용됩니다.",
-    old_stack: "구 스택 (기준)", new_stack: "신 스택 (검증 대상)", base_url: "Base URL",
-    mysql_host: "MySQL 호스트", mysql_port: "포트", mysql_user: "사용자", mysql_password: "비밀번호",
-    attribution: "귀속 (binlog 윈도우)", quiet_ms: "정지 판정 시간 (ms)", timeout_ms: "최대 대기 (ms)",
-    noise_title: "노이즈 규칙 (비교 제외)", response_paths: "응답 JSON 경로 (줄바꿈 구분)",
-    noise_columns: "DB 컬럼 (table.column, 줄바꿈 구분)", tables_ignore: "제외 테이블",
-    sort_title: "JSON 배열 정렬 비교", sort_desc: "매퍼(Jackson, MyBatis…)에 따라 배열 순서가 달라질 수 있습니다. 여기 등록한 경로의 배열은 지정한 키로 정렬한 뒤 비교합니다.",
-    sort_path: "배열 경로 (예: data.items, **)", sort_by: "정렬 키 (예: id, $canonical)",
-    add_rule: "+ 규칙 추가", save: "저장", saved: "저장되었습니다",
-    err_prefix: "오류: ", confirm_stop: "수집을 중지할까요?",
+    noise_diffs: "노이즈 — 기준선 셀프체크와 일치하는 수집 아티팩트 (판정 제외)",
+    writeset: "Write-set (기준 / 검증대상)", changes: "건의 변경", no_writes: "(쓰기 없음)",
+    response_bodies: "응답 바디", kind: "종류", path: "경로", old: "기준(구)", new: "검증(신)",
     duration: "소요",
+    /* 수집 */
+    capture_title: "트래픽 녹화 (프록시)",
+    capture_desc: "이 콘솔 안에 녹화 프록시를 띄웁니다. 리슨 포트로 들어온 요청은 녹화 대상 서버로 그대로 전달되면서 파일로 저장됩니다. dev/스테이징에서 테스트 트래픽을 이 포트로 보내는 용도이고, 운영 수집은 CLI의 패시브 모드(sniff/mirror)를 쓰세요.",
+    listen_port: "프록시 리슨 포트",
+    listen_hint: "새로 여는 포트 — 여기로 요청을 보내면 녹화됩니다",
+    upstream: "녹화 대상 서버 (업스트림)",
+    upstream_hint: "요청을 실제로 처리할 서버. 기준이 되는 쪽(보통 구서버)입니다",
+    corpus_name: "녹화본 이름",
+    start_capture: "녹화 시작", stop_capture: "녹화 중지",
+    capturing: "녹화 중", captured_n: "건 저장됨",
+    proxy_hint: "이 주소로 요청을 보내면 녹화됩니다",
+    golden_mode: "정답지 포함 (골든 녹화) — 권장",
+    golden_hint: "요청뿐 아니라 그 순간의 응답과 DB 변경(write-set)까지 “정답지”로 저장합니다. 검증 때 구서버 없이 신서버만으로 비교할 수 있게 됩니다. (요청을 한 건씩 순차 처리)",
+    /* 녹화본 */
+    corpora: "녹화본 목록",
+    corpora_desc: "녹화본 = 재생 가능한 요청 모음(JSONL 파일). “정답지” 배지가 있으면 기대 응답·write-set이 함께 들어 있어 신서버 단독 검증이 가능합니다. CLI로 수집한 파일을 corpus 디렉토리에 넣어도 여기 나타납니다.",
+    col_count: "요청 수", col_size: "크기", col_modified: "수정", col_type: "종류",
+    type_golden: "정답지", type_requests: "요청만",
+    no_corpora: "녹화본이 없습니다 — 위에서 녹화를 시작하거나 .jsonl/.har/.golden.jsonl 파일을 corpus 디렉토리에 넣으세요",
+    run_verify: "검증 실행", run_live: "라이브 비교",
+    verify_hint_row: "신서버에만 재생, 정답지와 비교",
+    live_hint_row: "구·신 둘 다 필요",
+    replaying: "실행 중", replay_done: "완료 — 대시보드에서 결과를 확인하세요", view_result: "결과 보기",
+    /* 설정 */
+    settings_desc: "저장하면 config 파일에 반영되고 다음 실행부터 적용됩니다.",
+    sec_servers: "대상 서버", sec_compare: "비교 규칙", sec_advanced: "고급 (귀속 타이밍 · HTTP)",
+    old_stack: "기준 서버 (구 — 녹화 대상)", new_stack: "검증 대상 서버 (신)",
+    base_url: "Base URL",
+    mysql_title: "MySQL (write-set 검증용 — 비우면 응답만 비교)",
+    mysql_host: "호스트", mysql_port: "포트", mysql_user: "사용자", mysql_password: "비밀번호",
+    noise_title: "노이즈 제외 규칙",
+    noise_desc: "실행할 때마다 달라지는 값(시각·토큰 등)을 비교에서 제외합니다.",
+    response_paths: "응답 JSON 경로 (줄바꿈 구분, 예: **.updated_at)",
+    noise_columns: "DB 컬럼 (table.column, 예: *.created_at)",
+    tables_ignore: "비교 제외 테이블",
+    sort_title: "JSON 배열 정렬 후 비교",
+    sort_desc: "매퍼(jOOQ/MyBatis/Jackson…)에 따라 배열 순서가 달라질 수 있습니다. 등록한 경로의 배열은 양쪽 다 지정 키로 정렬한 뒤 비교합니다. 순서 자체가 스펙인 API에는 걸지 마세요.",
+    sort_path: "배열 경로 (예: contracts, data.items, **)", sort_by: "정렬 키 (예: contract_id, $canonical)",
+    add_rule: "+ 규칙 추가",
+    quiet_ms: "write-set 윈도우 정지 판정 (ms)", timeout_ms: "윈도우 최대 대기 (ms)",
+    http_timeout: "HTTP 타임아웃 (초)",
+    save: "저장", saved: "저장되었습니다",
+    err_prefix: "오류: ",
   },
   en: {
-    tab_dashboard: "Dashboard", tab_capture: "Capture", tab_replay: "Replay", tab_settings: "Settings",
+    tab_dashboard: "Dashboard", tab_capture: "Capture · Recordings", tab_settings: "Settings",
     lang_btn: "한국어",
-    runs: "Runs", no_runs: "No reports yet — capture some traffic and run a replay",
+    intro_title: "What this console is",
+    intro_body: "mocking-box verifies that a rewritten backend behaves exactly like the original. This screen is the verification console — the UI of the mockingbox process running in your verification environment; the recording proxy below runs inside this same process. For zero-touch capture on production hosts, run the CLI passive modes (mockingbox sniff/mirror) remotely and drop the recording file here.",
+    intro_flow: "1. Record: pass traffic through the proxy, saving requests (+answer sheet)\n2. Verify: replay the recording and diff responses + DB write-sets\n3. Inspect: per-request differences on the dashboard",
+    runs: "Runs", no_runs: "No results yet — record on the [Capture · Recordings] tab, then run a verification",
     requests: "requests", match: "match", diff: "diff", error: "error", noise: "noise",
-    noise_diffs: "Noise (matched the baseline self-check — capture artifacts)",
-    results: "Results", col_name: "name", col_request: "request", col_verdict: "verdict",
+    filter_all: "all",
+    results: "Per-request results", col_name: "name", col_request: "request", col_verdict: "verdict",
     col_status: "status", col_writes: "writes", col_first_diff: "first difference",
     differences: "Differences", no_diff: "no differences",
-    writeset: "Write-set (old / new)", changes: "change(s)", no_writes: "(no writes)",
-    response_bodies: "Response bodies", kind: "kind", path: "path", old: "old", new: "new",
-    capture_title: "Traffic capture", capture_desc: "Put a recording proxy in front of a live server: every request flowing through is appended to a corpus. Point your client (or test traffic) at the proxy port — requests are forwarded to the upstream unchanged.",
-    listen_port: "Proxy listen port", upstream: "Upstream (server to forward traffic to)",
-    corpus_name: "Corpus name", start_capture: "Start capture", stop_capture: "Stop capture",
-    capturing: "Recording", captured_n: "recorded", proxy_hint: "Send requests to this address to record them",
-    use_old: "old server", use_new: "new server",
-    golden_mode: "Golden recording (Record & Verify)",
-    golden_hint: "Also saves responses and write-sets — verification then needs no old server. Requests are serialized; meant for dev/staging capture.",
-    golden_tag: "golden", verify_mode_hint: "Golden verify mode — replays against the new stack only, compared to recorded expectations",
-    corpora: "Corpora", col_count: "requests", col_size: "size", col_modified: "modified",
-    no_corpora: "No corpora yet — start a capture, or drop .jsonl/.har files into the corpus directory",
-    replay_this: "Replay",
-    replay_title: "Run replay", replay_desc: "Replays the selected corpus sequentially against both stacks and diffs responses + write-sets.",
-    select_corpus: "Select corpus", start_replay: "Start replay", replaying: "Replay in progress",
-    replay_done: "Replay finished — check the results on the dashboard", view_result: "View result",
-    settings_title: "Settings", settings_desc: "Saving writes the config file; the next replay picks it up.",
-    old_stack: "Old stack (reference)", new_stack: "New stack (under test)", base_url: "Base URL",
-    mysql_host: "MySQL host", mysql_port: "Port", mysql_user: "User", mysql_password: "Password",
-    attribution: "Attribution (binlog window)", quiet_ms: "Quiesce silence (ms)", timeout_ms: "Max wait (ms)",
-    noise_title: "Noise rules (excluded from comparison)", response_paths: "Response JSON paths (one per line)",
-    noise_columns: "DB columns (table.column, one per line)", tables_ignore: "Ignored tables",
-    sort_title: "JSON array sort before compare", sort_desc: "Mappers (Jackson, MyBatis result order, …) can reorder arrays. Arrays at these paths are sorted by the given key before comparison.",
-    sort_path: "Array path (e.g. data.items, **)", sort_by: "Sort key (e.g. id, $canonical)",
-    add_rule: "+ Add rule", save: "Save", saved: "Saved",
-    err_prefix: "Error: ", confirm_stop: "Stop capturing?",
+    noise_diffs: "Noise — capture artifacts matching the baseline self-check (excluded from verdict)",
+    writeset: "Write-set (reference / under test)", changes: "change(s)", no_writes: "(no writes)",
+    response_bodies: "Response bodies", kind: "kind", path: "path", old: "reference (old)", new: "under test (new)",
     duration: "took",
+    capture_title: "Traffic recording (proxy)",
+    capture_desc: "Starts a recording proxy inside this console. Requests sent to the listen port are forwarded unchanged to the target server and saved to a file. Use it for dev/staging test traffic; for production use the CLI passive modes (sniff/mirror).",
+    listen_port: "Proxy listen port",
+    listen_hint: "A new port — send requests here to record them",
+    upstream: "Recording target (upstream)",
+    upstream_hint: "The server that actually handles the requests — your reference side (usually the old server)",
+    corpus_name: "Recording name",
+    start_capture: "Start recording", stop_capture: "Stop recording",
+    capturing: "Recording", captured_n: "saved",
+    proxy_hint: "Send requests to this address to record them",
+    golden_mode: "Include answer sheet (golden) — recommended",
+    golden_hint: "Also stores each request's response and DB write-set as the “answer sheet”, so verification later needs only the new server. (Requests are handled one at a time.)",
+    corpora: "Recordings",
+    corpora_desc: "A recording is a replayable set of requests (JSONL). The “answer sheet” badge means expected responses/write-sets are included, enabling new-server-only verification. Files collected via CLI appear here too.",
+    col_count: "requests", col_size: "size", col_modified: "modified", col_type: "type",
+    type_golden: "answer sheet", type_requests: "requests only",
+    no_corpora: "No recordings yet — start one above, or drop .jsonl/.har/.golden.jsonl files into the corpus directory",
+    run_verify: "Verify", run_live: "Live compare",
+    verify_hint_row: "replays against the new server only",
+    live_hint_row: "needs both servers running",
+    replaying: "Running", replay_done: "Finished — check the dashboard", view_result: "View result",
+    settings_desc: "Saving writes the config file; the next run picks it up.",
+    sec_servers: "Target servers", sec_compare: "Comparison rules", sec_advanced: "Advanced (attribution · HTTP)",
+    old_stack: "Reference server (old — recording target)", new_stack: "Server under test (new)",
+    base_url: "Base URL",
+    mysql_title: "MySQL (for write-set verification — leave empty to compare responses only)",
+    mysql_host: "Host", mysql_port: "Port", mysql_user: "User", mysql_password: "Password",
+    noise_title: "Noise exclusion rules",
+    noise_desc: "Values that legitimately differ per run (timestamps, tokens, …) are excluded from comparison.",
+    response_paths: "Response JSON paths (one per line, e.g. **.updated_at)",
+    noise_columns: "DB columns (table.column, e.g. *.created_at)",
+    tables_ignore: "Ignored tables",
+    sort_title: "Sort JSON arrays before comparing",
+    sort_desc: "Mappers (jOOQ/MyBatis/Jackson…) may reorder arrays. Arrays at these paths are sorted by the given key on both sides before diffing. Don't add paths where order is part of the contract.",
+    sort_path: "Array path (e.g. contracts, data.items, **)", sort_by: "Sort key (e.g. contract_id, $canonical)",
+    add_rule: "+ Add rule",
+    quiet_ms: "Write-set window quiesce (ms)", timeout_ms: "Window max wait (ms)",
+    http_timeout: "HTTP timeout (s)",
+    save: "Save", saved: "Saved",
+    err_prefix: "Error: ",
   },
 };
 let lang = localStorage.getItem("mb-lang") || (navigator.language.startsWith("ko") ? "ko" : "en");
@@ -240,17 +288,19 @@ const t = k => (MSG[lang] && MSG[lang][k]) || MSG.en[k] || k;
 
 /* ------------------------------------------------------------------ state */
 let tab = localStorage.getItem("mb-tab") || "dashboard";
-let runsCache = [];
+if (tab === "replay") tab = "capture"; // replay 탭은 capture로 통합됨
 let currentRunFile = null;
 let currentRun = null;
 let cfgCache = null;
 let capturePoll = null, replayPoll = null;
+let verdictFilter = "ALL";
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmtVal = v => v === null || v === undefined ? "null" : (typeof v === "string" ? v : JSON.stringify(v));
 const pretty = s => { if (!s) return "(empty)"; try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; } };
 const verdictHTML = v => `<span class="verdict v-${esc(v)}"><span class="dot"></span>${esc(v)}</span>`;
-const toast = msg => { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2400); };
+const toast = msg => { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2600); };
+const isGoldenName = n => (n || "").endsWith(".golden.jsonl");
 
 async function api(path, opts) {
   const res = await fetch(path, opts);
@@ -265,12 +315,10 @@ function renderShell() {
   const tabs = [
     ["dashboard", t("tab_dashboard")],
     ["capture", t("tab_capture")],
-    ["replay", t("tab_replay")],
     ["settings", t("tab_settings")],
   ];
   document.getElementById("nav").innerHTML = tabs.map(([id, label]) =>
-    `<button data-tab="${id}" class="${tab === id ? "active" : ""}">${esc(label)}<span id="badge-${id}" style="display:none" class="badge"></span></button>`
-  ).join("");
+    `<button data-tab="${id}" class="${tab === id ? "active" : ""}">${esc(label)}</button>`).join("");
   document.querySelectorAll("#nav button").forEach(el =>
     el.addEventListener("click", () => { tab = el.dataset.tab; localStorage.setItem("mb-tab", tab); render(); }));
   const lt = document.getElementById("lang-toggle");
@@ -280,79 +328,124 @@ function renderShell() {
 
 function render() {
   renderShell();
-  ({dashboard: renderDashboard, capture: renderCapture, replay: renderReplay, settings: renderSettings}[tab])();
+  ({dashboard: renderDashboard, capture: renderCapture, settings: renderSettings}[tab])();
 }
 
 /* ------------------------------------------------------------- dashboard */
+const FILTERS = [
+  { key: "ALL",   labelKey: "filter_all", dot: "var(--ink-3)",
+    match: () => true },
+  { key: "MATCH", labelKey: "match", dot: "var(--good)",
+    match: r => r.verdict === "MATCH" },
+  { key: "DIFF",  labelKey: "diff", dot: "var(--critical)",
+    match: r => ["RESPONSE_DIFF", "WRITESET_DIFF", "BOTH_DIFF"].includes(r.verdict) },
+  { key: "NOISE", labelKey: "noise", dot: "var(--warning)",
+    match: r => r.verdict === "NOISE" },
+  { key: "ERROR", labelKey: "error", dot: "var(--warning)",
+    match: r => r.verdict === "ERROR" },
+];
+
 async function renderDashboard() {
   const main = document.getElementById("main");
   main.innerHTML = `<h2>${esc(t("runs"))}</h2><div id="runbar" class="runbar"></div><div id="run-view"></div>`;
-  try { runsCache = await api("/api/runs"); } catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
-  if (!runsCache.length) {
+  let runs;
+  try { runs = await api("/api/runs"); }
+  catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
+  if (!runs.length) {
     document.getElementById("runbar").innerHTML = `<div class="empty" style="width:100%">${esc(t("no_runs"))}</div>`;
     return;
   }
-  document.getElementById("runbar").innerHTML = runsCache.map(r => {
+  document.getElementById("runbar").innerHTML = runs.map(r => {
     const bad = (r.summary.RESPONSE_DIFF||0)+(r.summary.WRITESET_DIFF||0)+(r.summary.BOTH_DIFF||0);
-    const err = r.summary.ERROR||0;
+    const noise = r.summary.NOISE||0, err = r.summary.ERROR||0;
     const when = (r.generated_at||r.file).replace("T"," ").slice(5,19);
     return `<button class="runbtn ${r.file===currentRunFile?"active":""}" data-file="${esc(r.file)}">
       <div class="when">${esc(when)}</div>
       <div class="chips">
         <span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${r.summary.MATCH||0}</span>
         ${bad?`<span class="chip v-BOTH_DIFF"><span class="dot" style="background:var(--critical)"></span>${bad}</span>`:""}
+        ${noise?`<span class="chip v-NOISE"><span class="dot" style="background:var(--warning)"></span>${noise}</span>`:""}
         ${err?`<span class="chip v-ERROR"><span class="dot" style="background:var(--warning)"></span>${err}</span>`:""}
       </div></button>`;
   }).join("");
   document.querySelectorAll(".runbtn").forEach(el =>
     el.addEventListener("click", () => loadRun(el.dataset.file)));
-  loadRun(currentRunFile && runsCache.some(r => r.file === currentRunFile) ? currentRunFile : runsCache[0].file);
+  loadRun(currentRunFile && runs.some(r => r.file === currentRunFile) ? currentRunFile : runs[0].file);
 }
 
 async function loadRun(file) {
   currentRunFile = file;
   document.querySelectorAll(".runbtn").forEach(el => el.classList.toggle("active", el.dataset.file === file));
-  const run = currentRun = await api(`/api/run?file=${encodeURIComponent(file)}`);
+  currentRun = await api(`/api/run?file=${encodeURIComponent(file)}`);
+  renderRunView();
+}
+
+function renderRunView() {
+  const run = currentRun;
   const s = run.summary || {};
-  const total = (run.results||[]).length;
-  const tiles = [
-    { label: t("requests"), value: total, dot: "var(--ink-3)" },
-    { label: t("match"), value: s.MATCH||0, dot: "var(--good)" },
-    { label: t("diff"), value: (s.RESPONSE_DIFF||0)+(s.WRITESET_DIFF||0)+(s.BOTH_DIFF||0), dot: "var(--critical)" },
-    { label: t("noise"), value: s.NOISE||0, dot: "var(--warning)" },
-    { label: t("error"), value: s.ERROR||0, dot: "var(--warning)" },
-  ];
-  const rows = (run.results||[]).map((r, i) => {
+  const results = run.results || [];
+  const counts = {
+    ALL: results.length,
+    MATCH: s.MATCH||0,
+    DIFF: (s.RESPONSE_DIFF||0)+(s.WRITESET_DIFF||0)+(s.BOTH_DIFF||0),
+    NOISE: s.NOISE||0,
+    ERROR: s.ERROR||0,
+  };
+  if (verdictFilter !== "ALL" && !counts[verdictFilter]) verdictFilter = "ALL";
+  document.getElementById("run-meta")?.remove();
+
+  const filterDef = FILTERS.find(f => f.key === verdictFilter);
+  const visible = results.map((r, i) => ({r, i})).filter(({r}) => filterDef.match(r));
+
+  const rows = visible.map(({r, i}) => {
     const first = (r.differences||[])[0];
     const detail = r.error ? esc(r.error)
       : first ? `${esc(first.path)}: ${esc(fmtVal(first.old))} → ${esc(fmtVal(first.new))}` +
-                (r.differences.length > 1 ? ` <span class="muted">(+${r.differences.length-1})</span>` : "") : "";
-    return `<tr class="click" data-i="${i}">
-      <td class="num muted">${i+1}</td><td>${esc(r.name)}</td>
-      <td class="mono">${esc(r.request)}</td><td>${verdictHTML(r.verdict)}</td>
+                (r.differences.length > 1 ? ` <span class="muted">(+${r.differences.length-1})</span>` : "")
+      : (r.verdict === "NOISE" ? `<span class="muted">${(r.noise_differences||[]).length} noise</span>` : "");
+    return `
+    <tr class="click" data-i="${i}">
+      <td class="num muted">${i+1}</td>
+      <td>${esc(r.name)}</td>
+      <td class="mono">${esc(r.request)}</td>
+      <td>${verdictHTML(r.verdict)}</td>
       <td class="mono">${esc(r.old_status ?? "—")}/${esc(r.new_status ?? "—")}</td>
       <td class="num mono">${(r.old_writeset||[]).length}/${(r.new_writeset||[]).length}</td>
       <td class="mono muted" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${detail}</td></tr>
-      <tr class="detail-row" data-i="${i}" hidden><td colspan="7"><div class="detail" id="detail-${i}"></div></td></tr>`;
+    <tr class="detail-row" data-i="${i}" hidden><td colspan="7"><div class="detail" id="detail-${i}"></div></td></tr>`;
   }).join("");
+
   document.getElementById("run-view").innerHTML = `
-    <div class="tiles">${tiles.map(x => `<div class="tile">
-      <div class="label"><span class="dot" style="background:${x.dot}"></span>${esc(x.label)}</div>
-      <div class="value">${x.value}</div></div>`).join("")}</div>
-    <h2>${esc(t("results"))} — <span class="mono">${esc(run.corpus||"")}</span></h2>
-    <table class="t"><thead><tr><th>#</th><th>${esc(t("col_name"))}</th><th>${esc(t("col_request"))}</th>
+    <div class="tiles">${FILTERS.map(f => `
+      <button class="tile ${verdictFilter===f.key?"on":""}" data-filter="${f.key}">
+        <div class="label"><span class="dot" style="background:${f.dot}"></span>${esc(t(f.labelKey))}</div>
+        <div class="value">${counts[f.key]}</div>
+      </button>`).join("")}
+    </div>
+    <h2>${esc(t("results"))} — <span class="mono">${esc(run.corpus||"")}</span>
+      <span class="muted" style="text-transform:none">· ${esc(run.old_base_url||"")} ↔ ${esc(run.new_base_url||"")}</span></h2>
+    ${visible.length ? `<table class="t">
+      <thead><tr><th>#</th><th>${esc(t("col_name"))}</th><th>${esc(t("col_request"))}</th>
       <th>${esc(t("col_verdict"))}</th><th>${esc(t("col_status"))}</th><th>${esc(t("col_writes"))}</th>
-      <th>${esc(t("col_first_diff"))}</th></tr></thead><tbody>${rows}</tbody></table>`;
+      <th>${esc(t("col_first_diff"))}</th></tr></thead><tbody>${rows}</tbody></table>`
+      : `<div class="empty">0</div>`}`;
+
+  document.querySelectorAll(".tile").forEach(el =>
+    el.addEventListener("click", () => { verdictFilter = el.dataset.filter; renderRunView(); }));
   document.querySelectorAll("tr.click").forEach(el =>
     el.addEventListener("click", () => toggleDetail(+el.dataset.i)));
-  const firstBad = (run.results||[]).findIndex(r => r.verdict !== "MATCH");
-  if (firstBad >= 0) toggleDetail(firstBad);
+
+  if (verdictFilter === "ALL") {
+    const firstBad = results.findIndex(r => r.verdict !== "MATCH" && r.verdict !== "NOISE");
+    if (firstBad >= 0) toggleDetail(firstBad);
+  }
 }
 
 function toggleDetail(i) {
   const run = currentRun;
   const row = document.querySelector(`tr.click[data-i="${i}"]`);
   const holder = document.querySelector(`tr.detail-row[data-i="${i}"]`);
+  if (!row || !holder) return;
   const wasOpen = !holder.hidden;
   document.querySelectorAll("tr.detail-row").forEach(el => el.hidden = true);
   document.querySelectorAll("tr.click").forEach(el => el.classList.remove("open"));
@@ -365,25 +458,25 @@ function toggleDetail(i) {
     <tbody>${r.differences.map(d => `<tr><td class="muted">${esc(d.kind)}</td><td>${esc(d.path)}</td>
       <td class="old">${esc(fmtVal(d.old))}</td><td class="new">${esc(fmtVal(d.new))}</td></tr>`).join("")}</tbody></table>`
     : `<div class="muted">${esc(t("no_diff"))}</div>`;
-  const ws = side => (side||[]).length ? JSON.stringify(side, null, 2) : t("no_writes");
   const noiseTable = (r.noise_differences||[]).length ? `
     <h3>${esc(t("noise_diffs"))}</h3>
     <table class="diffs" style="opacity:.6"><tbody>${r.noise_differences.map(d => `
       <tr><td class="muted">${esc(d.kind)}</td><td>${esc(d.path)}</td>
       <td>${esc(fmtVal(d.old))}</td><td>${esc(fmtVal(d.new))}</td></tr>`).join("")}</tbody></table>` : "";
+  const ws = side => (side||[]).length ? JSON.stringify(side, null, 2) : t("no_writes");
   document.getElementById(`detail-${i}`).innerHTML = `
     <h3>${esc(t("differences"))} ${verdictHTML(r.verdict)} <span class="muted" style="text-transform:none">· ${esc(t("duration"))} ${r.duration_ms||0}ms</span></h3>
     ${r.error ? `<div class="mono" style="color:var(--warning-text)">${esc(r.error)}</div>` : diffsTable}
     ${noiseTable}
     <h3>${esc(t("writeset"))}</h3>
     <div class="cols">
-      <div class="pane"><div class="pane-title">old — ${(r.old_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.old_writeset))}</pre></div>
-      <div class="pane"><div class="pane-title">new — ${(r.new_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.new_writeset))}</pre></div>
+      <div class="pane"><div class="pane-title">${esc(t("old"))} — ${(r.old_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.old_writeset))}</pre></div>
+      <div class="pane"><div class="pane-title">${esc(t("new"))} — ${(r.new_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.new_writeset))}</pre></div>
     </div>
     <details class="raw"><summary>${esc(t("response_bodies"))} (${esc(r.old_status ?? "—")} / ${esc(r.new_status ?? "—")})</summary>
       <div class="cols">
-        <div class="pane"><div class="pane-title">old</div><pre>${esc(pretty(r.old_body))}</pre></div>
-        <div class="pane"><div class="pane-title">new</div><pre>${esc(pretty(r.new_body))}</pre></div>
+        <div class="pane"><div class="pane-title">${esc(t("old"))}</div><pre>${esc(pretty(r.old_body))}</pre></div>
+        <div class="pane"><div class="pane-title">${esc(t("new"))}</div><pre>${esc(pretty(r.new_body))}</pre></div>
       </div></details>`;
 }
 
@@ -392,21 +485,40 @@ async function renderCapture() {
   const main = document.getElementById("main");
   try { cfgCache = await api("/api/config"); } catch (e) { cfgCache = null; }
   const st = await api("/api/capture/status").catch(() => ({running:false, count:0}));
-  const oldURL = cfgCache?.old?.base_url || "http://localhost:8081";
-  const newURL = cfgCache?.new?.base_url || "http://localhost:8082";
+  const oldURL = cfgCache?.old?.base_url || "";
 
   main.innerHTML = `
     <div class="card">
-      <h2 style="margin-top:0">${esc(t("capture_title"))}</h2>
-      <p class="muted" style="margin:4px 0 12px; font-size:13px">${esc(t("capture_desc"))}</p>
+      <h2>${esc(t("intro_title"))}</h2>
+      <p class="desc" style="margin-bottom:10px">${esc(t("intro_body"))}</p>
+      <div class="flow">${esc(t("intro_flow"))}</div>
+    </div>
+    <div class="card">
+      <h2>${esc(t("capture_title"))}</h2>
+      <p class="desc">${esc(t("capture_desc"))}</p>
       <div id="capture-body"></div>
     </div>
-    <h2>${esc(t("corpora"))}</h2>
-    <div id="corpora"></div>`;
+    <div class="card">
+      <h2>${esc(t("corpora"))}</h2>
+      <p class="desc">${esc(t("corpora_desc"))}</p>
+      <div id="rp-status"></div>
+      <div id="corpora"></div>
+    </div>`;
 
   const body = document.getElementById("capture-body");
   if (st.running) {
-    body.innerHTML = captureRunningHTML(st);
+    const port = st.listen.startsWith(":") ? st.listen : ":" + st.listen;
+    body.innerHTML = `
+      <div class="status-line"><span class="pulse"></span>
+        <strong>${esc(t("capturing"))}</strong>
+        <span class="mono">http://localhost${esc(port)} → ${esc(st.upstream)}</span>
+        ${st.golden ? `<span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${esc(t("type_golden"))}</span>` : ""}
+        <span class="chip"><span class="dot" style="background:var(--good)"></span><span id="cap-count">${st.count}</span> ${esc(t("captured_n"))}</span>
+        <button class="btn danger" id="stop-capture" style="margin-left:auto">${esc(t("stop_capture"))}</button>
+      </div>
+      <div class="hint" style="margin-top:8px">${esc(t("proxy_hint"))}: <span class="mono">curl http://localhost${esc(port)}/...</span>
+        → <span class="mono">${esc(st.corpus_path)}</span></div>
+      ${st.last_error ? `<div class="hint" style="color:var(--critical-text)">${esc(st.last_error)}</div>` : ""}`;
     document.getElementById("stop-capture").onclick = async () => {
       await api("/api/capture/stop", {method:"POST"}).catch(e => toast(t("err_prefix")+e.message));
       renderCapture();
@@ -416,15 +528,13 @@ async function renderCapture() {
     body.innerHTML = `
       <div class="row">
         <div style="max-width:150px"><label>${esc(t("listen_port"))}</label>
-          <input type="text" id="cap-listen" value="9090" class="mono"></div>
+          <input type="text" id="cap-listen" value="9090" class="mono">
+          <div class="hint">${esc(t("listen_hint"))}</div></div>
         <div style="flex:2"><label>${esc(t("upstream"))}</label>
           <input type="text" id="cap-upstream" value="${esc(oldURL)}" class="mono">
-          <div class="hint">
-            <button class="link" id="preset-old">${esc(t("use_old"))} (${esc(oldURL)})</button> ·
-            <button class="link" id="preset-new">${esc(t("use_new"))} (${esc(newURL)})</button>
-          </div></div>
+          <div class="hint">${esc(t("upstream_hint"))}</div></div>
         <div><label>${esc(t("corpus_name"))}</label>
-          <input type="text" id="cap-corpus" value="captured-${new Date().toISOString().slice(0,10)}" class="mono"></div>
+          <input type="text" id="cap-corpus" value="rec-${new Date().toISOString().slice(0,10)}" class="mono"></div>
         <div style="flex:0"><button class="btn primary" id="start-capture">${esc(t("start_capture"))}</button></div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer">
@@ -432,8 +542,6 @@ async function renderCapture() {
         <span>${esc(t("golden_mode"))}</span>
       </label>
       <div class="hint">${esc(t("golden_hint"))}</div>`;
-    document.getElementById("preset-old").onclick = () => document.getElementById("cap-upstream").value = oldURL;
-    document.getElementById("preset-new").onclick = () => document.getElementById("cap-upstream").value = newURL;
     document.getElementById("start-capture").onclick = async () => {
       try {
         await api("/api/capture/start", {method:"POST", headers:{"content-type":"application/json"},
@@ -448,20 +556,9 @@ async function renderCapture() {
     };
   }
   renderCorpora();
-}
-
-function captureRunningHTML(st) {
-  const port = st.listen.startsWith(":") ? st.listen : ":" + st.listen;
-  return `
-    <div class="status-line"><span class="pulse"></span>
-      <strong>${esc(t("capturing"))}</strong>
-      <span class="mono">http://localhost${esc(port)} → ${esc(st.upstream)}</span>
-      <span class="chip"><span class="dot" style="background:var(--good)"></span><span id="cap-count">${st.count}</span> ${esc(t("captured_n"))}</span>
-      <button class="btn danger" id="stop-capture" style="margin-left:auto">${esc(t("stop_capture"))}</button>
-    </div>
-    <div class="hint" style="margin-top:8px">${esc(t("proxy_hint"))}: <span class="mono">curl http://localhost${esc(port)}/...</span>
-      → <span class="mono">${esc(st.corpus_path)}</span></div>
-    ${st.last_error ? `<div class="hint" style="color:var(--critical-text)">${esc(st.last_error)}</div>` : ""}`;
+  const st2 = await api("/api/replay/status").catch(() => ({running:false}));
+  if (st2.running) startReplayPoll();
+  else renderReplayStatus(st2);
 }
 
 function startCapturePoll() {
@@ -479,64 +576,33 @@ async function renderCorpora() {
   const box = document.getElementById("corpora");
   if (!box) return;
   const corpora = await api("/api/corpora").catch(() => []);
+  const st = await api("/api/replay/status").catch(() => ({running:false}));
   if (!corpora.length) { box.innerHTML = `<div class="empty">${esc(t("no_corpora"))}</div>`; return; }
   box.innerHTML = `<table class="t"><thead><tr>
-      <th>${esc(t("corpus_name"))}</th><th>${esc(t("col_count"))}</th><th>${esc(t("col_size"))}</th>
-      <th>${esc(t("col_modified"))}</th><th></th></tr></thead>
+      <th>${esc(t("corpus_name"))}</th><th>${esc(t("col_type"))}</th><th>${esc(t("col_count"))}</th>
+      <th>${esc(t("col_size"))}</th><th>${esc(t("col_modified"))}</th><th></th></tr></thead>
     <tbody>${corpora.map(c => `<tr>
-      <td class="mono">${esc(c.name)}${c.golden ? ` <span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${esc(t("golden_tag"))}</span>` : ""}</td>
+      <td class="mono">${esc(c.name)}</td>
+      <td>${c.golden
+        ? `<span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${esc(t("type_golden"))}</span>`
+        : `<span class="chip muted">${esc(t("type_requests"))}</span>`}</td>
       <td class="num">${c.count}</td>
-      <td class="num muted">${(c.size/1024).toFixed(1)} KB</td>
+      <td class="num muted">${((c.size||0)/1024).toFixed(1)} KB</td>
       <td class="mono muted">${esc(c.modified_at||"")}</td>
-      <td><button class="btn" data-corpus="${esc(c.name)}">${esc(t("replay_this"))}</button></td>
+      <td style="text-align:right">
+        <button class="btn small" data-corpus="${esc(c.name)}" ${st.running?"disabled":""}
+          title="${esc(c.golden ? t("verify_hint_row") : t("live_hint_row"))}">
+          ${esc(c.golden ? t("run_verify") : t("run_live"))}</button></td>
     </tr>`).join("")}</tbody></table>`;
   box.querySelectorAll("button[data-corpus]").forEach(el =>
-    el.addEventListener("click", () => {
-      tab = "replay"; localStorage.setItem("mb-tab", tab);
-      renderReplay(el.dataset.corpus);
+    el.addEventListener("click", async () => {
+      try {
+        await api("/api/replay/start", {method:"POST", headers:{"content-type":"application/json"},
+          body: JSON.stringify({corpus: el.dataset.corpus})});
+        startReplayPoll();
+        renderCorpora();
+      } catch (e) { toast(t("err_prefix") + e.message); }
     }));
-}
-
-/* ---------------------------------------------------------------- replay */
-async function renderReplay(preselect) {
-  renderShell();
-  const main = document.getElementById("main");
-  const corpora = await api("/api/corpora").catch(() => []);
-  const st = await api("/api/replay/status").catch(() => ({running:false}));
-
-  main.innerHTML = `
-    <div class="card">
-      <h2 style="margin-top:0">${esc(t("replay_title"))}</h2>
-      <p class="muted" style="margin:4px 0 12px; font-size:13px">${esc(t("replay_desc"))}</p>
-      <div class="row">
-        <div style="flex:2"><label>${esc(t("select_corpus"))}</label>
-          <select id="rp-corpus" class="mono" ${st.running?"disabled":""}>
-            ${corpora.map(c => `<option value="${esc(c.name)}" ${c.name===preselect?"selected":""}>${esc(c.name)} (${c.count})</option>`).join("")}
-          </select></div>
-        <div style="flex:0"><button class="btn primary" id="start-replay" ${st.running||!corpora.length?"disabled":""}>${esc(t("start_replay"))}</button></div>
-      </div>
-      <div class="hint" id="rp-mode-hint" style="margin-top:6px"></div>
-      <div id="rp-status"></div>
-    </div>`;
-  const modeHint = () => {
-    const sel = document.getElementById("rp-corpus");
-    const hint = document.getElementById("rp-mode-hint");
-    if (sel && hint) hint.textContent = (sel.value || "").endsWith(".golden.jsonl") ? t("verify_mode_hint") : "";
-  };
-  document.getElementById("rp-corpus")?.addEventListener("change", modeHint);
-  modeHint();
-  if (!corpora.length) main.querySelector(".card").insertAdjacentHTML("beforeend", `<div class="empty">${esc(t("no_corpora"))}</div>`);
-
-  document.getElementById("start-replay").onclick = async () => {
-    const corpus = document.getElementById("rp-corpus").value;
-    try {
-      await api("/api/replay/start", {method:"POST", headers:{"content-type":"application/json"},
-        body: JSON.stringify({corpus})});
-      startReplayPoll();
-    } catch (e) { toast(t("err_prefix") + e.message); }
-  };
-  if (st.running) startReplayPoll();
-  else if (st.last_report || st.last_error) renderReplayStatus(st);
 }
 
 function renderReplayStatus(st) {
@@ -545,19 +611,21 @@ function renderReplayStatus(st) {
   if (st.running) {
     const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
     box.innerHTML = `
-      <div class="status-line" style="margin-top:12px"><span class="pulse"></span>
+      <div class="status-line"><span class="pulse"></span>
         <strong>${esc(t("replaying"))}</strong>
-        <span class="mono">${st.done}/${st.total} ${esc(st.current||"")}</span></div>
+        <span class="mono">${esc(st.corpus||"")} · ${st.done}/${st.total} ${esc(st.current||"")}</span></div>
       <div class="progress"><div style="width:${pct}%"></div></div>`;
   } else if (st.last_error) {
-    box.innerHTML = `<div class="hint" style="color:var(--critical-text); margin-top:10px">${esc(st.last_error)}</div>`;
+    box.innerHTML = `<div class="hint" style="color:var(--critical-text); margin-bottom:8px">${esc(st.last_error)}</div>`;
   } else if (st.last_report) {
-    box.innerHTML = `<div class="status-line" style="margin-top:12px">
+    box.innerHTML = `<div class="status-line" style="margin-bottom:8px">
       <span class="dot" style="background:var(--good)"></span> ${esc(t("replay_done"))}
-      <button class="btn" id="goto-run">${esc(t("view_result"))}</button></div>`;
+      <button class="btn small" id="goto-run">${esc(t("view_result"))}</button></div>`;
     document.getElementById("goto-run").onclick = () => {
       currentRunFile = st.last_report; tab = "dashboard"; localStorage.setItem("mb-tab", tab); render();
     };
+  } else {
+    box.innerHTML = "";
   }
 }
 
@@ -566,9 +634,11 @@ function startReplayPoll() {
   replayPoll = setInterval(async () => {
     const st = await api("/api/replay/status").catch(() => null);
     if (!st) return;
-    if (tab === "replay") renderReplayStatus(st);
-    document.getElementById("badge-replay")?.style.setProperty("display", st.running ? "inline-block" : "none");
-    if (!st.running) { clearInterval(replayPoll); if (tab === "replay") renderReplayStatus(st); }
+    if (tab === "capture") renderReplayStatus(st);
+    if (!st.running) {
+      clearInterval(replayPoll);
+      if (tab === "capture") { renderReplayStatus(st); renderCorpora(); }
+    }
   }, 900);
 }
 
@@ -582,11 +652,12 @@ async function renderSettings() {
   const stackForm = (key, title) => {
     const st = cfg[key] || {};
     const my = st.mysql || {};
-    return `<div class="card"><h2 style="margin-top:0">${esc(title)}</h2>
+    return `<div class="card"><h2>${esc(title)}</h2>
       <label>${esc(t("base_url"))}</label><input type="text" class="mono" id="${key}-url" value="${esc(st.base_url||"")}">
+      <label style="margin-top:12px">${esc(t("mysql_title"))}</label>
       <div class="row">
         <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono" id="${key}-mh" value="${esc(my.host||"")}"></div>
-        <div style="max-width:110px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono" id="${key}-mp" value="${my.port||3306}"></div>
+        <div style="max-width:100px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono" id="${key}-mp" value="${my.port||3306}"></div>
         <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono" id="${key}-mu" value="${esc(my.user||"")}"></div>
         <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono" id="${key}-mw" value="${esc(my.password||"")}"></div>
       </div></div>`;
@@ -594,26 +665,32 @@ async function renderSettings() {
 
   const sortRules = (cfg.compare?.sort_arrays || []);
   main.innerHTML = `
-    <p class="muted" style="margin:0 0 12px; font-size:13px">${esc(t("settings_desc"))}</p>
+    <p class="desc muted" style="margin:0 0 12px; font-size:13px">${esc(t("settings_desc"))}</p>
+    <h2>${esc(t("sec_servers"))}</h2>
     <div class="grid2">${stackForm("old", t("old_stack"))}${stackForm("new", t("new_stack"))}</div>
+    <h2>${esc(t("sec_compare"))}</h2>
     <div class="grid2">
-      <div class="card"><h2 style="margin-top:0">${esc(t("attribution"))}</h2>
-        <div class="row">
-          <div><label>${esc(t("quiet_ms"))}</label><input type="number" class="mono" id="at-quiet" value="${cfg.attribution?.quiet_ms||300}"></div>
-          <div><label>${esc(t("timeout_ms"))}</label><input type="number" class="mono" id="at-timeout" value="${cfg.attribution?.timeout_ms||5000}"></div>
-        </div></div>
-      <div class="card"><h2 style="margin-top:0">${esc(t("noise_title"))}</h2>
+      <div class="card"><h2>${esc(t("noise_title"))}</h2>
+        <p class="desc">${esc(t("noise_desc"))}</p>
         <label>${esc(t("response_paths"))}</label><textarea id="ns-resp">${esc((cfg.noise?.response_paths||[]).join("\n"))}</textarea>
         <label>${esc(t("noise_columns"))}</label><textarea id="ns-cols">${esc((cfg.noise?.columns||[]).join("\n"))}</textarea>
-        <label>${esc(t("tables_ignore"))}</label><textarea id="ns-tables" style="min-height:40px">${esc((cfg.noise?.tables_ignore||[]).join("\n"))}</textarea>
+        <label>${esc(t("tables_ignore"))}</label><textarea id="ns-tables" style="min-height:38px">${esc((cfg.noise?.tables_ignore||[]).join("\n"))}</textarea>
+      </div>
+      <div class="card"><h2>${esc(t("sort_title"))}</h2>
+        <p class="desc">${esc(t("sort_desc"))}</p>
+        <div id="sort-rules"></div>
+        <button class="btn small" id="add-rule">${esc(t("add_rule"))}</button>
       </div>
     </div>
-    <div class="card"><h2 style="margin-top:0">${esc(t("sort_title"))}</h2>
-      <p class="muted" style="margin:4px 0 10px; font-size:13px">${esc(t("sort_desc"))}</p>
-      <div id="sort-rules"></div>
-      <button class="btn" id="add-rule">${esc(t("add_rule"))}</button>
-    </div>
-    <button class="btn primary" id="save-settings" style="margin:4px 0 30px">${esc(t("save"))}</button>`;
+    <details class="adv">
+      <summary>${esc(t("sec_advanced"))}</summary>
+      <div class="card"><div class="row">
+        <div><label>${esc(t("quiet_ms"))}</label><input type="number" class="mono" id="at-quiet" value="${cfg.attribution?.quiet_ms||300}"></div>
+        <div><label>${esc(t("timeout_ms"))}</label><input type="number" class="mono" id="at-timeout" value="${cfg.attribution?.timeout_ms||5000}"></div>
+        <div><label>${esc(t("http_timeout"))}</label><input type="number" class="mono" id="http-timeout" value="${cfg.http_timeout_s||10}"></div>
+      </div></div>
+    </details>
+    <button class="btn primary" id="save-settings" style="margin:14px 0 30px">${esc(t("save"))}</button>`;
 
   const rulesBox = document.getElementById("sort-rules");
   const addRule = (path = "", by = "") => {
@@ -653,7 +730,7 @@ async function renderSettings() {
       },
       noise: { response_paths: lines("ns-resp"), columns: lines("ns-cols"), tables_ignore: lines("ns-tables") },
       compare: { sort_arrays: rules },
-      http_timeout_s: cfg.http_timeout_s || 10,
+      http_timeout_s: +document.getElementById("http-timeout").value || 10,
       compare_headers: cfg.compare_headers || [],
       report: cfg.report || {dir: "./report"},
       corpus: cfg.corpus || {dir: "./corpus"},
