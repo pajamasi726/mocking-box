@@ -64,22 +64,22 @@ func main() {
 }
 
 func cmdCollect(args []string) int {
-	if len(args) == 0 {
-		usage()
-		return 2
+	// 기본 = 사이드카 스니핑. 모드 하위명령은 특수 상황용(고급).
+	if len(args) == 0 || strings.HasPrefix(args[0], "-") {
+		return cmdSniff(args)
 	}
 	switch args[0] {
-	case "proxy":
-		return cmdCollectProxy(args[1:])
 	case "sniff":
 		return cmdSniff(args[1:])
 	case "pcap":
 		return cmdConvert(args[1:])
 	case "mirror":
 		return cmdMirror(args[1:])
+	case "proxy":
+		return cmdCollectProxy(args[1:])
 	default:
-		fmt.Fprintf(os.Stderr, "unknown collect mode %q (proxy|sniff|pcap|mirror)\n", args[0])
-		return 2
+		// 모드 생략하고 바로 플래그를 준 경우
+		return cmdSniff(args)
 	}
 }
 
@@ -132,38 +132,29 @@ func cmdCollectProxy(args []string) int {
 }
 
 func usage() {
-	fmt.Fprint(os.Stderr, `mockingbox — one binary, two roles:
-  mocking-box-collector  (collector …)  records traffic where it flows
-  mocking-box-dashboard  (dashboard)    manages recordings, runs verification, shows results
+	fmt.Fprint(os.Stderr, `mockingbox — verify a backend rewrite behaves like the original.
 
-COLLECTOR — record traffic into a portable recording file, where traffic flows:
-  collect proxy  -c cfg.yaml --listen :9090 --out r.golden.jsonl   dev/staging: in-path proxy;
-                                                                   the only mode that records
-                                                                   per-request DB write-sets
-  collect sniff  --iface eth0 --port 8080 --out r.golden.jsonl     prod: passive NIC tap
-                                                                   (root or CAP_NET_RAW)
-  collect pcap   --pcap dump.pcap --port 8080 --out r.golden.jsonl prod: convert a tcpdump file
-                                                                   (nothing installed on prod)
-  collect mirror --listen :4789 --port 8080 --out r.golden.jsonl   prod: AWS VPC Traffic
-                                                                   Mirroring receiver (VXLAN)
+Two things run:
+  dashboard   the console + verifier (one place; open it in a browser)
+  collect     a sidecar that records traffic where it flows, and sends it to the dashboard
 
-VERIFIER — prepare the DB, replay a recording, grade the new stack:
-  seed      -c cfg.yaml --from host:port [--from-user u --from-password p]
-            [--schemas a,b] [--exclude-tables huge_blob] [--golden r.golden.jsonl]
-            copies schemas+data from a source MySQL (PITR temp instance / dev DB)
-            into new.mysql — tables created automatically, seed marker recorded
-  verify    -c cfg.yaml --golden r.golden.jsonl [--baseline run.json]  new stack only, vs answer sheet
-  run       -c cfg.yaml --corpus r.jsonl                               live-parallel: old AND new
-  dashboard -c cfg.yaml [--addr :8642] [--token s]                     web console: results, health,
-                                                                       collector registry, config
+Typical use (assumes an internal/trusted network):
 
-  Collectors register OUTBOUND to the dashboard (--dashboard http://host:8642 --token s):
-  live status turns green/yellow/red and finished recordings upload automatically.
-  No connectivity? run collectors standalone and import the file in the dashboard.
+  # 1) on the box that will hold the console + the new stack:
+  mockingbox dashboard -c config.yaml
+        → open http://<this-host>:8642, fill in the new stack + seed source, click Seed
 
-  --out *.golden.jsonl = answer sheet included (responses; +write-sets in proxy mode)
-  --out *.jsonl        = requests only (for live-parallel runs)
-  --sample 0.3         = keep 30% of reads; writes are always kept (state fidelity)
+  # 2) next to the running old service (its port is 8080 here):
+  mockingbox collect --port 8080 --out rec.golden.jsonl --dashboard http://<console>:8642
+        → records passively (never in the request path); uploads when done
+
+  # 3) back in the dashboard: pick the recording, click Verify. Done.
+
+More:
+  verify/run  run a verification from the CLI instead of the dashboard button
+  collect pcap|mirror|proxy   other capture sources (tcpdump file / AWS mirror / dev proxy)
+  seed        seed the DB from the CLI instead of the dashboard button
+  run 'mockingbox <cmd> -h' for flags
 `)
 }
 
@@ -233,17 +224,25 @@ func cmdVerify(args []string) int {
 
 func cmdSniff(args []string) int {
 	fs := flag.NewFlagSet("sniff", flag.ExitOnError)
-	iface := fs.String("iface", "", "network interface (required, e.g. eth0 / lo0)")
-	port := fs.Int("port", 0, "service TCP port (required)")
+	iface := fs.String("iface", "", "network interface (default: auto-detect primary)")
+	port := fs.Int("port", 0, "service TCP port to listen for (required)")
 	out := fs.String("out", "", "output file: .jsonl (requests) or .golden.jsonl (required)")
 	duration := fs.Duration("duration", 0, "stop after this long (default: until Ctrl-C)")
 	sample := fs.Float64("sample", 1.0, "keep this fraction of READ exchanges (writes always kept)")
 	sampleWrites := fs.Bool("sample-writes-too", false, "also sample non-GET requests (breaks state replay!)")
 	dashboard, token, name := agentFlags(fs)
 	fs.Parse(args)
-	if *iface == "" || *port == 0 || *out == "" {
+	if *port == 0 || *out == "" {
 		fs.Usage()
 		return 2
+	}
+	if *iface == "" {
+		detected, err := sniff.DefaultInterface()
+		if err != nil {
+			log.Fatalf("interface auto-detect failed (%v) — pass --iface", err)
+		}
+		*iface = detected
+		log.Printf("interface: %s (auto)", *iface)
 	}
 	output, err := sniff.NewOutput(*out, "sniff://"+*iface)
 	if err != nil {

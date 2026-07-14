@@ -53,6 +53,17 @@ type Corpus struct {
 	Dir string `yaml:"dir"`
 }
 
+// SeedSource: 검증 DB를 채울 원본 (dev DB / read replica / 복원 인스턴스).
+// 접속만 하면 되는 이미 존재하는 DB — 대시보드 [시딩] 버튼이 사용.
+type SeedSource struct {
+	Host     string   `yaml:"host"`
+	Port     int      `yaml:"port"`
+	User     string   `yaml:"user"`
+	Password string   `yaml:"password"`
+	Schemas  []string `yaml:"schemas"`
+	Exclude  []string `yaml:"exclude_tables"`
+}
+
 // SortRule: sort matching arrays before response comparison (mapper-dependent
 // ordering). By is an element key, or "$canonical" for whole-element sort.
 type SortRule struct {
@@ -74,6 +85,7 @@ type Config struct {
 	CompareHeaders []string    `yaml:"compare_headers"`
 	Report         Report      `yaml:"report"`
 	Corpus         Corpus      `yaml:"corpus"`
+	SeedSource     *SeedSource `yaml:"seed_source"`
 }
 
 func Load(path string) (*Config, error) {

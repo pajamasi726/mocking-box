@@ -155,3 +155,23 @@ func decapVXLAN(pkt gopacket.Packet) gopacket.Packet {
 	}
 	return decapVXLANPayload(udpLayer.LayerPayload())
 }
+
+// DefaultInterface picks the primary non-loopback interface for --iface auto.
+func DefaultInterface() (string, error) {
+	ifaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range ifaces {
+		if iface.Flags&net.FlagUp == 0 || iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+		addrs, _ := iface.Addrs()
+		for _, a := range addrs {
+			if ipnet, ok := a.(*net.IPNet); ok && ipnet.IP.To4() != nil {
+				return iface.Name, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("no active non-loopback interface")
+}

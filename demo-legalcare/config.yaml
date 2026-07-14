@@ -27,3 +27,10 @@ compare:
 
 report: { dir: "./report" }
 corpus: { dir: "./corpus" }
+
+seed_source:
+  host: 127.0.0.1
+  port: 13306
+  user: root
+  password: root
+  schemas: [lawkit]

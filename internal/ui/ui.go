@@ -44,6 +44,17 @@ type Server struct {
 	recorder *capture.Recorder
 	replayMu sync.Mutex
 	replayST replayStatus
+	seedMu   sync.Mutex
+	seedST   seedStatus
+}
+
+type seedStatus struct {
+	Running bool   `json:"running"`
+	Done    bool   `json:"done"`
+	Log     string `json:"log"`
+	Error   string `json:"error,omitempty"`
+	Tables  int    `json:"tables"`
+	Rows    int64  `json:"rows"`
 }
 
 type replayStatus struct {
@@ -91,6 +102,8 @@ func Serve(addr, configPath, token string) error {
 	mux.HandleFunc("POST /api/agents/upload", s.agentUpload)
 	mux.HandleFunc("POST /api/corpora/upload", s.corpusUpload)
 	mux.HandleFunc("GET /api/health", s.healthCheck)
+	mux.HandleFunc("GET /api/seed/status", s.seedStatusHandler)
+	mux.HandleFunc("POST /api/seed/start", s.seedStart)
 
 	return http.ListenAndServe(addr, mux)
 }
@@ -236,6 +249,21 @@ func configToJSON(cfg *config.Config) map[string]any {
 		"compare_headers": orEmpty(cfg.CompareHeaders),
 		"report":          map[string]any{"dir": cfg.Report.Dir},
 		"corpus":          map[string]any{"dir": cfg.Corpus.Dir},
+		"seed_source":     seedSourceJSON(cfg.SeedSource),
+	}
+}
+
+func seedSourceJSON(src *config.SeedSource) map[string]any {
+	if src == nil {
+		return map[string]any{"host": "", "port": 3306, "user": "", "password": "", "schemas": []string{}, "exclude_tables": []string{}}
+	}
+	port := src.Port
+	if port == 0 {
+		port = 3306
+	}
+	return map[string]any{
+		"host": src.Host, "port": port, "user": src.User, "password": src.Password,
+		"schemas": orEmpty(src.Schemas), "exclude_tables": orEmpty(src.Exclude),
 	}
 }
 
