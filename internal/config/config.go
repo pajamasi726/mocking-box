@@ -155,8 +155,12 @@ func Load(path string) (*Config, error) {
 	// legacy shorthand: `mysql:` (+ top-level seed_source) → a single datastore
 	promoteLegacy(&cfg.Old, nil)
 	promoteLegacy(&cfg.New, cfg.SeedSource)
-	normalizeDatastores(cfg.Old.Datastores)
-	normalizeDatastores(cfg.New.Datastores)
+	if err := normalizeDatastores(cfg.Old.Datastores); err != nil {
+		return nil, err
+	}
+	if err := normalizeDatastores(cfg.New.Datastores); err != nil {
+		return nil, err
+	}
 	if cfg.Attribution.QuietMs == 0 {
 		cfg.Attribution.QuietMs = 300
 	}
@@ -202,10 +206,13 @@ func promoteLegacy(stack *Stack, seedSource *SeedSource) {
 	stack.MySQL = nil
 }
 
-func normalizeDatastores(datastores []*Datastore) {
+func normalizeDatastores(datastores []*Datastore) error {
 	for i, d := range datastores {
 		if d.Type == "" {
 			d.Type = "mysql"
+		}
+		if d.Type != "mysql" {
+			return fmt.Errorf("datastore %q: type %q는 아직 지원되지 않습니다 (현재 mysql만)", d.Name, d.Type)
 		}
 		if d.Port == 0 {
 			d.Port = 3306
@@ -217,4 +224,5 @@ func normalizeDatastores(datastores []*Datastore) {
 			d.SeedFrom.Port = 3306
 		}
 	}
+	return nil
 }

@@ -212,7 +212,7 @@ const MSG = {
     new_url_label: "검증 대상 서버 (신) Base URL",
     old_stack: "기준 서버 (구 — 녹화 대상)", new_stack: "검증 대상 서버 (신)",
     base_url: "Base URL",
-    db_pair_ref: "기준(구) DB — 시딩 원본", db_pair_new: "검증대상(신) DB — 시딩 대상",
+    db_type: "종류", soon: "준비중", db_pair_ref: "기준(구) DB — 복사 원본", db_pair_new: "검증대상(신) DB — 복사 대상",
     db_pair_hint: "이름이 같은 구↔신끼리 비교·시딩됩니다. DB가 하나면 이름은 자동입니다.",
     mysql_title: "MySQL (write-set 검증용 — 비우면 응답만 비교)",
     mysql_host: "호스트", mysql_port: "포트", mysql_user: "사용자", mysql_password: "비밀번호",
@@ -238,11 +238,11 @@ const MSG = {
     imported: "가져왔습니다",
     health_title: "연결 상태",
     h_old_api: "기준 API", h_new_api: "검증 API", h_old_db: "기준 DB", h_new_db: "검증 DB",
-    tab_seed: "DB 준비", seed_title: "검증 DB 준비 (시딩)",
-    seed_desc: "검증 대상의 각 DB를 원본과 같은 상태로 채웁니다. 원본 접속 정보를 넣고 [탐색]으로 스키마·테이블을 확인한 뒤 체크한 것만 복사합니다 (테이블 생성 포함).",
+    tab_seed: "DB 복사", seed_title: "검증 DB 복사 (구 → 신)",
+    seed_desc: "검증 대상(신) DB를 기준(구) DB와 같은 상태로 복사합니다. [탐색]으로 스키마·테이블을 확인하고 체크한 것만 복사합니다 (테이블 생성 포함). 채점 전에 양쪽 출발선을 맞추는 단계입니다.",
     seed_src: "원본 DB (dev/복제본/복원 인스턴스 — 접속만 되면 됨)",
-    seed_run: "전체 시딩 실행", seeding: "시딩 중…", seed_done: "시딩 완료",
-    no_new_ds: "검증 대상 DB가 없습니다 — [설정] 탭에서 datastore를 추가하세요",
+    seed_run: "구 → 신 복사 실행", seeding: "복사 중…", seed_done: "복사 완료",
+    no_new_ds: "검증 대상 DB가 없습니다 — [설정] 탭에서 추가하세요",
     discover: "탐색", discovering: "탐색 중…", discover_hint: "접속해서 스키마·테이블 목록을 불러옵니다",
     pick_schemas: "복사할 스키마·테이블 (체크 해제 = 제외)",
     ds_name: "이름 (구/신 매칭 키)", ds_add: "+ DB 추가", ds_remove: "삭제",
@@ -293,7 +293,7 @@ const MSG = {
     new_url_label: "Server under test (new) Base URL",
     old_stack: "Reference server (old — recording target)", new_stack: "Server under test (new)",
     base_url: "Base URL",
-    db_pair_ref: "Reference (old) DB — seed source", db_pair_new: "DB under test (new) — seed target",
+    db_type: "Type", soon: "soon", db_pair_ref: "Reference (old) DB — copy source", db_pair_new: "DB under test (new) — copy target",
     db_pair_hint: "Same-named old↔new are compared & seeded together. With one DB the name is automatic.",
     mysql_title: "MySQL (for write-set verification — leave empty to compare responses only)",
     mysql_host: "Host", mysql_port: "Port", mysql_user: "User", mysql_password: "Password",
@@ -319,10 +319,10 @@ const MSG = {
     imported: "Imported",
     health_title: "Connections",
     h_old_api: "Reference API", h_new_api: "API under test", h_old_db: "Reference DB", h_new_db: "DB under test",
-    tab_seed: "Prepare DB", seed_title: "Prepare the verification DB (seed)",
-    seed_desc: "Fills each DB under test with the same state as the original. Enter the source connection, click Discover to see schemas/tables, then only the checked ones are copied (tables created for you).",
+    tab_seed: "Copy DB", seed_title: "Copy into the verification DB (old → new)",
+    seed_desc: "Copies the reference (old) DB into the DB under test (new) so both start from the same data. Click Discover, then only checked schemas/tables are copied (tables created for you).",
     seed_src: "Source DB (dev / replica / restored instance — just needs to be reachable)",
-    seed_run: "Seed all", seeding: "Seeding…", seed_done: "Seed complete",
+    seed_run: "Copy old → new", seeding: "Copying…", seed_done: "Copy complete",
     no_new_ds: "No DB under test — add a datastore in the Settings tab",
     discover: "Discover", discovering: "Discovering…", discover_hint: "Connect and load the schema/table list",
     pick_schemas: "Schemas & tables to copy (unchecked = excluded)",
@@ -936,10 +936,16 @@ async function renderSettings() {
 
   // old↔new DB pairs (one row = reference conn + target conn, matched by name)
   const pairsBox = document.getElementById("db-pairs");
+  const typeOptions = sel => ["mysql","postgres","mongodb"].map(tp =>
+    `<option value="${tp}" ${sel===tp?"selected":""} ${tp!=="mysql"?"disabled":""}>${tp==="mysql"?"MySQL / MariaDB":tp==="postgres"?"PostgreSQL ("+t("soon")+")":"MongoDB ("+t("soon")+")"}</option>`).join("");
   const connFields = (side, d) => `
     <div class="row" style="margin-top:4px">
+      <div style="max-width:150px"><label>${esc(t("db_type"))}</label>
+        <select class="mono ${side}-type">${typeOptions(d.type||"mysql")}</select></div>
       <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono ${side}-host" value="${esc(d.host||"127.0.0.1")}"></div>
-      <div style="max-width:78px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono ${side}-port" value="${d.port||3306}"></div>
+      <div style="max-width:72px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono ${side}-port" value="${d.port||3306}"></div>
+    </div>
+    <div class="row" style="margin-top:4px">
       <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono ${side}-user" value="${esc(d.user||"")}"></div>
       <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono ${side}-pw" value="${esc(d.password||"")}"></div>
     </div>`;
@@ -997,6 +1003,7 @@ async function renderSettings() {
       let name = row.querySelector(".pair-name").value.trim();
       if (!name) name = pairRows.length > 1 ? "db" + (i+1) : "default";
       const conn = side => ({
+        type: row.querySelector(`.${side}-type`).value || "mysql",
         host: row.querySelector(`.${side}-host`).value.trim(),
         port: +row.querySelector(`.${side}-port`).value || 3306,
         user: row.querySelector(`.${side}-user`).value.trim(),
@@ -1004,12 +1011,12 @@ async function renderSettings() {
       });
       const ref = conn("ref"), tgt = conn("tgt");
       if (ref.host) {
-        const d = { name, type: "mysql", ...ref };
+        const d = { name, ...ref };
         if (row._schemas) d.schemas = row._schemas;
         if (row._exclude) d.exclude_tables = row._exclude;
         oldDS.push(d);
       }
-      if (tgt.host) newDS.push({ name, type: "mysql", ...tgt });
+      if (tgt.host) newDS.push({ name, ...tgt });
     });
     const stack = key => ({
       base_url: document.getElementById(`${key}-url`).value.trim(),
