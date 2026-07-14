@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -185,7 +186,7 @@ func (s *Server) pollSeed() (string, error) {
 		json.Unmarshal(data, &st)
 		if !st.Running {
 			if st.Error != "" {
-				return "", fmt.Errorf(st.Error)
+				return "", errors.New(st.Error)
 			}
 			return fmt.Sprintf("copy complete: %d tables, %d rows into the verification DB", st.Tables, st.Rows), nil
 		}
@@ -210,7 +211,7 @@ func (s *Server) pollReplay() (string, error) {
 		json.Unmarshal(data, &st)
 		if !st.Running {
 			if st.LastError != "" {
-				return "", fmt.Errorf(st.LastError)
+				return "", errors.New(st.LastError)
 			}
 			if st.LastReport != "" {
 				rep, _ := s.get("/api/run?file=" + url.QueryEscape(st.LastReport))
