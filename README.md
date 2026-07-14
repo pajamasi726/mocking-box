@@ -5,12 +5,14 @@ Replays captured HTTP traffic against an *old* and a *new* implementation, then 
 **responses** AND **per-request DB write-sets** — so it keeps working even when the
 framework/ORM changed completely (jOOQ → MyBatis, monolith consolidation, language port, …).
 
-> Why not Keploy? Keploy records DB *wire-protocol* traffic as mocks, so replay breaks the
-> moment your new ORM emits different SQL. mocking-box never looks at SQL text: it compares
-> the **row changes** each request actually committed, read from the MySQL ROW binlog —
-> the same mechanism Debezium uses. Different SQL, same effect ⇒ MATCH.
+Single Go binary. Zero code changes in the systems under test. Any language, any framework.
+
+> **Why not Keploy?** Keploy records DB *wire-protocol* traffic as mocks, so replay breaks
+> the moment your new ORM emits different SQL. mocking-box never looks at SQL text: it
+> compares the **row changes** each request actually committed, read from the MySQL ROW
+> binlog — the same mechanism Debezium uses. Different SQL, same effect ⇒ `MATCH`.
 > See [research/01](research/01-differential-testing-tools.md) (tool landscape) and
-> [research/02](research/02-architecture.md) (architecture) for the full story.
+> [research/02](research/02-architecture.md) (architecture).
 
 ## How it works
 
@@ -30,42 +32,49 @@ corpus (JSONL/HAR) ──▶ Replayer ──▶ old stack ──▶ MySQL-old �
 4. Write-sets are canonicalized (changed columns only, noise columns dropped,
    order-insensitive) and compared.
 
-The target apps need **zero code changes**, any language/framework. Both MySQL instances
-should start from the **same seed/snapshot** so auto-increment counters line up.
-
-## Requirements
-
-- Python 3.11+
-- MySQL 5.7/8.x with ROW binlog. Recommended flags (see `demo/mysql/my.cnf`):
-  ```
-  binlog_format=ROW  binlog_row_image=FULL  binlog_row_metadata=FULL
-  binlog_rows_query_log_events=ON   # optional: attaches SQL text for Level-1 attribution
-  ```
-- A MySQL user with `REPLICATION SLAVE, REPLICATION CLIENT` (+ `PROCESS` for quiesce checks).
+Both MySQL instances should start from the **same seed/snapshot** so auto-increment
+counters line up.
 
 ## Quickstart (self-contained demo)
 
 The demo spins up two MySQL instances and two deliberately different wallet apps:
 the "old" one uses relative `UPDATE balance = balance + ?`, the "new" one uses
 `SELECT ... FOR UPDATE` + absolute update — plus one **planted bug** (withdraw
-forgets the history INSERT, while returning a perfectly identical HTTP response).
+forgets the history INSERT while returning a perfectly identical HTTP response).
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -e .
+go build -o bin/mockingbox ./cmd/mockingbox
+
 cd demo
 docker compose up -d --build
-../.venv/bin/mockingbox run -c config.yaml --corpus corpus.jsonl
+../bin/mockingbox run -c config.yaml --corpus corpus.jsonl
+../bin/mockingbox ui  --report-dir ./report        # → http://localhost:8642
 ```
 
-Expected output: 7 × `MATCH` (different SQL, same behavior) and 1 × `WRITESET_DIFF`
-pinpointing the missing `wallet_history` INSERT. Exit code is non-zero on any
-divergence, so it slots straight into CI.
+Expected: 7 × `MATCH` (different SQL, same behavior) and 1 × `WRITESET_DIFF`
+pinpointing the missing `wallet_history` INSERT. Non-zero exit on any divergence,
+so it slots straight into CI.
 
-Reset the demo state between runs (identical snapshots matter):
+Reset demo state between runs (identical snapshots matter):
 
 ```bash
 docker compose down -v && docker compose up -d
 ```
+
+## Dashboard
+
+`mockingbox ui` serves an embedded dashboard (no external assets): run history,
+verdict tiles, per-request results, and side-by-side write-set / response diffs.
+
+## Requirements
+
+- MySQL 5.7/8.x with ROW binlog. Recommended flags (see `demo/mysql/my.cnf`):
+  ```
+  binlog_format=ROW  binlog_row_image=FULL  binlog_row_metadata=FULL
+  binlog_rows_query_log_events=ON   # optional: attaches SQL text per change
+  ```
+- A MySQL user with `REPLICATION SLAVE, REPLICATION CLIENT` (+ `PROCESS` for quiesce checks).
+- Go 1.23+ to build (release binaries later).
 
 ## Configuration
 
@@ -95,42 +104,39 @@ Omit a stack's `mysql:` block to run response-diff only (no write-set capture).
 
 - **JSONL** (native): one request per line —
   `{"name": "charge", "method": "POST", "path": "/wallet/3/charge", "body": {"amount": 5000}}`
-- **HAR**: any browser/proxy capture (`mockingbox run --corpus traffic.har ...`)
-- Converters for Keploy YAML / GoReplay `.gor` files: planned (v0.2).
+- **HAR**: any browser/proxy capture
+- Converters for Keploy YAML / GoReplay `.gor`: planned (v0.2)
 
 ## Current limitations (v0.1)
 
 - **Attribution is Level 0** (sequential + quiesce window): fire-and-forget async writes
-  that commit *after* the window may be attributed to the next request. A warning is
-  logged when changes arrive between windows. Level 1 (trace-id in SQL comments via
-  OTel/SQLCommenter, recovered from `Rows_query` binlog events) is wired but not exposed yet.
-- Generated-ID drift: if a write bug makes auto-increment counters diverge, subsequent
-  inserts report pk mismatches (cascade). Fix the first divergence and rerun; pk-mapping
-  normalization is planned (v0.3).
-- MySQL/MariaDB only for write-sets (Postgres via logical decoding / Debezium: v0.4).
-- External side effects (mail, HTTP calls to third parties) are out of scope — pair with
-  an egress mock/recorder if needed.
+  that commit *after* the window may be attributed to the next request (a warning is
+  logged). Level 1 — trace-id in SQL comments via OTel/SQLCommenter, recovered from
+  `Rows_query` binlog events — is wired in the capture layer but not exposed yet.
+- Generated-ID drift: once a write bug makes auto-increment counters diverge, subsequent
+  inserts report pk mismatches (cascade). Fix the first divergence and rerun.
+- MySQL/MariaDB only for write-sets (Postgres via logical decoding: roadmap).
+- External side effects (mail, third-party HTTP) are out of scope — pair with an egress
+  recorder if needed.
 
 ## Roadmap
 
 | version | scope |
 |---|---|
-| v0.2 | noise auto-learning (replay old twice, collect self-mismatches), end-of-scenario full-state hash safety net, Keploy/GoReplay corpus converters, HTML report |
-| v0.3 | Level-1 attribution (rid/SQLCommenter), generated-ID mapping, `{{last_created_id}}` templating for scenario chaining |
-| v0.4 | Debezium-based capture (Postgres, etc.), parallel scenario lanes |
-
-## Running the box itself in Docker
-
-```bash
-docker build -t mocking-box .
-docker run --rm --network host \
-  -v $PWD/demo/config.yaml:/config.yaml -v $PWD/demo/corpus.jsonl:/corpus.jsonl \
-  -v $PWD/report:/report \
-  mocking-box run -c /config.yaml --corpus /corpus.jsonl
-```
+| v0.2 | traffic **capture** proxy mode, noise auto-learning, Keploy/GoReplay corpus converters, end-of-run full-state hash safety net |
+| v0.3 | Level-1 attribution (rid/SQLCommenter), generated-ID mapping, `{{last_created_id}}` scenario templating |
+| v0.4 | Postgres (logical decoding), parallel scenario lanes, GoReleaser distribution (brew/docker) |
 
 ## Development
 
 ```bash
-.venv/bin/python -m pytest tests/   # diff-engine unit tests, no DB needed
+go test ./...        # diff-engine unit tests, no DB needed
+go vet ./...
 ```
+
+`poc/python/` contains the original Python proof-of-concept that validated the
+architecture end-to-end; the Go implementation is the product line.
+
+## License
+
+Apache-2.0 (to be added before first public release).

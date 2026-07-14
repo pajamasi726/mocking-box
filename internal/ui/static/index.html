@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>mocking-box</title>
+<style>
+  :root {
+    --surface: #fcfcfb;
+    --surface-2: #f4f4f1;
+    --ink: #1d1d1b;
+    --ink-2: #5b5b56;
+    --ink-3: #8e8e87;
+    --border: rgba(11,11,11,0.10);
+    --hairline: #e1e0d9;
+    --good: #0ca30c;       --good-text: #006300;
+    --warning: #fab219;    --warning-text: #7a5200;
+    --critical: #d03b3b;   --critical-text: #a12525;
+    --accent: #1d1d1b;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface: #1a1a19;
+      --surface-2: #232322;
+      --ink: #ececea;
+      --ink-2: #a8a8a2;
+      --ink-3: #7a7a74;
+      --border: rgba(255,255,255,0.10);
+      --hairline: #2c2c2a;
+      --good-text: #2fbf2f;
+      --warning-text: #fab219;
+      --critical-text: #e06060;
+      --accent: #ececea;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--surface); color: var(--ink);
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    display: flex; align-items: baseline; gap: 12px;
+    padding: 14px 20px; border-bottom: 1px solid var(--hairline);
+  }
+  header h1 { font-size: 16px; margin: 0; letter-spacing: -0.01em; }
+  header .sub { color: var(--ink-3); font-size: 12.5px; }
+  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 49px); }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } aside { border-right: none !important; border-bottom: 1px solid var(--hairline); } }
+
+  aside { border-right: 1px solid var(--hairline); padding: 12px; }
+  aside h2, main h2 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--ink-3); margin: 8px 4px; font-weight: 600;
+  }
+  .run {
+    width: 100%; text-align: left; display: block; padding: 10px 12px; margin-bottom: 6px;
+    border: 1px solid var(--border); border-radius: 8px; background: transparent;
+    color: inherit; cursor: pointer; font: inherit;
+  }
+  .run:hover { background: var(--surface-2); }
+  .run.active { background: var(--surface-2); border-color: var(--ink-3); }
+  .run .when { font-family: var(--mono); font-size: 12.5px; }
+  .run .chips { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+
+  main { padding: 16px 20px; min-width: 0; }
+  .tiles { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tile {
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 128px;
+    background: var(--surface);
+  }
+  .tile .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+  .tile .value { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  .verdict { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .verdict .dot { width: 7px; height: 7px; }
+  .v-MATCH        { color: var(--good-text); }     .v-MATCH .dot        { background: var(--good); }
+  .v-ERROR        { color: var(--warning-text); }  .v-ERROR .dot        { background: var(--warning); }
+  .v-RESPONSE_DIFF, .v-WRITESET_DIFF, .v-BOTH_DIFF { color: var(--critical-text); }
+  .v-RESPONSE_DIFF .dot, .v-WRITESET_DIFF .dot, .v-BOTH_DIFF .dot { background: var(--critical); }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px;
+    border-radius: 999px; border: 1px solid var(--border); font-size: 11.5px;
+    font-family: var(--mono); font-variant-numeric: tabular-nums;
+  }
+
+  table.results { width: 100%; border-collapse: collapse; }
+  table.results th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--ink-3); font-weight: 600; padding: 6px 10px; border-bottom: 1px solid var(--hairline);
+  }
+  table.results td { padding: 8px 10px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  table.results tr.row { cursor: pointer; }
+  table.results tr.row:hover td { background: var(--surface-2); }
+  table.results tr.row.open td { background: var(--surface-2); }
+  td.mono, .mono { font-family: var(--mono); font-size: 12.5px; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-3); }
+
+  .detail { padding: 14px; background: var(--surface-2); border-radius: 0 0 8px 8px; }
+  .detail h3 { font-size: 12px; margin: 14px 0 6px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .detail h3:first-child { margin-top: 0; }
+  table.diffs { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+  table.diffs th { text-align: left; color: var(--ink-3); font-weight: 600; padding: 4px 8px; }
+  table.diffs td { padding: 4px 8px; border-top: 1px solid var(--hairline); word-break: break-all; }
+  table.diffs td.old { color: var(--critical-text); }
+  table.diffs td.new { color: var(--good-text); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+  .pane { min-width: 0; }
+  .pane .pane-title { font-size: 11.5px; color: var(--ink-2); margin-bottom: 4px; font-family: var(--mono); }
+  pre {
+    margin: 0; padding: 10px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.45;
+    max-height: 360px;
+  }
+  .empty { color: var(--ink-3); padding: 40px 0; text-align: center; }
+  details.raw summary { cursor: pointer; color: var(--ink-2); font-size: 12.5px; margin: 10px 0 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>mocking-box</h1>
+  <span class="sub">old ↔ new differential report</span>
+  <span class="sub" id="run-meta" style="margin-left:auto"></span>
+</header>
+<div class="layout">
+  <aside>
+    <h2>Runs</h2>
+    <div id="runs"><div class="empty">loading…</div></div>
+  </aside>
+  <main id="main"><div class="empty">no run selected</div></main>
+</div>
+
+<script>
+const VERDICTS = ["MATCH", "RESPONSE_DIFF", "WRITESET_DIFF", "BOTH_DIFF", "ERROR"];
+let currentFile = null;
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtVal = v => {
+  if (v === null || v === undefined) return "null";
+  return typeof v === "string" ? v : JSON.stringify(v);
+};
+const pretty = s => {
+  if (!s) return "(empty)";
+  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
+};
+const verdictHTML = v => `<span class="verdict v-${esc(v)}"><span class="dot"></span>${esc(v)}</span>`;
+
+async function loadRuns() {
+  const runs = await (await fetch("/api/runs")).json();
+  const box = document.getElementById("runs");
+  if (!runs.length) {
+    box.innerHTML = `<div class="empty">no reports yet<br><span class="mono">mockingbox run …</span></div>`;
+    return;
+  }
+  box.innerHTML = runs.map(r => {
+    const bad = (r.summary.RESPONSE_DIFF||0)+(r.summary.WRITESET_DIFF||0)+(r.summary.BOTH_DIFF||0);
+    const err = r.summary.ERROR||0;
+    const when = (r.generated_at||r.file).replace("T"," ").slice(0,19);
+    return `<button class="run" data-file="${esc(r.file)}">
+      <div class="when">${esc(when)}</div>
+      <div class="chips">
+        <span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${r.summary.MATCH||0}</span>
+        ${bad ? `<span class="chip v-BOTH_DIFF"><span class="dot" style="background:var(--critical)"></span>${bad} diff</span>` : ""}
+        ${err ? `<span class="chip v-ERROR"><span class="dot" style="background:var(--warning)"></span>${err} err</span>` : ""}
+        <span class="chip muted">${r.total} reqs</span>
+      </div>
+    </button>`;
+  }).join("");
+  box.querySelectorAll(".run").forEach(el =>
+    el.addEventListener("click", () => loadRun(el.dataset.file)));
+  loadRun(runs[0].file);
+}
+
+async function loadRun(file) {
+  currentFile = file;
+  document.querySelectorAll(".run").forEach(el =>
+    el.classList.toggle("active", el.dataset.file === file));
+  const run = await (await fetch(`/api/run?file=${encodeURIComponent(file)}`)).json();
+  document.getElementById("run-meta").textContent =
+    `${run.old_base_url} ↔ ${run.new_base_url}`;
+
+  const s = run.summary || {};
+  const total = (run.results||[]).length;
+  const tiles = [
+    { label: "requests", value: total, dot: "var(--ink-3)" },
+    { label: "match", value: s.MATCH||0, dot: "var(--good)" },
+    { label: "diff", value: (s.RESPONSE_DIFF||0)+(s.WRITESET_DIFF||0)+(s.BOTH_DIFF||0), dot: "var(--critical)" },
+    { label: "error", value: s.ERROR||0, dot: "var(--warning)" },
+  ];
+
+  const rows = (run.results||[]).map((r, i) => {
+    const first = (r.differences||[])[0];
+    const detail = r.error ? esc(r.error)
+      : first ? `${esc(first.path)}: ${esc(fmtVal(first.old))} → ${esc(fmtVal(first.new))}` +
+                (r.differences.length > 1 ? ` <span class="muted">(+${r.differences.length-1})</span>` : "")
+      : "";
+    return `
+    <tr class="row" data-i="${i}">
+      <td class="num muted">${i+1}</td>
+      <td>${esc(r.name)}</td>
+      <td class="mono">${esc(r.request)}</td>
+      <td>${verdictHTML(r.verdict)}</td>
+      <td class="mono">${esc(r.old_status ?? "—")}/${esc(r.new_status ?? "—")}</td>
+      <td class="num mono">${(r.old_writeset||[]).length}/${(r.new_writeset||[]).length}</td>
+      <td class="mono muted" style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${detail}</td>
+    </tr>
+    <tr class="detail-row" data-i="${i}" hidden><td colspan="7"><div class="detail" id="detail-${i}"></div></td></tr>`;
+  }).join("");
+
+  document.getElementById("main").innerHTML = `
+    <div class="tiles">${tiles.map(t => `
+      <div class="tile">
+        <div class="label"><span class="dot" style="background:${t.dot}"></span>${t.label}</div>
+        <div class="value">${t.value}</div>
+      </div>`).join("")}
+    </div>
+    <h2>Results — ${esc(run.corpus||"")}</h2>
+    <table class="results">
+      <thead><tr><th>#</th><th>name</th><th>request</th><th>verdict</th><th>status</th><th>writes</th><th>first difference</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  document.querySelectorAll("tr.row").forEach(el =>
+    el.addEventListener("click", () => toggleDetail(run, +el.dataset.i)));
+
+  const firstBad = (run.results||[]).findIndex(r => r.verdict !== "MATCH");
+  if (firstBad >= 0) toggleDetail(run, firstBad);
+}
+
+function toggleDetail(run, i) {
+  const row = document.querySelector(`tr.row[data-i="${i}"]`);
+  const holder = document.querySelector(`tr.detail-row[data-i="${i}"]`);
+  const isOpen = !holder.hidden;
+  document.querySelectorAll("tr.detail-row").forEach(el => el.hidden = true);
+  document.querySelectorAll("tr.row").forEach(el => el.classList.remove("open"));
+  if (isOpen) return;
+  holder.hidden = false;
+  row.classList.add("open");
+
+  const r = run.results[i];
+  const diffsTable = (r.differences||[]).length ? `
+    <table class="diffs">
+      <thead><tr><th>kind</th><th>path</th><th>old</th><th>new</th></tr></thead>
+      <tbody>${r.differences.map(d => `
+        <tr>
+          <td class="muted">${esc(d.kind)}</td>
+          <td>${esc(d.path)}</td>
+          <td class="old">${esc(fmtVal(d.old))}</td>
+          <td class="new">${esc(fmtVal(d.new))}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>` : `<div class="muted">no differences</div>`;
+
+  const ws = side => (side||[]).length
+    ? JSON.stringify(side, null, 2) : "(no writes)";
+
+  document.getElementById(`detail-${i}`).innerHTML = `
+    <h3>Differences ${verdictHTML(r.verdict)}</h3>
+    ${r.error ? `<div class="mono" style="color:var(--warning-text)">${esc(r.error)}</div>` : diffsTable}
+    <h3>Write-set (old / new)</h3>
+    <div class="cols">
+      <div class="pane"><div class="pane-title">old — ${(r.old_writeset||[]).length} change(s)</div><pre>${esc(ws(r.old_writeset))}</pre></div>
+      <div class="pane"><div class="pane-title">new — ${(r.new_writeset||[]).length} change(s)</div><pre>${esc(ws(r.new_writeset))}</pre></div>
+    </div>
+    <details class="raw">
+      <summary>Response bodies (${esc(r.old_status ?? "—")} / ${esc(r.new_status ?? "—")})</summary>
+      <div class="cols">
+        <div class="pane"><div class="pane-title">old</div><pre>${esc(pretty(r.old_body))}</pre></div>
+        <div class="pane"><div class="pane-title">new</div><pre>${esc(pretty(r.new_body))}</pre></div>
+      </div>
+    </details>`;
+}
+
+loadRuns();
+</script>
+</body>
+</html>

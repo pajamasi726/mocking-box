@@ -1,6 +1,7 @@
+bin/
+report/
+demo/report/
 .venv/
 __pycache__/
 *.egg-info/
-report/
-demo/report/
 .pytest_cache/
