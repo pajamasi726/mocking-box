@@ -19,7 +19,10 @@ const (
 	ResponseDiff = "RESPONSE_DIFF"
 	WritesetDiff = "WRITESET_DIFF"
 	BothDiff     = "BOTH_DIFF"
-	Error        = "ERROR"
+	// Noise: every difference matched the baseline (self-check) fingerprints —
+	// a capture artifact, not a behavior change of the new stack.
+	Noise = "NOISE"
+	Error = "ERROR"
 )
 
 type Difference struct {

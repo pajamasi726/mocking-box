@@ -23,14 +23,16 @@ type Result struct {
 	Request     string            `json:"request"`
 	Verdict     string            `json:"verdict"`
 	Differences []diff.Difference `json:"differences"`
-	OldStatus   int               `json:"old_status,omitempty"`
-	NewStatus   int               `json:"new_status,omitempty"`
-	OldBody     string            `json:"old_body,omitempty"`
-	NewBody     string            `json:"new_body,omitempty"`
-	OldWriteset []diff.WriteEntry `json:"old_writeset"`
-	NewWriteset []diff.WriteEntry `json:"new_writeset"`
-	Error       string            `json:"error,omitempty"`
-	DurationMs  int64             `json:"duration_ms"`
+	// differences that matched the baseline run (capture artifacts)
+	NoiseDifferences []diff.Difference `json:"noise_differences,omitempty"`
+	OldStatus        int               `json:"old_status,omitempty"`
+	NewStatus        int               `json:"new_status,omitempty"`
+	OldBody          string            `json:"old_body,omitempty"`
+	NewBody          string            `json:"new_body,omitempty"`
+	OldWriteset      []diff.WriteEntry `json:"old_writeset"`
+	NewWriteset      []diff.WriteEntry `json:"new_writeset"`
+	Error            string            `json:"error,omitempty"`
+	DurationMs       int64             `json:"duration_ms"`
 }
 
 type stackRuntime struct {

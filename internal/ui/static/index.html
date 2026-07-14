@@ -93,6 +93,7 @@
   .verdict .dot { width: 7px; height: 7px; }
   .v-MATCH { color: var(--good-text); }   .v-MATCH .dot { background: var(--good); }
   .v-ERROR { color: var(--warning-text); } .v-ERROR .dot { background: var(--warning); }
+  .v-NOISE { color: var(--warning-text); } .v-NOISE .dot { background: var(--warning); }
   .v-RESPONSE_DIFF, .v-WRITESET_DIFF, .v-BOTH_DIFF { color: var(--critical-text); }
   .v-RESPONSE_DIFF .dot, .v-WRITESET_DIFF .dot, .v-BOTH_DIFF .dot { background: var(--critical); }
   .chip { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px;
@@ -163,7 +164,8 @@ const MSG = {
     tab_dashboard: "대시보드", tab_capture: "수집", tab_replay: "리플레이", tab_settings: "설정",
     lang_btn: "English",
     runs: "실행 이력", no_runs: "아직 리포트가 없습니다 — 수집 후 리플레이를 실행해보세요",
-    requests: "요청", match: "일치", diff: "불일치", error: "오류",
+    requests: "요청", match: "일치", diff: "불일치", error: "오류", noise: "노이즈",
+    noise_diffs: "노이즈 (기준선 셀프체크와 일치 — 수집 아티팩트)",
     results: "결과", col_name: "이름", col_request: "요청", col_verdict: "판정",
     col_status: "상태코드", col_writes: "쓰기", col_first_diff: "첫 번째 차이",
     differences: "차이점", no_diff: "차이 없음",
@@ -199,7 +201,8 @@ const MSG = {
     tab_dashboard: "Dashboard", tab_capture: "Capture", tab_replay: "Replay", tab_settings: "Settings",
     lang_btn: "한국어",
     runs: "Runs", no_runs: "No reports yet — capture some traffic and run a replay",
-    requests: "requests", match: "match", diff: "diff", error: "error",
+    requests: "requests", match: "match", diff: "diff", error: "error", noise: "noise",
+    noise_diffs: "Noise (matched the baseline self-check — capture artifacts)",
     results: "Results", col_name: "name", col_request: "request", col_verdict: "verdict",
     col_status: "status", col_writes: "writes", col_first_diff: "first difference",
     differences: "Differences", no_diff: "no differences",
@@ -316,6 +319,7 @@ async function loadRun(file) {
     { label: t("requests"), value: total, dot: "var(--ink-3)" },
     { label: t("match"), value: s.MATCH||0, dot: "var(--good)" },
     { label: t("diff"), value: (s.RESPONSE_DIFF||0)+(s.WRITESET_DIFF||0)+(s.BOTH_DIFF||0), dot: "var(--critical)" },
+    { label: t("noise"), value: s.NOISE||0, dot: "var(--warning)" },
     { label: t("error"), value: s.ERROR||0, dot: "var(--warning)" },
   ];
   const rows = (run.results||[]).map((r, i) => {
@@ -362,9 +366,15 @@ function toggleDetail(i) {
       <td class="old">${esc(fmtVal(d.old))}</td><td class="new">${esc(fmtVal(d.new))}</td></tr>`).join("")}</tbody></table>`
     : `<div class="muted">${esc(t("no_diff"))}</div>`;
   const ws = side => (side||[]).length ? JSON.stringify(side, null, 2) : t("no_writes");
+  const noiseTable = (r.noise_differences||[]).length ? `
+    <h3>${esc(t("noise_diffs"))}</h3>
+    <table class="diffs" style="opacity:.6"><tbody>${r.noise_differences.map(d => `
+      <tr><td class="muted">${esc(d.kind)}</td><td>${esc(d.path)}</td>
+      <td>${esc(fmtVal(d.old))}</td><td>${esc(fmtVal(d.new))}</td></tr>`).join("")}</tbody></table>` : "";
   document.getElementById(`detail-${i}`).innerHTML = `
     <h3>${esc(t("differences"))} ${verdictHTML(r.verdict)} <span class="muted" style="text-transform:none">· ${esc(t("duration"))} ${r.duration_ms||0}ms</span></h3>
     ${r.error ? `<div class="mono" style="color:var(--warning-text)">${esc(r.error)}</div>` : diffsTable}
+    ${noiseTable}
     <h3>${esc(t("writeset"))}</h3>
     <div class="cols">
       <div class="pane"><div class="pane-title">old — ${(r.old_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.old_writeset))}</pre></div>

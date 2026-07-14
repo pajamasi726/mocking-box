@@ -75,6 +75,7 @@ func cmdVerify(args []string) int {
 	configPath := fs.String("c", "", "config YAML path (required; only `new` stack is used)")
 	fs.StringVar(configPath, "config", *configPath, "config YAML path")
 	goldenPath := fs.String("golden", "", "golden file (.golden.jsonl) (required)")
+	baselinePath := fs.String("baseline", "", "self-check run report (run-*.json): matching diffs become NOISE")
 	fs.Parse(args)
 	if *configPath == "" || *goldenPath == "" {
 		fs.Usage()
@@ -99,6 +100,14 @@ func cmdVerify(args []string) int {
 	defer verifier.Stop()
 
 	results := verifier.Run(meta, entries)
+	if *baselinePath != "" {
+		baseline, err := report.LoadRun(*baselinePath)
+		if err != nil {
+			log.Fatalf("baseline: %v", err)
+		}
+		noise := report.ApplyBaseline(results, baseline)
+		log.Printf("baseline: %d result(s) reclassified as NOISE (capture artifacts)", noise)
+	}
 	report.PrintConsole(results)
 	path, err := report.WriteJSON(results, cfg.Report.Dir, *goldenPath+" (verify)",
 		"golden:"+*goldenPath, cfg.New.BaseURL)
@@ -108,7 +117,7 @@ func cmdVerify(args []string) int {
 	log.Printf("JSON report: %s", path)
 
 	for _, r := range results {
-		if r.Verdict != diff.Match {
+		if r.Verdict != diff.Match && r.Verdict != diff.Noise {
 			return 1
 		}
 	}
