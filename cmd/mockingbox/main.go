@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pajamasi726/mocking-box/internal/capture"
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/corpus"
 	"github.com/pajamasi726/mocking-box/internal/diff"
@@ -30,12 +31,17 @@ func main() {
 		os.Exit(2)
 	}
 	switch os.Args[1] {
+	// 분석기 (verifier)
 	case "run":
 		os.Exit(cmdRun(os.Args[2:]))
 	case "verify":
 		os.Exit(cmdVerify(os.Args[2:]))
 	case "ui":
 		os.Exit(cmdUI(os.Args[2:]))
+	// 수집기 (collector)
+	case "collect":
+		os.Exit(cmdCollect(os.Args[2:]))
+	// deprecated aliases (pre-collect layout)
 	case "sniff":
 		os.Exit(cmdSniff(os.Args[2:]))
 	case "convert":
@@ -51,22 +57,96 @@ func main() {
 	}
 }
 
+func cmdCollect(args []string) int {
+	if len(args) == 0 {
+		usage()
+		return 2
+	}
+	switch args[0] {
+	case "proxy":
+		return cmdCollectProxy(args[1:])
+	case "sniff":
+		return cmdSniff(args[1:])
+	case "pcap":
+		return cmdConvert(args[1:])
+	case "mirror":
+		return cmdMirror(args[1:])
+	default:
+		fmt.Fprintf(os.Stderr, "unknown collect mode %q (proxy|sniff|pcap|mirror)\n", args[0])
+		return 2
+	}
+}
+
+// cmdCollectProxy runs the dev recording proxy headless (no UI) — for remote
+// staging hosts. With a config file it records full answer sheets (responses
+// + per-request write-sets from the old stack's DB).
+func cmdCollectProxy(args []string) int {
+	fs := flag.NewFlagSet("collect proxy", flag.ExitOnError)
+	configPath := fs.String("c", "", "config YAML (old stack = recording target + its MySQL)")
+	fs.StringVar(configPath, "config", *configPath, "config YAML")
+	listen := fs.String("listen", ":9090", "proxy listen address")
+	upstream := fs.String("upstream", "", "recording target (default: old.base_url from config)")
+	out := fs.String("out", "", "output file: .golden.jsonl (answer sheet) or .jsonl (requests only)")
+	duration := fs.Duration("duration", 0, "stop after this long (default: until Ctrl-C)")
+	fs.Parse(args)
+	if *out == "" {
+		fs.Usage()
+		return 2
+	}
+
+	opts := capture.Options{Golden: golden.IsGoldenFile(*out)}
+	if *configPath != "" {
+		cfg, err := config.Load(*configPath)
+		if err != nil {
+			log.Fatalf("config: %v", err)
+		}
+		if *upstream == "" {
+			*upstream = cfg.Old.BaseURL
+		}
+		if opts.Golden {
+			opts.Source = cfg.Old.MySQL
+			opts.Attribution = cfg.Attribution
+			opts.NoiseColumns = cfg.Noise.Columns
+			opts.TablesIgnore = cfg.Noise.TablesIgnore
+		}
+	}
+	if *upstream == "" {
+		log.Fatalf("--upstream (or -c with old.base_url) is required")
+	}
+
+	rec, err := capture.Start(*listen, *upstream, *out, opts)
+	if err != nil {
+		log.Fatalf("collect proxy: %v", err)
+	}
+	<-stopChannel(*duration)
+	rec.Stop()
+	st := rec.Status()
+	log.Printf("recorded %d exchange(s) -> %s", st.Count, *out)
+	return 0
+}
+
 func usage() {
-	fmt.Fprint(os.Stderr, `mockingbox — differential-testing box for backend rewrites:
-replay captured traffic, diff responses AND per-request DB write-sets.
+	fmt.Fprint(os.Stderr, `mockingbox — one binary, two roles.
 
-Verification:
-  run     -c <config.yaml> --corpus <file.jsonl|.har>     live-parallel: replay against old AND new
-  verify  -c <config.yaml> --golden <file.golden.jsonl>   record&verify: replay against new only
-  ui      -c <config.yaml> [--addr :8642]                 web console (capture, replay, reports, settings)
+COLLECTOR — record traffic into a portable recording file, where traffic flows:
+  collect proxy  -c cfg.yaml --listen :9090 --out r.golden.jsonl   dev/staging: in-path proxy;
+                                                                   the only mode that records
+                                                                   per-request DB write-sets
+  collect sniff  --iface eth0 --port 8080 --out r.golden.jsonl     prod: passive NIC tap
+                                                                   (root or CAP_NET_RAW)
+  collect pcap   --pcap dump.pcap --port 8080 --out r.golden.jsonl prod: convert a tcpdump file
+                                                                   (nothing installed on prod)
+  collect mirror --listen :4789 --port 8080 --out r.golden.jsonl   prod: AWS VPC Traffic
+                                                                   Mirroring receiver (VXLAN)
 
-Passive capture (box philosophy — never in the request path):
-  sniff   --iface <if> --port <p> --out <file>            live NIC capture (root or CAP_NET_RAW)
-  convert --pcap <file.pcap> --port <p> --out <file>      offline: convert a tcpdump capture
-  mirror  --listen :4789 --port <p> --out <file>          AWS VPC Traffic Mirroring receiver (VXLAN)
+VERIFIER — replay a recording and grade the new stack:
+  verify  -c cfg.yaml --golden r.golden.jsonl [--baseline run.json]  new stack only, vs answer sheet
+  run     -c cfg.yaml --corpus r.jsonl                               live-parallel: old AND new
+  ui      -c cfg.yaml [--addr :8642]                                 web console (dashboards, dev proxy)
 
-  --out ending in .golden.jsonl records responses too (Record & Verify);
-  plain .jsonl records requests only (live-parallel corpus).
+  --out *.golden.jsonl = answer sheet included (responses; +write-sets in proxy mode)
+  --out *.jsonl        = requests only (for live-parallel runs)
+  --sample 0.3         = keep 30% of reads; writes are always kept (state fidelity)
 `)
 }
 
