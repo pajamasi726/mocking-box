@@ -43,8 +43,8 @@ func usage() {
 then diff responses AND per-request DB write-sets (framework/ORM agnostic).
 
 Commands:
-  run   -c <config.yaml> --corpus <file.jsonl|.har>   replay and report
-  ui    [--report-dir ./report] [--addr :8642]        dashboard for run reports
+  run   -c <config.yaml> --corpus <file.jsonl|.har>   replay and report (CI mode)
+  ui    -c <config.yaml> [--addr :8642]               web console: capture, replay, reports, settings
 `)
 }
 
@@ -94,12 +94,16 @@ func cmdRun(args []string) int {
 
 func cmdUI(args []string) int {
 	fs := flag.NewFlagSet("ui", flag.ExitOnError)
-	reportDir := fs.String("report-dir", "./report", "directory containing run-*.json reports")
+	configPath := fs.String("c", "config.yaml", "config YAML path")
+	fs.StringVar(configPath, "config", *configPath, "config YAML path")
 	addr := fs.String("addr", ":8642", "listen address")
 	fs.Parse(args)
 
-	log.Printf("mocking-box dashboard: http://localhost%s  (reports: %s)", *addr, *reportDir)
-	if err := ui.Serve(*addr, *reportDir); err != nil {
+	if _, err := config.Load(*configPath); err != nil {
+		log.Fatalf("config: %v", err)
+	}
+	log.Printf("mocking-box console: http://localhost%s  (config: %s)", *addr, *configPath)
+	if err := ui.Serve(*addr, *configPath); err != nil {
 		log.Fatalf("ui: %v", err)
 	}
 	return 0

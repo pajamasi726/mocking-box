@@ -47,8 +47,8 @@ go build -o bin/mockingbox ./cmd/mockingbox
 
 cd demo
 docker compose up -d --build
-../bin/mockingbox run -c config.yaml --corpus corpus.jsonl
-../bin/mockingbox ui  --report-dir ./report        # → http://localhost:8642
+../bin/mockingbox run -c config.yaml --corpus corpus.jsonl   # CI mode
+../bin/mockingbox ui  -c config.yaml                         # → http://localhost:8642
 ```
 
 Expected: 7 × `MATCH` (different SQL, same behavior) and 1 × `WRITESET_DIFF`
@@ -61,10 +61,34 @@ Reset demo state between runs (identical snapshots matter):
 docker compose down -v && docker compose up -d
 ```
 
-## Dashboard
+## Web console (`mockingbox ui`)
 
-`mockingbox ui` serves an embedded dashboard (no external assets): run history,
-verdict tiles, per-request results, and side-by-side write-set / response diffs.
+A single embedded web console (no external assets), English/한국어:
+
+- **Dashboard** — run history, verdict tiles, per-request results, side-by-side
+  write-set / response diffs
+- **Capture** — start/stop a recording proxy from the browser: choose the listen
+  port, the upstream server to forward to (old/new presets), and a corpus name;
+  every request flowing through is appended to the corpus
+- **Replay** — pick a corpus, run it against both stacks with a live progress bar
+- **Settings** — edit the config (stack URLs, MySQL, noise rules, array-sort rules)
+  in forms; saving rewrites the config file
+
+## JSON comparison semantics
+
+- Object **key order never matters** (mapper-dependent field order is ignored).
+- **Array order** is significant by default; when a mapper/ORM legitimately
+  reorders lists, add a sort rule so the array is canonically sorted before diffing:
+
+```yaml
+compare:
+  sort_arrays:
+    - { path: "data.items", by: "id" }         # sort by an element key
+    - { path: "**",         by: "$canonical" } # or by whole-element canonical JSON
+```
+
+- Numbers compare scale-insensitively (`50000` == `50000.0`), UTF-8 (Korean etc.)
+  compares byte-exact.
 
 ## Requirements
 
@@ -123,9 +147,9 @@ Omit a stack's `mysql:` block to run response-diff only (no write-set capture).
 
 | version | scope |
 |---|---|
-| v0.2 | traffic **capture** proxy mode, noise auto-learning, Keploy/GoReplay corpus converters, end-of-run full-state hash safety net |
-| v0.3 | Level-1 attribution (rid/SQLCommenter), generated-ID mapping, `{{last_created_id}}` scenario templating |
-| v0.4 | Postgres (logical decoding), parallel scenario lanes, GoReleaser distribution (brew/docker) |
+| v0.3 | noise auto-learning, Keploy/GoReplay corpus converters, end-of-run full-state hash safety net, corpus editing in UI |
+| v0.4 | Level-1 attribution (rid/SQLCommenter), generated-ID mapping, `{{last_created_id}}` scenario templating |
+| v0.5 | Postgres (logical decoding), parallel scenario lanes, GoReleaser distribution (brew/docker) |
 
 ## Development
 

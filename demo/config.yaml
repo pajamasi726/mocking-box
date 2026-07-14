@@ -12,15 +12,19 @@ attribution:
   timeout_ms: 5000
 
 noise:
-  # response fields that legitimately differ between runs
   response_paths:
     - "**.updated_at"
     - "**.created_at"
-  # write-set columns that legitimately differ (wall-clock timestamps)
   columns:
     - "*.updated_at"
     - "*.created_at"
   tables_ignore: []
 
-report:
-  dir: "./report"
+# 매퍼별 배열 순서 차이를 흡수하려면 정렬 규칙 추가 (UI 설정 탭에서도 편집 가능)
+# compare:
+#   sort_arrays:
+#     - { path: "data.items", by: "id" }
+#     - { path: "**", by: "$canonical" }
+
+report: { dir: "./report" }
+corpus: { dir: "./corpus" }

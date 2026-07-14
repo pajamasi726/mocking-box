@@ -43,6 +43,9 @@ type Runner struct {
 	client *http.Client
 	old    *stackRuntime
 	new    *stackRuntime
+
+	// OnProgress, when set, is called before each request is replayed.
+	OnProgress func(done, total int, name string)
 }
 
 func NewRunner(cfg *config.Config) *Runner {
@@ -84,7 +87,13 @@ func (r *Runner) Run(specs []corpus.RequestSpec) []Result {
 	results := make([]Result, 0, len(specs))
 	for i, spec := range specs {
 		log.Printf("(%d/%d) %s  %s", i+1, len(specs), spec.Name, spec.Describe())
+		if r.OnProgress != nil {
+			r.OnProgress(i, len(specs), spec.Name)
+		}
 		results = append(results, r.runOne(spec))
+	}
+	if r.OnProgress != nil {
+		r.OnProgress(len(specs), len(specs), "")
 	}
 	return results
 }
@@ -115,16 +124,23 @@ func (r *Runner) runOne(spec corpus.RequestSpec) Result {
 	result.OldStatus, result.NewStatus = oldRes.status, newRes.status
 	result.OldBody, result.NewBody = oldRes.body, newRes.body
 
+	sortRules := make([]diff.SortRule, len(r.cfg.Compare.SortArrays))
+	for i, sr := range r.cfg.Compare.SortArrays {
+		sortRules[i] = diff.SortRule{Path: sr.Path, By: sr.By}
+	}
 	responseDiffs := diff.DiffResponses(
 		oldRes.status, oldRes.body,
 		newRes.status, newRes.body,
-		r.cfg.Noise.ResponsePaths,
 		oldRes.headers, newRes.headers,
-		r.cfg.CompareHeaders,
+		diff.Options{
+			NoisePaths:     r.cfg.Noise.ResponsePaths,
+			CompareHeaders: r.cfg.CompareHeaders,
+			SortArrays:     sortRules,
+		},
 	)
 
-	result.OldWriteset = diff.NormalizeWriteset(oldRes.changes, r.cfg.Noise.Columns, r.cfg.Noise.TablesIgnore)
-	result.NewWriteset = diff.NormalizeWriteset(newRes.changes, r.cfg.Noise.Columns, r.cfg.Noise.TablesIgnore)
+	result.OldWriteset = orEmptyWS(diff.NormalizeWriteset(oldRes.changes, r.cfg.Noise.Columns, r.cfg.Noise.TablesIgnore))
+	result.NewWriteset = orEmptyWS(diff.NormalizeWriteset(newRes.changes, r.cfg.Noise.Columns, r.cfg.Noise.TablesIgnore))
 	writesetDiffs := diff.DiffWritesets(result.OldWriteset, result.NewWriteset)
 
 	result.Differences = append(responseDiffs, writesetDiffs...)
@@ -179,6 +195,14 @@ func (r *Runner) fire(rt *stackRuntime, spec corpus.RequestSpec) (*fired, error)
 		}
 	}
 	return out, nil
+}
+
+// orEmptyWS keeps empty write-sets as [] (not null) in report JSON.
+func orEmptyWS(ws []diff.WriteEntry) []diff.WriteEntry {
+	if ws == nil {
+		return []diff.WriteEntry{}
+	}
+	return ws
 }
 
 func toLower(s string) string {

@@ -142,6 +142,52 @@ func match(pat, path []string) bool {
 	return false
 }
 
+// SortRule sorts arrays whose path matches Path before comparison, so mapper-
+// dependent ordering (Jackson vs MyBatis result order, …) doesn't read as a diff.
+// By is an element key to sort by, or "$canonical" to sort by the element's
+// canonical JSON.
+type SortRule struct {
+	Path string `json:"path" yaml:"path"`
+	By   string `json:"by" yaml:"by"`
+}
+
+// SortArrays returns a copy of v with matching arrays canonically sorted.
+func SortArrays(v any, rules []SortRule) any { return sortArrays(v, rules, nil) }
+
+func sortArrays(v any, rules []SortRule, path []string) any {
+	switch x := v.(type) {
+	case map[string]any:
+		out := make(map[string]any, len(x))
+		for k, val := range x {
+			out[k] = sortArrays(val, rules, append(append([]string{}, path...), k))
+		}
+		return out
+	case []any:
+		items := make([]any, len(x))
+		for i, val := range x {
+			items[i] = sortArrays(val, rules, append(append([]string{}, path...), strconv.Itoa(i)))
+		}
+		for _, rule := range rules {
+			if !PathMatches(rule.Path, path) {
+				continue
+			}
+			sortKey := func(e any) string {
+				if rule.By != "" && rule.By != "$canonical" {
+					if m, ok := e.(map[string]any); ok {
+						return canonical(m[rule.By])
+					}
+				}
+				return canonical(e)
+			}
+			sort.SliceStable(items, func(i, j int) bool { return sortKey(items[i]) < sortKey(items[j]) })
+			break // first matching rule wins
+		}
+		return items
+	default:
+		return v
+	}
+}
+
 // StripNoise returns a copy of v with noise-matching keys removed.
 func StripNoise(v any, patterns []string) any { return stripNoise(v, patterns, nil) }
 
@@ -241,18 +287,24 @@ func diffJSON(old, new any, path []string, out *[]Difference) {
 	}
 }
 
+// Options controls response comparison.
+type Options struct {
+	NoisePaths     []string
+	CompareHeaders []string
+	SortArrays     []SortRule
+}
+
 func DiffResponses(
 	oldStatus int, oldBody string,
 	newStatus int, newBody string,
-	noisePaths []string,
 	oldHeaders, newHeaders map[string]string,
-	compareHeaders []string,
+	opts Options,
 ) []Difference {
 	var diffs []Difference
 	if oldStatus != newStatus {
 		diffs = append(diffs, Difference{"response", "status", oldStatus, newStatus})
 	}
-	for _, h := range compareHeaders {
+	for _, h := range opts.CompareHeaders {
 		ov, nv := oldHeaders[h], newHeaders[h]
 		if ov != nv {
 			diffs = append(diffs, Difference{"response", "header." + h, ov, nv})
@@ -261,7 +313,10 @@ func DiffResponses(
 	oldParsed, oldIsJSON := tryJSON(oldBody)
 	newParsed, newIsJSON := tryJSON(newBody)
 	if oldIsJSON || newIsJSON {
-		diffJSON(StripNoise(oldParsed, noisePaths), StripNoise(newParsed, noisePaths), nil, &diffs)
+		normalize := func(v any) any {
+			return SortArrays(StripNoise(v, opts.NoisePaths), opts.SortArrays)
+		}
+		diffJSON(normalize(oldParsed), normalize(newParsed), nil, &diffs)
 	} else if oldBody != newBody {
 		diffs = append(diffs, Difference{"response", "body", oldBody, newBody})
 	}

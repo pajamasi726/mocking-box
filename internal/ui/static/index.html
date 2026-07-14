@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,91 +16,108 @@
     --good: #0ca30c;       --good-text: #006300;
     --warning: #fab219;    --warning-text: #7a5200;
     --critical: #d03b3b;   --critical-text: #a12525;
-    --accent: #1d1d1b;
     --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --surface: #1a1a19;
-      --surface-2: #232322;
-      --ink: #ececea;
-      --ink-2: #a8a8a2;
-      --ink-3: #7a7a74;
-      --border: rgba(255,255,255,0.10);
-      --hairline: #2c2c2a;
-      --good-text: #2fbf2f;
-      --warning-text: #fab219;
-      --critical-text: #e06060;
-      --accent: #ececea;
+      --surface: #1a1a19; --surface-2: #232322;
+      --ink: #ececea; --ink-2: #a8a8a2; --ink-3: #7a7a74;
+      --border: rgba(255,255,255,0.10); --hairline: #2c2c2a;
+      --good-text: #2fbf2f; --warning-text: #fab219; --critical-text: #e06060;
     }
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--surface); color: var(--ink);
-    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  body { margin: 0; background: var(--surface); color: var(--ink);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+  header { display: flex; align-items: center; gap: 4px; padding: 0 20px;
+           border-bottom: 1px solid var(--hairline); }
+  header h1 { font-size: 15px; margin: 0 18px 0 0; padding: 14px 0; letter-spacing: -0.01em; }
+  nav { display: flex; gap: 2px; }
+  nav button {
+    border: none; background: none; color: var(--ink-2); font: inherit; cursor: pointer;
+    padding: 14px 12px; border-bottom: 2px solid transparent; font-size: 13.5px;
   }
-  header {
-    display: flex; align-items: baseline; gap: 12px;
-    padding: 14px 20px; border-bottom: 1px solid var(--hairline);
+  nav button:hover { color: var(--ink); }
+  nav button.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+  nav button .badge {
+    display: inline-block; margin-left: 6px; min-width: 8px; height: 8px;
+    border-radius: 50%; background: var(--critical); vertical-align: middle;
   }
-  header h1 { font-size: 16px; margin: 0; letter-spacing: -0.01em; }
-  header .sub { color: var(--ink-3); font-size: 12.5px; }
-  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 49px); }
-  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } aside { border-right: none !important; border-bottom: 1px solid var(--hairline); } }
+  #lang-toggle { margin-left: auto; border: 1px solid var(--border); background: none;
+    color: var(--ink-2); border-radius: 6px; padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12.5px; }
+  #lang-toggle:hover { background: var(--surface-2); }
 
-  aside { border-right: 1px solid var(--hairline); padding: 12px; }
-  aside h2, main h2 {
-    font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--ink-3); margin: 8px 4px; font-weight: 600;
-  }
-  .run {
-    width: 100%; text-align: left; display: block; padding: 10px 12px; margin-bottom: 6px;
-    border: 1px solid var(--border); border-radius: 8px; background: transparent;
-    color: inherit; cursor: pointer; font: inherit;
-  }
-  .run:hover { background: var(--surface-2); }
-  .run.active { background: var(--surface-2); border-color: var(--ink-3); }
-  .run .when { font-family: var(--mono); font-size: 12.5px; }
-  .run .chips { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
+  main { padding: 18px 20px; max-width: 1280px; margin: 0 auto; }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+       color: var(--ink-3); margin: 18px 0 8px; font-weight: 600; }
+  h2:first-child { margin-top: 0; }
+  .muted { color: var(--ink-3); }
+  .mono { font-family: var(--mono); font-size: 12.5px; }
+  .empty { color: var(--ink-3); padding: 32px 0; text-align: center; }
 
-  main { padding: 16px 20px; min-width: 0; }
+  .card { border: 1px solid var(--border); border-radius: 10px; padding: 16px; background: var(--surface); margin-bottom: 14px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+
+  label { display: block; font-size: 12px; color: var(--ink-2); margin: 10px 0 4px; }
+  input[type=text], input[type=number], input[type=password], select, textarea {
+    width: 100%; padding: 7px 10px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--surface); color: var(--ink); font: inherit; font-size: 13px;
+  }
+  textarea { font-family: var(--mono); font-size: 12.5px; min-height: 74px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 1.5px solid var(--ink-3); }
+  .row { display: flex; gap: 8px; align-items: end; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 140px; }
+  .hint { font-size: 11.5px; color: var(--ink-3); margin-top: 3px; }
+
+  button.btn {
+    border: 1px solid var(--border); background: var(--surface-2); color: var(--ink);
+    font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 7px; cursor: pointer;
+  }
+  button.btn:hover { border-color: var(--ink-3); }
+  button.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+  button.btn.danger { color: var(--critical-text); }
+  button.btn:disabled { opacity: 0.45; cursor: default; }
+  button.link { border: none; background: none; color: var(--ink-2); cursor: pointer;
+    font: inherit; font-size: 12.5px; text-decoration: underline; padding: 0; }
+
   .tiles { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
-  .tile {
-    border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 128px;
-    background: var(--surface);
-  }
-  .tile .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
-  .tile .value { font-size: 26px; font-weight: 650; letter-spacing: -0.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .tile { border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 126px; }
+  .tile .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+  .tile .value { font-size: 26px; font-weight: 650; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
 
-  .verdict { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .verdict { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono);
+    font-size: 12px; font-weight: 600; }
   .verdict .dot { width: 7px; height: 7px; }
-  .v-MATCH        { color: var(--good-text); }     .v-MATCH .dot        { background: var(--good); }
-  .v-ERROR        { color: var(--warning-text); }  .v-ERROR .dot        { background: var(--warning); }
+  .v-MATCH { color: var(--good-text); }   .v-MATCH .dot { background: var(--good); }
+  .v-ERROR { color: var(--warning-text); } .v-ERROR .dot { background: var(--warning); }
   .v-RESPONSE_DIFF, .v-WRITESET_DIFF, .v-BOTH_DIFF { color: var(--critical-text); }
   .v-RESPONSE_DIFF .dot, .v-WRITESET_DIFF .dot, .v-BOTH_DIFF .dot { background: var(--critical); }
-
-  .chip {
-    display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px;
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px;
     border-radius: 999px; border: 1px solid var(--border); font-size: 11.5px;
-    font-family: var(--mono); font-variant-numeric: tabular-nums;
-  }
+    font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
-  table.results { width: 100%; border-collapse: collapse; }
-  table.results th {
-    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
-    color: var(--ink-3); font-weight: 600; padding: 6px 10px; border-bottom: 1px solid var(--hairline);
-  }
-  table.results td { padding: 8px 10px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
-  table.results tr.row { cursor: pointer; }
-  table.results tr.row:hover td { background: var(--surface-2); }
-  table.results tr.row.open td { background: var(--surface-2); }
-  td.mono, .mono { font-family: var(--mono); font-size: 12.5px; }
+  table.t { width: 100%; border-collapse: collapse; }
+  table.t th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--ink-3); font-weight: 600; padding: 6px 10px; border-bottom: 1px solid var(--hairline); }
+  table.t td { padding: 8px 10px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+  table.t tr.click { cursor: pointer; }
+  table.t tr.click:hover td, table.t tr.open td { background: var(--surface-2); }
   td.num { text-align: right; font-variant-numeric: tabular-nums; }
-  .muted { color: var(--ink-3); }
+
+  .runbar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; }
+  .runbtn { flex: none; text-align: left; border: 1px solid var(--border); border-radius: 8px;
+    background: none; color: inherit; cursor: pointer; font: inherit; padding: 8px 12px; }
+  .runbtn:hover { background: var(--surface-2); }
+  .runbtn.active { background: var(--surface-2); border-color: var(--ink-3); }
+  .runbtn .when { font-family: var(--mono); font-size: 12px; }
+  .runbtn .chips { margin-top: 3px; display: flex; gap: 5px; }
 
   .detail { padding: 14px; background: var(--surface-2); border-radius: 0 0 8px 8px; }
-  .detail h3 { font-size: 12px; margin: 14px 0 6px; color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .detail h3 { font-size: 12px; margin: 14px 0 6px; color: var(--ink-2);
+    text-transform: uppercase; letter-spacing: 0.06em; }
   .detail h3:first-child { margin-top: 0; }
   table.diffs { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
   table.diffs th { text-align: left; color: var(--ink-3); font-weight: 600; padding: 4px 8px; }
@@ -111,171 +128,516 @@
   @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
   .pane { min-width: 0; }
   .pane .pane-title { font-size: 11.5px; color: var(--ink-2); margin-bottom: 4px; font-family: var(--mono); }
-  pre {
-    margin: 0; padding: 10px; background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.45;
-    max-height: 360px;
-  }
-  .empty { color: var(--ink-3); padding: 40px 0; text-align: center; }
+  pre { margin: 0; padding: 10px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px;
+    line-height: 1.45; max-height: 360px; }
   details.raw summary { cursor: pointer; color: var(--ink-2); font-size: 12.5px; margin: 10px 0 6px; }
+
+  .progress { height: 8px; border-radius: 999px; background: var(--surface-2);
+    border: 1px solid var(--border); overflow: hidden; margin: 10px 0 6px; }
+  .progress > div { height: 100%; background: var(--good); width: 0%; transition: width .3s; }
+  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .pulse { width: 9px; height: 9px; border-radius: 50%; background: var(--good); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .toast { position: fixed; bottom: 18px; right: 18px; background: var(--ink); color: var(--surface);
+    padding: 10px 16px; border-radius: 8px; font-size: 13px; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+  .sortrule { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+  .sortrule input { flex: 1; }
+  .sortrule .rm { border: none; background: none; color: var(--critical-text); cursor: pointer; font-size: 15px; }
 </style>
 </head>
 <body>
 <header>
   <h1>mocking-box</h1>
-  <span class="sub">old ↔ new differential report</span>
-  <span class="sub" id="run-meta" style="margin-left:auto"></span>
+  <nav id="nav"></nav>
+  <button id="lang-toggle"></button>
 </header>
-<div class="layout">
-  <aside>
-    <h2>Runs</h2>
-    <div id="runs"><div class="empty">loading…</div></div>
-  </aside>
-  <main id="main"><div class="empty">no run selected</div></main>
-</div>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
 
 <script>
-const VERDICTS = ["MATCH", "RESPONSE_DIFF", "WRITESET_DIFF", "BOTH_DIFF", "ERROR"];
-let currentFile = null;
+/* ------------------------------------------------------------------ i18n */
+const MSG = {
+  ko: {
+    tab_dashboard: "대시보드", tab_capture: "수집", tab_replay: "리플레이", tab_settings: "설정",
+    lang_btn: "English",
+    runs: "실행 이력", no_runs: "아직 리포트가 없습니다 — 수집 후 리플레이를 실행해보세요",
+    requests: "요청", match: "일치", diff: "불일치", error: "오류",
+    results: "결과", col_name: "이름", col_request: "요청", col_verdict: "판정",
+    col_status: "상태코드", col_writes: "쓰기", col_first_diff: "첫 번째 차이",
+    differences: "차이점", no_diff: "차이 없음",
+    writeset: "Write-set (구 / 신)", changes: "건의 변경", no_writes: "(쓰기 없음)",
+    response_bodies: "응답 바디", kind: "종류", path: "경로", old: "구(old)", new: "신(new)",
+    capture_title: "트래픽 수집", capture_desc: "녹화 프록시를 앞단에 세워 지나가는 요청을 코퍼스로 저장합니다. 클라이언트(또는 테스트 트래픽)를 프록시 포트로 보내면 업스트림 서버로 그대로 전달되면서 녹화됩니다.",
+    listen_port: "프록시 리슨 포트", upstream: "업스트림 (트래픽을 흘려보낼 서버)",
+    corpus_name: "코퍼스 이름", start_capture: "수집 시작", stop_capture: "수집 중지",
+    capturing: "수집 중", captured_n: "건 녹화됨", proxy_hint: "이 주소로 요청을 보내면 녹화됩니다",
+    use_old: "구 서버로", use_new: "신 서버로",
+    corpora: "코퍼스 목록", col_count: "요청 수", col_size: "크기", col_modified: "수정",
+    no_corpora: "코퍼스가 없습니다 — 수집을 시작하거나 .jsonl/.har 파일을 corpus 디렉토리에 넣으세요",
+    replay_this: "리플레이",
+    replay_title: "리플레이 실행", replay_desc: "선택한 코퍼스를 구/신 스택에 순차 재생하고 응답과 write-set을 비교합니다.",
+    select_corpus: "코퍼스 선택", start_replay: "리플레이 시작", replaying: "리플레이 진행 중",
+    replay_done: "리플레이 완료 — 대시보드에서 결과를 확인하세요", view_result: "결과 보기",
+    settings_title: "설정", settings_desc: "저장하면 config 파일에 반영되고 다음 리플레이부터 적용됩니다.",
+    old_stack: "구 스택 (기준)", new_stack: "신 스택 (검증 대상)", base_url: "Base URL",
+    mysql_host: "MySQL 호스트", mysql_port: "포트", mysql_user: "사용자", mysql_password: "비밀번호",
+    attribution: "귀속 (binlog 윈도우)", quiet_ms: "정지 판정 시간 (ms)", timeout_ms: "최대 대기 (ms)",
+    noise_title: "노이즈 규칙 (비교 제외)", response_paths: "응답 JSON 경로 (줄바꿈 구분)",
+    noise_columns: "DB 컬럼 (table.column, 줄바꿈 구분)", tables_ignore: "제외 테이블",
+    sort_title: "JSON 배열 정렬 비교", sort_desc: "매퍼(Jackson, MyBatis…)에 따라 배열 순서가 달라질 수 있습니다. 여기 등록한 경로의 배열은 지정한 키로 정렬한 뒤 비교합니다.",
+    sort_path: "배열 경로 (예: data.items, **)", sort_by: "정렬 키 (예: id, $canonical)",
+    add_rule: "+ 규칙 추가", save: "저장", saved: "저장되었습니다",
+    err_prefix: "오류: ", confirm_stop: "수집을 중지할까요?",
+    duration: "소요",
+  },
+  en: {
+    tab_dashboard: "Dashboard", tab_capture: "Capture", tab_replay: "Replay", tab_settings: "Settings",
+    lang_btn: "한국어",
+    runs: "Runs", no_runs: "No reports yet — capture some traffic and run a replay",
+    requests: "requests", match: "match", diff: "diff", error: "error",
+    results: "Results", col_name: "name", col_request: "request", col_verdict: "verdict",
+    col_status: "status", col_writes: "writes", col_first_diff: "first difference",
+    differences: "Differences", no_diff: "no differences",
+    writeset: "Write-set (old / new)", changes: "change(s)", no_writes: "(no writes)",
+    response_bodies: "Response bodies", kind: "kind", path: "path", old: "old", new: "new",
+    capture_title: "Traffic capture", capture_desc: "Put a recording proxy in front of a live server: every request flowing through is appended to a corpus. Point your client (or test traffic) at the proxy port — requests are forwarded to the upstream unchanged.",
+    listen_port: "Proxy listen port", upstream: "Upstream (server to forward traffic to)",
+    corpus_name: "Corpus name", start_capture: "Start capture", stop_capture: "Stop capture",
+    capturing: "Recording", captured_n: "recorded", proxy_hint: "Send requests to this address to record them",
+    use_old: "old server", use_new: "new server",
+    corpora: "Corpora", col_count: "requests", col_size: "size", col_modified: "modified",
+    no_corpora: "No corpora yet — start a capture, or drop .jsonl/.har files into the corpus directory",
+    replay_this: "Replay",
+    replay_title: "Run replay", replay_desc: "Replays the selected corpus sequentially against both stacks and diffs responses + write-sets.",
+    select_corpus: "Select corpus", start_replay: "Start replay", replaying: "Replay in progress",
+    replay_done: "Replay finished — check the results on the dashboard", view_result: "View result",
+    settings_title: "Settings", settings_desc: "Saving writes the config file; the next replay picks it up.",
+    old_stack: "Old stack (reference)", new_stack: "New stack (under test)", base_url: "Base URL",
+    mysql_host: "MySQL host", mysql_port: "Port", mysql_user: "User", mysql_password: "Password",
+    attribution: "Attribution (binlog window)", quiet_ms: "Quiesce silence (ms)", timeout_ms: "Max wait (ms)",
+    noise_title: "Noise rules (excluded from comparison)", response_paths: "Response JSON paths (one per line)",
+    noise_columns: "DB columns (table.column, one per line)", tables_ignore: "Ignored tables",
+    sort_title: "JSON array sort before compare", sort_desc: "Mappers (Jackson, MyBatis result order, …) can reorder arrays. Arrays at these paths are sorted by the given key before comparison.",
+    sort_path: "Array path (e.g. data.items, **)", sort_by: "Sort key (e.g. id, $canonical)",
+    add_rule: "+ Add rule", save: "Save", saved: "Saved",
+    err_prefix: "Error: ", confirm_stop: "Stop capturing?",
+    duration: "took",
+  },
+};
+let lang = localStorage.getItem("mb-lang") || (navigator.language.startsWith("ko") ? "ko" : "en");
+const t = k => (MSG[lang] && MSG[lang][k]) || MSG.en[k] || k;
+
+/* ------------------------------------------------------------------ state */
+let tab = localStorage.getItem("mb-tab") || "dashboard";
+let runsCache = [];
+let currentRunFile = null;
+let currentRun = null;
+let cfgCache = null;
+let capturePoll = null, replayPoll = null;
 
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const fmtVal = v => {
-  if (v === null || v === undefined) return "null";
-  return typeof v === "string" ? v : JSON.stringify(v);
-};
-const pretty = s => {
-  if (!s) return "(empty)";
-  try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; }
-};
+const fmtVal = v => v === null || v === undefined ? "null" : (typeof v === "string" ? v : JSON.stringify(v));
+const pretty = s => { if (!s) return "(empty)"; try { return JSON.stringify(JSON.parse(s), null, 2); } catch { return s; } };
 const verdictHTML = v => `<span class="verdict v-${esc(v)}"><span class="dot"></span>${esc(v)}</span>`;
+const toast = msg => { const el = document.getElementById("toast"); el.textContent = msg; el.classList.add("show"); setTimeout(() => el.classList.remove("show"), 2400); };
 
-async function loadRuns() {
-  const runs = await (await fetch("/api/runs")).json();
-  const box = document.getElementById("runs");
-  if (!runs.length) {
-    box.innerHTML = `<div class="empty">no reports yet<br><span class="mono">mockingbox run …</span></div>`;
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || res.statusText);
+  return data;
+}
+
+/* ------------------------------------------------------------------ shell */
+function renderShell() {
+  document.documentElement.lang = lang;
+  const tabs = [
+    ["dashboard", t("tab_dashboard")],
+    ["capture", t("tab_capture")],
+    ["replay", t("tab_replay")],
+    ["settings", t("tab_settings")],
+  ];
+  document.getElementById("nav").innerHTML = tabs.map(([id, label]) =>
+    `<button data-tab="${id}" class="${tab === id ? "active" : ""}">${esc(label)}<span id="badge-${id}" style="display:none" class="badge"></span></button>`
+  ).join("");
+  document.querySelectorAll("#nav button").forEach(el =>
+    el.addEventListener("click", () => { tab = el.dataset.tab; localStorage.setItem("mb-tab", tab); render(); }));
+  const lt = document.getElementById("lang-toggle");
+  lt.textContent = t("lang_btn");
+  lt.onclick = () => { lang = lang === "ko" ? "en" : "ko"; localStorage.setItem("mb-lang", lang); render(); };
+}
+
+function render() {
+  renderShell();
+  ({dashboard: renderDashboard, capture: renderCapture, replay: renderReplay, settings: renderSettings}[tab])();
+}
+
+/* ------------------------------------------------------------- dashboard */
+async function renderDashboard() {
+  const main = document.getElementById("main");
+  main.innerHTML = `<h2>${esc(t("runs"))}</h2><div id="runbar" class="runbar"></div><div id="run-view"></div>`;
+  try { runsCache = await api("/api/runs"); } catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
+  if (!runsCache.length) {
+    document.getElementById("runbar").innerHTML = `<div class="empty" style="width:100%">${esc(t("no_runs"))}</div>`;
     return;
   }
-  box.innerHTML = runs.map(r => {
+  document.getElementById("runbar").innerHTML = runsCache.map(r => {
     const bad = (r.summary.RESPONSE_DIFF||0)+(r.summary.WRITESET_DIFF||0)+(r.summary.BOTH_DIFF||0);
     const err = r.summary.ERROR||0;
-    const when = (r.generated_at||r.file).replace("T"," ").slice(0,19);
-    return `<button class="run" data-file="${esc(r.file)}">
+    const when = (r.generated_at||r.file).replace("T"," ").slice(5,19);
+    return `<button class="runbtn ${r.file===currentRunFile?"active":""}" data-file="${esc(r.file)}">
       <div class="when">${esc(when)}</div>
       <div class="chips">
         <span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${r.summary.MATCH||0}</span>
-        ${bad ? `<span class="chip v-BOTH_DIFF"><span class="dot" style="background:var(--critical)"></span>${bad} diff</span>` : ""}
-        ${err ? `<span class="chip v-ERROR"><span class="dot" style="background:var(--warning)"></span>${err} err</span>` : ""}
-        <span class="chip muted">${r.total} reqs</span>
-      </div>
-    </button>`;
+        ${bad?`<span class="chip v-BOTH_DIFF"><span class="dot" style="background:var(--critical)"></span>${bad}</span>`:""}
+        ${err?`<span class="chip v-ERROR"><span class="dot" style="background:var(--warning)"></span>${err}</span>`:""}
+      </div></button>`;
   }).join("");
-  box.querySelectorAll(".run").forEach(el =>
+  document.querySelectorAll(".runbtn").forEach(el =>
     el.addEventListener("click", () => loadRun(el.dataset.file)));
-  loadRun(runs[0].file);
+  loadRun(currentRunFile && runsCache.some(r => r.file === currentRunFile) ? currentRunFile : runsCache[0].file);
 }
 
 async function loadRun(file) {
-  currentFile = file;
-  document.querySelectorAll(".run").forEach(el =>
-    el.classList.toggle("active", el.dataset.file === file));
-  const run = await (await fetch(`/api/run?file=${encodeURIComponent(file)}`)).json();
-  document.getElementById("run-meta").textContent =
-    `${run.old_base_url} ↔ ${run.new_base_url}`;
-
+  currentRunFile = file;
+  document.querySelectorAll(".runbtn").forEach(el => el.classList.toggle("active", el.dataset.file === file));
+  const run = currentRun = await api(`/api/run?file=${encodeURIComponent(file)}`);
   const s = run.summary || {};
   const total = (run.results||[]).length;
   const tiles = [
-    { label: "requests", value: total, dot: "var(--ink-3)" },
-    { label: "match", value: s.MATCH||0, dot: "var(--good)" },
-    { label: "diff", value: (s.RESPONSE_DIFF||0)+(s.WRITESET_DIFF||0)+(s.BOTH_DIFF||0), dot: "var(--critical)" },
-    { label: "error", value: s.ERROR||0, dot: "var(--warning)" },
+    { label: t("requests"), value: total, dot: "var(--ink-3)" },
+    { label: t("match"), value: s.MATCH||0, dot: "var(--good)" },
+    { label: t("diff"), value: (s.RESPONSE_DIFF||0)+(s.WRITESET_DIFF||0)+(s.BOTH_DIFF||0), dot: "var(--critical)" },
+    { label: t("error"), value: s.ERROR||0, dot: "var(--warning)" },
   ];
-
   const rows = (run.results||[]).map((r, i) => {
     const first = (r.differences||[])[0];
     const detail = r.error ? esc(r.error)
       : first ? `${esc(first.path)}: ${esc(fmtVal(first.old))} → ${esc(fmtVal(first.new))}` +
-                (r.differences.length > 1 ? ` <span class="muted">(+${r.differences.length-1})</span>` : "")
-      : "";
-    return `
-    <tr class="row" data-i="${i}">
-      <td class="num muted">${i+1}</td>
-      <td>${esc(r.name)}</td>
-      <td class="mono">${esc(r.request)}</td>
-      <td>${verdictHTML(r.verdict)}</td>
+                (r.differences.length > 1 ? ` <span class="muted">(+${r.differences.length-1})</span>` : "") : "";
+    return `<tr class="click" data-i="${i}">
+      <td class="num muted">${i+1}</td><td>${esc(r.name)}</td>
+      <td class="mono">${esc(r.request)}</td><td>${verdictHTML(r.verdict)}</td>
       <td class="mono">${esc(r.old_status ?? "—")}/${esc(r.new_status ?? "—")}</td>
       <td class="num mono">${(r.old_writeset||[]).length}/${(r.new_writeset||[]).length}</td>
-      <td class="mono muted" style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${detail}</td>
-    </tr>
-    <tr class="detail-row" data-i="${i}" hidden><td colspan="7"><div class="detail" id="detail-${i}"></div></td></tr>`;
+      <td class="mono muted" style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${detail}</td></tr>
+      <tr class="detail-row" data-i="${i}" hidden><td colspan="7"><div class="detail" id="detail-${i}"></div></td></tr>`;
   }).join("");
-
-  document.getElementById("main").innerHTML = `
-    <div class="tiles">${tiles.map(t => `
-      <div class="tile">
-        <div class="label"><span class="dot" style="background:${t.dot}"></span>${t.label}</div>
-        <div class="value">${t.value}</div>
-      </div>`).join("")}
-    </div>
-    <h2>Results — ${esc(run.corpus||"")}</h2>
-    <table class="results">
-      <thead><tr><th>#</th><th>name</th><th>request</th><th>verdict</th><th>status</th><th>writes</th><th>first difference</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-
-  document.querySelectorAll("tr.row").forEach(el =>
-    el.addEventListener("click", () => toggleDetail(run, +el.dataset.i)));
-
+  document.getElementById("run-view").innerHTML = `
+    <div class="tiles">${tiles.map(x => `<div class="tile">
+      <div class="label"><span class="dot" style="background:${x.dot}"></span>${esc(x.label)}</div>
+      <div class="value">${x.value}</div></div>`).join("")}</div>
+    <h2>${esc(t("results"))} — <span class="mono">${esc(run.corpus||"")}</span></h2>
+    <table class="t"><thead><tr><th>#</th><th>${esc(t("col_name"))}</th><th>${esc(t("col_request"))}</th>
+      <th>${esc(t("col_verdict"))}</th><th>${esc(t("col_status"))}</th><th>${esc(t("col_writes"))}</th>
+      <th>${esc(t("col_first_diff"))}</th></tr></thead><tbody>${rows}</tbody></table>`;
+  document.querySelectorAll("tr.click").forEach(el =>
+    el.addEventListener("click", () => toggleDetail(+el.dataset.i)));
   const firstBad = (run.results||[]).findIndex(r => r.verdict !== "MATCH");
-  if (firstBad >= 0) toggleDetail(run, firstBad);
+  if (firstBad >= 0) toggleDetail(firstBad);
 }
 
-function toggleDetail(run, i) {
-  const row = document.querySelector(`tr.row[data-i="${i}"]`);
+function toggleDetail(i) {
+  const run = currentRun;
+  const row = document.querySelector(`tr.click[data-i="${i}"]`);
   const holder = document.querySelector(`tr.detail-row[data-i="${i}"]`);
-  const isOpen = !holder.hidden;
+  const wasOpen = !holder.hidden;
   document.querySelectorAll("tr.detail-row").forEach(el => el.hidden = true);
-  document.querySelectorAll("tr.row").forEach(el => el.classList.remove("open"));
-  if (isOpen) return;
-  holder.hidden = false;
-  row.classList.add("open");
-
+  document.querySelectorAll("tr.click").forEach(el => el.classList.remove("open"));
+  if (wasOpen) return;
+  holder.hidden = false; row.classList.add("open");
   const r = run.results[i];
   const diffsTable = (r.differences||[]).length ? `
-    <table class="diffs">
-      <thead><tr><th>kind</th><th>path</th><th>old</th><th>new</th></tr></thead>
-      <tbody>${r.differences.map(d => `
-        <tr>
-          <td class="muted">${esc(d.kind)}</td>
-          <td>${esc(d.path)}</td>
-          <td class="old">${esc(fmtVal(d.old))}</td>
-          <td class="new">${esc(fmtVal(d.new))}</td>
-        </tr>`).join("")}
-      </tbody>
-    </table>` : `<div class="muted">no differences</div>`;
-
-  const ws = side => (side||[]).length
-    ? JSON.stringify(side, null, 2) : "(no writes)";
-
+    <table class="diffs"><thead><tr><th>${esc(t("kind"))}</th><th>${esc(t("path"))}</th>
+      <th>${esc(t("old"))}</th><th>${esc(t("new"))}</th></tr></thead>
+    <tbody>${r.differences.map(d => `<tr><td class="muted">${esc(d.kind)}</td><td>${esc(d.path)}</td>
+      <td class="old">${esc(fmtVal(d.old))}</td><td class="new">${esc(fmtVal(d.new))}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="muted">${esc(t("no_diff"))}</div>`;
+  const ws = side => (side||[]).length ? JSON.stringify(side, null, 2) : t("no_writes");
   document.getElementById(`detail-${i}`).innerHTML = `
-    <h3>Differences ${verdictHTML(r.verdict)}</h3>
+    <h3>${esc(t("differences"))} ${verdictHTML(r.verdict)} <span class="muted" style="text-transform:none">· ${esc(t("duration"))} ${r.duration_ms||0}ms</span></h3>
     ${r.error ? `<div class="mono" style="color:var(--warning-text)">${esc(r.error)}</div>` : diffsTable}
-    <h3>Write-set (old / new)</h3>
+    <h3>${esc(t("writeset"))}</h3>
     <div class="cols">
-      <div class="pane"><div class="pane-title">old — ${(r.old_writeset||[]).length} change(s)</div><pre>${esc(ws(r.old_writeset))}</pre></div>
-      <div class="pane"><div class="pane-title">new — ${(r.new_writeset||[]).length} change(s)</div><pre>${esc(ws(r.new_writeset))}</pre></div>
+      <div class="pane"><div class="pane-title">old — ${(r.old_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.old_writeset))}</pre></div>
+      <div class="pane"><div class="pane-title">new — ${(r.new_writeset||[]).length} ${esc(t("changes"))}</div><pre>${esc(ws(r.new_writeset))}</pre></div>
     </div>
-    <details class="raw">
-      <summary>Response bodies (${esc(r.old_status ?? "—")} / ${esc(r.new_status ?? "—")})</summary>
+    <details class="raw"><summary>${esc(t("response_bodies"))} (${esc(r.old_status ?? "—")} / ${esc(r.new_status ?? "—")})</summary>
       <div class="cols">
         <div class="pane"><div class="pane-title">old</div><pre>${esc(pretty(r.old_body))}</pre></div>
         <div class="pane"><div class="pane-title">new</div><pre>${esc(pretty(r.new_body))}</pre></div>
-      </div>
-    </details>`;
+      </div></details>`;
 }
 
-loadRuns();
+/* --------------------------------------------------------------- capture */
+async function renderCapture() {
+  const main = document.getElementById("main");
+  try { cfgCache = await api("/api/config"); } catch (e) { cfgCache = null; }
+  const st = await api("/api/capture/status").catch(() => ({running:false, count:0}));
+  const oldURL = cfgCache?.old?.base_url || "http://localhost:8081";
+  const newURL = cfgCache?.new?.base_url || "http://localhost:8082";
+
+  main.innerHTML = `
+    <div class="card">
+      <h2 style="margin-top:0">${esc(t("capture_title"))}</h2>
+      <p class="muted" style="margin:4px 0 12px; font-size:13px">${esc(t("capture_desc"))}</p>
+      <div id="capture-body"></div>
+    </div>
+    <h2>${esc(t("corpora"))}</h2>
+    <div id="corpora"></div>`;
+
+  const body = document.getElementById("capture-body");
+  if (st.running) {
+    body.innerHTML = captureRunningHTML(st);
+    document.getElementById("stop-capture").onclick = async () => {
+      await api("/api/capture/stop", {method:"POST"}).catch(e => toast(t("err_prefix")+e.message));
+      renderCapture();
+    };
+    startCapturePoll();
+  } else {
+    body.innerHTML = `
+      <div class="row">
+        <div style="max-width:150px"><label>${esc(t("listen_port"))}</label>
+          <input type="text" id="cap-listen" value="9090" class="mono"></div>
+        <div style="flex:2"><label>${esc(t("upstream"))}</label>
+          <input type="text" id="cap-upstream" value="${esc(oldURL)}" class="mono">
+          <div class="hint">
+            <button class="link" id="preset-old">${esc(t("use_old"))} (${esc(oldURL)})</button> ·
+            <button class="link" id="preset-new">${esc(t("use_new"))} (${esc(newURL)})</button>
+          </div></div>
+        <div><label>${esc(t("corpus_name"))}</label>
+          <input type="text" id="cap-corpus" value="captured-${new Date().toISOString().slice(0,10)}" class="mono"></div>
+        <div style="flex:0"><button class="btn primary" id="start-capture">${esc(t("start_capture"))}</button></div>
+      </div>`;
+    document.getElementById("preset-old").onclick = () => document.getElementById("cap-upstream").value = oldURL;
+    document.getElementById("preset-new").onclick = () => document.getElementById("cap-upstream").value = newURL;
+    document.getElementById("start-capture").onclick = async () => {
+      try {
+        await api("/api/capture/start", {method:"POST", headers:{"content-type":"application/json"},
+          body: JSON.stringify({
+            listen: document.getElementById("cap-listen").value.trim(),
+            upstream: document.getElementById("cap-upstream").value.trim(),
+            corpus: document.getElementById("cap-corpus").value.trim(),
+          })});
+        renderCapture();
+      } catch (e) { toast(t("err_prefix") + e.message); }
+    };
+  }
+  renderCorpora();
+}
+
+function captureRunningHTML(st) {
+  const port = st.listen.startsWith(":") ? st.listen : ":" + st.listen;
+  return `
+    <div class="status-line"><span class="pulse"></span>
+      <strong>${esc(t("capturing"))}</strong>
+      <span class="mono">http://localhost${esc(port)} → ${esc(st.upstream)}</span>
+      <span class="chip"><span class="dot" style="background:var(--good)"></span><span id="cap-count">${st.count}</span> ${esc(t("captured_n"))}</span>
+      <button class="btn danger" id="stop-capture" style="margin-left:auto">${esc(t("stop_capture"))}</button>
+    </div>
+    <div class="hint" style="margin-top:8px">${esc(t("proxy_hint"))}: <span class="mono">curl http://localhost${esc(port)}/...</span>
+      → <span class="mono">${esc(st.corpus_path)}</span></div>
+    ${st.last_error ? `<div class="hint" style="color:var(--critical-text)">${esc(st.last_error)}</div>` : ""}`;
+}
+
+function startCapturePoll() {
+  clearInterval(capturePoll);
+  capturePoll = setInterval(async () => {
+    if (tab !== "capture") { clearInterval(capturePoll); return; }
+    const st = await api("/api/capture/status").catch(() => null);
+    if (!st || !st.running) { clearInterval(capturePoll); renderCapture(); return; }
+    const el = document.getElementById("cap-count");
+    if (el) el.textContent = st.count;
+  }, 1500);
+}
+
+async function renderCorpora() {
+  const box = document.getElementById("corpora");
+  if (!box) return;
+  const corpora = await api("/api/corpora").catch(() => []);
+  if (!corpora.length) { box.innerHTML = `<div class="empty">${esc(t("no_corpora"))}</div>`; return; }
+  box.innerHTML = `<table class="t"><thead><tr>
+      <th>${esc(t("corpus_name"))}</th><th>${esc(t("col_count"))}</th><th>${esc(t("col_size"))}</th>
+      <th>${esc(t("col_modified"))}</th><th></th></tr></thead>
+    <tbody>${corpora.map(c => `<tr>
+      <td class="mono">${esc(c.name)}</td><td class="num">${c.count}</td>
+      <td class="num muted">${(c.size/1024).toFixed(1)} KB</td>
+      <td class="mono muted">${esc(c.modified_at||"")}</td>
+      <td><button class="btn" data-corpus="${esc(c.name)}">${esc(t("replay_this"))}</button></td>
+    </tr>`).join("")}</tbody></table>`;
+  box.querySelectorAll("button[data-corpus]").forEach(el =>
+    el.addEventListener("click", () => {
+      tab = "replay"; localStorage.setItem("mb-tab", tab);
+      renderReplay(el.dataset.corpus);
+    }));
+}
+
+/* ---------------------------------------------------------------- replay */
+async function renderReplay(preselect) {
+  renderShell();
+  const main = document.getElementById("main");
+  const corpora = await api("/api/corpora").catch(() => []);
+  const st = await api("/api/replay/status").catch(() => ({running:false}));
+
+  main.innerHTML = `
+    <div class="card">
+      <h2 style="margin-top:0">${esc(t("replay_title"))}</h2>
+      <p class="muted" style="margin:4px 0 12px; font-size:13px">${esc(t("replay_desc"))}</p>
+      <div class="row">
+        <div style="flex:2"><label>${esc(t("select_corpus"))}</label>
+          <select id="rp-corpus" class="mono" ${st.running?"disabled":""}>
+            ${corpora.map(c => `<option value="${esc(c.name)}" ${c.name===preselect?"selected":""}>${esc(c.name)} (${c.count})</option>`).join("")}
+          </select></div>
+        <div style="flex:0"><button class="btn primary" id="start-replay" ${st.running||!corpora.length?"disabled":""}>${esc(t("start_replay"))}</button></div>
+      </div>
+      <div id="rp-status"></div>
+    </div>`;
+  if (!corpora.length) main.querySelector(".card").insertAdjacentHTML("beforeend", `<div class="empty">${esc(t("no_corpora"))}</div>`);
+
+  document.getElementById("start-replay").onclick = async () => {
+    const corpus = document.getElementById("rp-corpus").value;
+    try {
+      await api("/api/replay/start", {method:"POST", headers:{"content-type":"application/json"},
+        body: JSON.stringify({corpus})});
+      startReplayPoll();
+    } catch (e) { toast(t("err_prefix") + e.message); }
+  };
+  if (st.running) startReplayPoll();
+  else if (st.last_report || st.last_error) renderReplayStatus(st);
+}
+
+function renderReplayStatus(st) {
+  const box = document.getElementById("rp-status");
+  if (!box) return;
+  if (st.running) {
+    const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+    box.innerHTML = `
+      <div class="status-line" style="margin-top:12px"><span class="pulse"></span>
+        <strong>${esc(t("replaying"))}</strong>
+        <span class="mono">${st.done}/${st.total} ${esc(st.current||"")}</span></div>
+      <div class="progress"><div style="width:${pct}%"></div></div>`;
+  } else if (st.last_error) {
+    box.innerHTML = `<div class="hint" style="color:var(--critical-text); margin-top:10px">${esc(st.last_error)}</div>`;
+  } else if (st.last_report) {
+    box.innerHTML = `<div class="status-line" style="margin-top:12px">
+      <span class="dot" style="background:var(--good)"></span> ${esc(t("replay_done"))}
+      <button class="btn" id="goto-run">${esc(t("view_result"))}</button></div>`;
+    document.getElementById("goto-run").onclick = () => {
+      currentRunFile = st.last_report; tab = "dashboard"; localStorage.setItem("mb-tab", tab); render();
+    };
+  }
+}
+
+function startReplayPoll() {
+  clearInterval(replayPoll);
+  replayPoll = setInterval(async () => {
+    const st = await api("/api/replay/status").catch(() => null);
+    if (!st) return;
+    if (tab === "replay") renderReplayStatus(st);
+    document.getElementById("badge-replay")?.style.setProperty("display", st.running ? "inline-block" : "none");
+    if (!st.running) { clearInterval(replayPoll); if (tab === "replay") renderReplayStatus(st); }
+  }, 900);
+}
+
+/* -------------------------------------------------------------- settings */
+async function renderSettings() {
+  const main = document.getElementById("main");
+  let cfg;
+  try { cfg = cfgCache = await api("/api/config"); }
+  catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
+
+  const stackForm = (key, title) => {
+    const st = cfg[key] || {};
+    const my = st.mysql || {};
+    return `<div class="card"><h2 style="margin-top:0">${esc(title)}</h2>
+      <label>${esc(t("base_url"))}</label><input type="text" class="mono" id="${key}-url" value="${esc(st.base_url||"")}">
+      <div class="row">
+        <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono" id="${key}-mh" value="${esc(my.host||"")}"></div>
+        <div style="max-width:110px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono" id="${key}-mp" value="${my.port||3306}"></div>
+        <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono" id="${key}-mu" value="${esc(my.user||"")}"></div>
+        <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono" id="${key}-mw" value="${esc(my.password||"")}"></div>
+      </div></div>`;
+  };
+
+  const sortRules = (cfg.compare?.sort_arrays || []);
+  main.innerHTML = `
+    <p class="muted" style="margin:0 0 12px; font-size:13px">${esc(t("settings_desc"))}</p>
+    <div class="grid2">${stackForm("old", t("old_stack"))}${stackForm("new", t("new_stack"))}</div>
+    <div class="grid2">
+      <div class="card"><h2 style="margin-top:0">${esc(t("attribution"))}</h2>
+        <div class="row">
+          <div><label>${esc(t("quiet_ms"))}</label><input type="number" class="mono" id="at-quiet" value="${cfg.attribution?.quiet_ms||300}"></div>
+          <div><label>${esc(t("timeout_ms"))}</label><input type="number" class="mono" id="at-timeout" value="${cfg.attribution?.timeout_ms||5000}"></div>
+        </div></div>
+      <div class="card"><h2 style="margin-top:0">${esc(t("noise_title"))}</h2>
+        <label>${esc(t("response_paths"))}</label><textarea id="ns-resp">${esc((cfg.noise?.response_paths||[]).join("\n"))}</textarea>
+        <label>${esc(t("noise_columns"))}</label><textarea id="ns-cols">${esc((cfg.noise?.columns||[]).join("\n"))}</textarea>
+        <label>${esc(t("tables_ignore"))}</label><textarea id="ns-tables" style="min-height:40px">${esc((cfg.noise?.tables_ignore||[]).join("\n"))}</textarea>
+      </div>
+    </div>
+    <div class="card"><h2 style="margin-top:0">${esc(t("sort_title"))}</h2>
+      <p class="muted" style="margin:4px 0 10px; font-size:13px">${esc(t("sort_desc"))}</p>
+      <div id="sort-rules"></div>
+      <button class="btn" id="add-rule">${esc(t("add_rule"))}</button>
+    </div>
+    <button class="btn primary" id="save-settings" style="margin:4px 0 30px">${esc(t("save"))}</button>`;
+
+  const rulesBox = document.getElementById("sort-rules");
+  const addRule = (path = "", by = "") => {
+    const div = document.createElement("div");
+    div.className = "sortrule";
+    div.innerHTML = `<input type="text" class="mono sr-path" placeholder="${esc(t("sort_path"))}" value="${esc(path)}">
+      <input type="text" class="mono sr-by" placeholder="${esc(t("sort_by"))}" value="${esc(by)}">
+      <button class="rm" title="remove">✕</button>`;
+    div.querySelector(".rm").onclick = () => div.remove();
+    rulesBox.appendChild(div);
+  };
+  sortRules.forEach(r => addRule(r.path, r.by));
+  document.getElementById("add-rule").onclick = () => addRule();
+
+  document.getElementById("save-settings").onclick = async () => {
+    const lines = id => document.getElementById(id).value.split("\n").map(s => s.trim()).filter(Boolean);
+    const stack = key => {
+      const out = { base_url: document.getElementById(`${key}-url`).value.trim() };
+      const host = document.getElementById(`${key}-mh`).value.trim();
+      if (host) out.mysql = {
+        host, port: +document.getElementById(`${key}-mp`).value || 3306,
+        user: document.getElementById(`${key}-mu`).value.trim(),
+        password: document.getElementById(`${key}-mw`).value,
+      };
+      return out;
+    };
+    const rules = [...rulesBox.querySelectorAll(".sortrule")].map(div => ({
+      path: div.querySelector(".sr-path").value.trim(),
+      by: div.querySelector(".sr-by").value.trim() || "$canonical",
+    })).filter(r => r.path);
+    const payload = {
+      old: stack("old"), new: stack("new"),
+      attribution: {
+        quiet_ms: +document.getElementById("at-quiet").value || 300,
+        timeout_ms: +document.getElementById("at-timeout").value || 5000,
+        check_innodb_trx: cfg.attribution?.check_innodb_trx ?? true,
+      },
+      noise: { response_paths: lines("ns-resp"), columns: lines("ns-cols"), tables_ignore: lines("ns-tables") },
+      compare: { sort_arrays: rules },
+      http_timeout_s: cfg.http_timeout_s || 10,
+      compare_headers: cfg.compare_headers || [],
+      report: cfg.report || {dir: "./report"},
+      corpus: cfg.corpus || {dir: "./corpus"},
+    };
+    try {
+      cfgCache = await api("/api/config", {method:"PUT", headers:{"content-type":"application/json"},
+        body: JSON.stringify(payload)});
+      toast(t("saved"));
+    } catch (e) { toast(t("err_prefix") + e.message); }
+  };
+}
+
+/* ------------------------------------------------------------------ boot */
+render();
+api("/api/replay/status").then(st => { if (st.running) startReplayPoll(); }).catch(() => {});
 </script>
 </body>
 </html>

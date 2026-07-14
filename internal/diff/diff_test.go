@@ -64,21 +64,21 @@ func TestStripNoiseNested(t *testing.T) {
 func TestResponseDiffIgnoresNoiseAndKeyOrder(t *testing.T) {
 	old := `{"wallet_id": 1, "balance": 55000, "updated_at": "2026-07-14T10:00:00"}`
 	new := `{"updated_at": "2026-07-14T10:00:03", "balance": 55000, "wallet_id": 1}`
-	diffs := DiffResponses(200, old, 200, new, []string{"**.updated_at"}, nil, nil, nil)
+	diffs := DiffResponses(200, old, 200, new, nil, nil, Options{NoisePaths: []string{"**.updated_at"}})
 	if len(diffs) != 0 {
 		t.Errorf("expected no diffs, got %+v", diffs)
 	}
 }
 
 func TestResponseDiffCatchesRealChange(t *testing.T) {
-	diffs := DiffResponses(200, `{"balance": 55000}`, 200, `{"balance": 56000}`, nil, nil, nil, nil)
+	diffs := DiffResponses(200, `{"balance": 55000}`, 200, `{"balance": 56000}`, nil, nil, Options{})
 	if len(diffs) != 1 || diffs[0].Path != "balance" {
 		t.Errorf("expected one balance diff, got %+v", diffs)
 	}
 }
 
 func TestResponseDiffStatus(t *testing.T) {
-	diffs := DiffResponses(200, `{}`, 404, `{}`, nil, nil, nil, nil)
+	diffs := DiffResponses(200, `{}`, 404, `{}`, nil, nil, Options{})
 	found := false
 	for _, d := range diffs {
 		if d.Path == "status" {
@@ -202,11 +202,53 @@ func TestIgnoredTables(t *testing.T) {
 }
 
 func TestVerdicts(t *testing.T) {
-	resp := DiffResponses(200, `{"a":1}`, 200, `{"a":2}`, nil, nil, nil, nil)
+	resp := DiffResponses(200, `{"a":1}`, 200, `{"a":2}`, nil, nil, Options{})
 	if VerdictOf(resp, nil) != ResponseDiff {
 		t.Errorf("expected RESPONSE_DIFF")
 	}
 	if VerdictOf(nil, nil) != Match {
 		t.Errorf("expected MATCH")
+	}
+}
+
+func TestSortArraysByKey(t *testing.T) {
+	// mapper-dependent list order: same rows, different order
+	old := `{"items": [{"id": 1, "v": "a"}, {"id": 2, "v": "b"}, {"id": 3, "v": "c"}]}`
+	new := `{"items": [{"id": 3, "v": "c"}, {"id": 1, "v": "a"}, {"id": 2, "v": "b"}]}`
+
+	// without a sort rule: order difference reads as a diff
+	if diffs := DiffResponses(200, old, 200, new, nil, nil, Options{}); len(diffs) == 0 {
+		t.Fatalf("expected order-sensitive diff without sort rule")
+	}
+	// with a sort rule: equivalent
+	opts := Options{SortArrays: []SortRule{{Path: "items", By: "id"}}}
+	if diffs := DiffResponses(200, old, 200, new, nil, nil, opts); len(diffs) != 0 {
+		t.Errorf("expected match with sort rule, got %+v", diffs)
+	}
+}
+
+func TestSortArraysCanonicalFallbackAndNested(t *testing.T) {
+	old := `{"data": {"tags": ["b", "a", "c"]}}`
+	new := `{"data": {"tags": ["c", "b", "a"]}}`
+	opts := Options{SortArrays: []SortRule{{Path: "**", By: "$canonical"}}}
+	if diffs := DiffResponses(200, old, 200, new, nil, nil, opts); len(diffs) != 0 {
+		t.Errorf("expected match with canonical sort, got %+v", diffs)
+	}
+	// real value difference still detected after sorting
+	bad := `{"data": {"tags": ["c", "b", "x"]}}`
+	if diffs := DiffResponses(200, old, 200, bad, nil, nil, opts); len(diffs) == 0 {
+		t.Errorf("expected diff for changed element")
+	}
+}
+
+func TestSortArraysFirstRuleWins(t *testing.T) {
+	old := `{"items": [{"id": 2, "rank": 1}, {"id": 1, "rank": 2}]}`
+	new := `{"items": [{"id": 1, "rank": 2}, {"id": 2, "rank": 1}]}`
+	opts := Options{SortArrays: []SortRule{
+		{Path: "items", By: "id"},
+		{Path: "**", By: "rank"}, // must not shadow the first rule
+	}}
+	if diffs := DiffResponses(200, old, 200, new, nil, nil, opts); len(diffs) != 0 {
+		t.Errorf("expected match, got %+v", diffs)
 	}
 }

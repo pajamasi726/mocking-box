@@ -49,14 +49,31 @@ type Report struct {
 	Dir string `yaml:"dir"`
 }
 
+type Corpus struct {
+	Dir string `yaml:"dir"`
+}
+
+// SortRule: sort matching arrays before response comparison (mapper-dependent
+// ordering). By is an element key, or "$canonical" for whole-element sort.
+type SortRule struct {
+	Path string `yaml:"path" json:"path"`
+	By   string `yaml:"by" json:"by"`
+}
+
+type Compare struct {
+	SortArrays []SortRule `yaml:"sort_arrays" json:"sort_arrays"`
+}
+
 type Config struct {
 	Old            Stack       `yaml:"old"`
 	New            Stack       `yaml:"new"`
 	Attribution    Attribution `yaml:"attribution"`
 	Noise          Noise       `yaml:"noise"`
+	Compare        Compare     `yaml:"compare"`
 	HTTPTimeoutS   float64     `yaml:"http_timeout_s"`
 	CompareHeaders []string    `yaml:"compare_headers"`
 	Report         Report      `yaml:"report"`
+	Corpus         Corpus      `yaml:"corpus"`
 }
 
 func Load(path string) (*Config, error) {
@@ -91,6 +108,9 @@ func Load(path string) (*Config, error) {
 	}
 	if cfg.Report.Dir == "" {
 		cfg.Report.Dir = "./report"
+	}
+	if cfg.Corpus.Dir == "" {
+		cfg.Corpus.Dir = "./corpus"
 	}
 	for i, h := range cfg.CompareHeaders {
 		cfg.CompareHeaders[i] = strings.ToLower(h)
