@@ -1,0 +1,63 @@
+# mocking-box 배포 config (DELL) — legalcare-renew 검증
+#
+# new = 검증 대상(리뉴얼): legalcare-renew 앱 + 이 compose의 검증용 DB
+# old = 기준: 운영 서비스/DB (복사 소스). 대시보드가 복사할 때만 접속.
+# 값은 대시보드 설정 탭 / DB 복사 탭에서 채워도 됩니다.
+
+new:
+  # legalcare-renew 게이트웨이/서비스 주소 (DELL에 올린 리뉴얼 스택)
+  base_url: "http://host.docker.internal:10000"
+  datastores:
+    - name: lawkit-db
+      type: mysql
+      host: mysql-new
+      port: 3306
+      user: root
+      password: mbroot
+    - name: medi-db
+      type: postgres
+      host: postgres-new
+      port: 5432
+      user: postgres
+      password: mbroot
+      database: postgres
+
+old:
+  # 기준(운영) — 복사 소스. 실제 운영 접속정보로 교체
+  base_url: "http://host.docker.internal:10000"
+  datastores:
+    - name: lawkit-db
+      type: mysql
+      host: "<lawkit-prod-host>"        # 54.180.87.20 등 (SG 허용 IP에서만)
+      port: 3306
+      user: "<user>"
+      password: "<password>"
+    - name: medi-db
+      type: postgres
+      host: "medilawyer-prod.crwcm0kcu3go.ap-northeast-2.rds.amazonaws.com"
+      port: 15431
+      user: "<user>"
+      password: "<password>"
+      database: "medilawyer-prod"       # 하이픈 포함
+      # 900GB 이미지 테이블 제외 — DB 복사 탭에서 체크 해제하거나 여기 명시
+      exclude_tables:
+        - "public.boost_dental_image"
+
+attribution:
+  quiet_ms: 400
+  timeout_ms: 5000
+
+noise:
+  response_paths:
+    - "**.updated_at"
+    - "**.created_at"
+  columns:
+    - "*.updated_at"
+    - "*.created_at"
+
+# jOOQ→JPA 매퍼 정렬 차이 흡수 (경로는 실제 응답 보고 조정)
+compare:
+  sort_arrays: []
+
+report: { dir: "/work/report" }
+corpus: { dir: "/work/corpus" }

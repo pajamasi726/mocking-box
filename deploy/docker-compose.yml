@@ -1,0 +1,64 @@
+# mocking-box 온프렘 배포 (DELL 192.168.1.55) — 대시보드 + 검증용 DB 2종
+#
+# 외부 접근: 회사 VPN → ipTIME 포워드 18643 → 192.168.1.55:8643
+# 검증 대상(신) DB는 여기 컨테이너로 띄우고, 구(운영) DB는 config에서 원격 접속.
+#
+#   docker compose up -d --build
+#   → http://192.168.1.55:8643  (VPN 밖에선 http://114.203.1.178:18643)
+
+services:
+  dashboard:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    command: ["dashboard", "-c", "/work/config.yaml", "--addr", ":8643"]
+    volumes:
+      - ./config.yaml:/work/config.yaml
+      - ./corpus:/work/corpus
+      - ./report:/work/report
+    ports:
+      - "8643:8643"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # 호스트/온프렘 미러 서비스 접근용
+    restart: unless-stopped
+
+  # 검증 대상 MySQL (lawkit / reviewed 리뉴얼 대상) — ROW binlog 필수
+  mysql-new:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: mbroot
+    command: >
+      --binlog-format=ROW --binlog-row-image=FULL
+      --binlog-row-metadata=FULL --binlog-rows-query-log-events=ON
+    volumes:
+      - mysql-new-data:/var/lib/mysql
+    ports:
+      - "13306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pmbroot"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  # 검증 대상 PostgreSQL (medilawyer 리뉴얼 대상) — logical decoding 필수
+  postgres-new:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: mbroot
+    command: >
+      postgres -c wal_level=logical -c max_replication_slots=8 -c max_wal_senders=8
+    volumes:
+      - postgres-new-data:/var/lib/postgresql/data
+    ports:
+      - "15432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+volumes:
+  mysql-new-data:
+  postgres-new-data:

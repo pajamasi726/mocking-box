@@ -10,3 +10,5 @@ __pycache__/
 .pytest_cache/
 demo-pg/report/
 demo-pg/corpus/
+deploy/corpus/
+deploy/report/
