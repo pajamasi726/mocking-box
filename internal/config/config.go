@@ -89,8 +89,10 @@ func Load(path string) (*Config, error) {
 	cfg.Old.Name, cfg.New.Name = "old", "new"
 	cfg.Old.BaseURL = strings.TrimRight(cfg.Old.BaseURL, "/")
 	cfg.New.BaseURL = strings.TrimRight(cfg.New.BaseURL, "/")
-	if cfg.Old.BaseURL == "" || cfg.New.BaseURL == "" {
-		return nil, fmt.Errorf("both old.base_url and new.base_url are required")
+	// new = 검증 대상(필수). old = 선택 — 라이브 비교(run)와 기준선 셀프체크에만 필요.
+	// 사이드카 수집 세계에서 대시보드는 구서버에 접속할 일이 없다.
+	if cfg.New.BaseURL == "" {
+		return nil, fmt.Errorf("new.base_url is required (the stack under test)")
 	}
 	for _, m := range []*MySQL{cfg.Old.MySQL, cfg.New.MySQL} {
 		if m != nil && m.Port == 0 {

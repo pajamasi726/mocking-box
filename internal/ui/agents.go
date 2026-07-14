@@ -183,7 +183,9 @@ func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request) {
 		}()
 	}
 
-	add("old_api", func() healthItem { return checkHTTP(cfg.Old.BaseURL) })
+	if cfg.Old.BaseURL != "" { // old = 선택 (라이브 비교/기준선용)
+		add("old_api", func() healthItem { return checkHTTP(cfg.Old.BaseURL) })
+	}
 	add("new_api", func() healthItem { return checkHTTP(cfg.New.BaseURL) })
 	if cfg.Old.MySQL != nil {
 		add("old_db", func() healthItem { return checkMySQL(cfg.Old.MySQL) })

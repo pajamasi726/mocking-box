@@ -10,6 +10,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -21,6 +23,7 @@ import (
 	"github.com/pajamasi726/mocking-box/internal/golden"
 	"github.com/pajamasi726/mocking-box/internal/replay"
 	"github.com/pajamasi726/mocking-box/internal/report"
+	"github.com/pajamasi726/mocking-box/internal/seed"
 	"github.com/pajamasi726/mocking-box/internal/sniff"
 	"github.com/pajamasi726/mocking-box/internal/ui"
 )
@@ -42,6 +45,8 @@ func main() {
 	// 수집기 (collector)
 	case "collector", "collect":
 		os.Exit(cmdCollect(os.Args[2:]))
+	case "seed":
+		os.Exit(cmdSeed(os.Args[2:]))
 	// deprecated aliases (pre-collect layout)
 	case "sniff":
 		os.Exit(cmdSniff(os.Args[2:]))
@@ -142,7 +147,11 @@ COLLECTOR — record traffic into a portable recording file, where traffic flows
   collect mirror --listen :4789 --port 8080 --out r.golden.jsonl   prod: AWS VPC Traffic
                                                                    Mirroring receiver (VXLAN)
 
-VERIFIER — replay a recording and grade the new stack:
+VERIFIER — prepare the DB, replay a recording, grade the new stack:
+  seed      -c cfg.yaml --from host:port [--from-user u --from-password p]
+            [--schemas a,b] [--exclude-tables huge_blob] [--golden r.golden.jsonl]
+            copies schemas+data from a source MySQL (PITR temp instance / dev DB)
+            into new.mysql — tables created automatically, seed marker recorded
   verify    -c cfg.yaml --golden r.golden.jsonl [--baseline run.json]  new stack only, vs answer sheet
   run       -c cfg.yaml --corpus r.jsonl                               live-parallel: old AND new
   dashboard -c cfg.yaml [--addr :8642] [--token s]                     web console: results, health,
@@ -180,6 +189,16 @@ func cmdVerify(args []string) int {
 	}
 	log.Printf("golden: %d entr(ies) | new=%s | per-request write-sets: %v",
 		len(entries), cfg.New.BaseURL, meta.Serialized)
+
+	// preflight: 검증 DB가 시딩된 적 있는지 (T0 정합의 최소 확인)
+	if cfg.New.MySQL != nil {
+		if marker, _ := seed.ReadMarker(cfg.New.MySQL); marker == nil {
+			log.Printf("⚠ 검증 DB에 seed 이력이 없습니다 — 골든의 T0 상태와 다르면 diff가 어긋납니다 (mockingbox seed 참고)")
+		} else {
+			log.Printf("seed marker: %s에 %s에서 시딩됨 (schemas=%s, golden=%s)",
+				marker.SeededAt, marker.Source, marker.Schemas, marker.Golden)
+		}
+	}
 
 	verifier := replay.NewVerifier(cfg)
 	if err := verifier.Start(); err != nil {
@@ -305,6 +324,64 @@ func cmdMirror(args []string) int {
 	return 0
 }
 
+// cmdSeed copies schemas+data from a source MySQL (PITR temp instance, dev DB)
+// into the verification datastore (config `new.mysql`). Pure Go — the user
+// provides connection info only; tables are created automatically.
+func cmdSeed(args []string) int {
+	fs := flag.NewFlagSet("seed", flag.ExitOnError)
+	configPath := fs.String("c", "", "config YAML (target = new.mysql) (required)")
+	fs.StringVar(configPath, "config", *configPath, "config YAML")
+	fromHost := fs.String("from", "", "source MySQL host:port — a PITR temp instance or dev DB (required)")
+	fromUser := fs.String("from-user", "root", "source MySQL user")
+	fromPassword := fs.String("from-password", "", "source MySQL password")
+	schemasCSV := fs.String("schemas", "", "schemas to copy, comma-separated (default: all non-system)")
+	excludeCSV := fs.String("exclude-tables", "", "tables to skip, comma-separated (e.g. huge blob tables)")
+	goldenName := fs.String("golden", "", "golden this seed corresponds to (recorded for verify preflight)")
+	fs.Parse(args)
+	if *configPath == "" || *fromHost == "" {
+		fs.Usage()
+		return 2
+	}
+
+	cfg, err := config.Load(*configPath)
+	if err != nil {
+		log.Fatalf("config: %v", err)
+	}
+	if cfg.New.MySQL == nil {
+		log.Fatalf("config new.mysql is required as the seed target")
+	}
+
+	host, port := *fromHost, 3306
+	if h, p, ok := strings.Cut(*fromHost, ":"); ok {
+		host = h
+		if v, err := strconv.Atoi(p); err == nil {
+			port = v
+		}
+	}
+	src := &config.MySQL{Host: host, Port: port, User: *fromUser, Password: *fromPassword}
+
+	opts := seed.Options{GoldenName: *goldenName, ExcludeTables: map[string]bool{}}
+	if *schemasCSV != "" {
+		opts.Schemas = strings.Split(*schemasCSV, ",")
+	}
+	for _, t := range strings.Split(*excludeCSV, ",") {
+		if t = strings.TrimSpace(t); t != "" {
+			opts.ExcludeTables[t] = true
+		}
+	}
+
+	log.Printf("seed: %s -> %s (검증용 DB를 소스 상태로 재구성 — 대상의 해당 스키마는 재생성됩니다)",
+		src.Addr(), cfg.New.MySQL.Addr())
+	started := time.Now()
+	stats, err := seed.Run(src, cfg.New.MySQL, opts)
+	if err != nil {
+		log.Fatalf("seed: %v", err)
+	}
+	log.Printf("seed done in %s: schemas=%v tables=%d rows=%d",
+		time.Since(started).Round(time.Millisecond), stats.Schemas, stats.Tables, stats.Rows)
+	return 0
+}
+
 // agentFlags registers the dashboard-link flags shared by collector modes.
 func agentFlags(fs *flag.FlagSet) (dashboard, token, name *string) {
 	dashboard = fs.String("dashboard", "", "dashboard URL to register with (Spring-Boot-Admin style; optional)")
@@ -362,6 +439,9 @@ func cmdRun(args []string) int {
 	cfg, err := config.Load(*configPath)
 	if err != nil {
 		log.Fatalf("config: %v", err)
+	}
+	if cfg.Old.BaseURL == "" {
+		log.Fatalf("live-parallel mode needs old.base_url in config (record & verify does not — use `verify`)")
 	}
 	specs, err := corpus.Load(*corpusPath)
 	if err != nil {
