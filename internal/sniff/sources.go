@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gopacket/gopacket"
@@ -174,4 +175,30 @@ func DefaultInterface() (string, error) {
 		}
 	}
 	return "", fmt.Errorf("no active non-loopback interface")
+}
+
+// CanCapture reports whether live packet capture is permitted on iface
+// (opens and immediately closes a handle). Returns a human-readable reason.
+func CanCapture(iface string) (bool, string) {
+	if iface == "" {
+		d, err := DefaultInterface()
+		if err != nil {
+			return false, "no interface: " + err.Error()
+		}
+		iface = d
+	}
+	handle, err := pcap.OpenLive(iface, 65535, false, pcap.BlockForever)
+	if err != nil {
+		return false, permissionHint(iface, err)
+	}
+	handle.Close()
+	return true, "capture ready on " + iface
+}
+
+func permissionHint(iface string, err error) string {
+	msg := err.Error()
+	if strings.Contains(msg, "permission") || strings.Contains(msg, "not permitted") || strings.Contains(msg, "Operation not permitted") {
+		return "no permission on " + iface + " — run: sudo setcap cap_net_raw+eip <binary>  (or sudo / --cap-add=NET_RAW)"
+	}
+	return iface + ": " + msg
 }

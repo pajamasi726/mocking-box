@@ -101,6 +101,7 @@ func Serve(addr, configPath, token string) error {
 	mux.HandleFunc("POST /api/agents/heartbeat", s.agentHeartbeat)
 	mux.HandleFunc("GET /api/agents", s.agentList)
 	mux.HandleFunc("POST /api/agents/upload", s.agentUpload)
+	mux.HandleFunc("POST /api/agents/command", s.agentCommand)
 	mux.HandleFunc("POST /api/corpora/upload", s.corpusUpload)
 	mux.HandleFunc("GET /api/health", s.healthCheck)
 	mux.HandleFunc("GET /api/seed/status", s.seedStatusHandler)

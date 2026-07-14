@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -38,6 +39,7 @@ type Expected struct {
 type Entry struct {
 	Type     string            `json:"type"` // "entry"
 	Name     string            `json:"name"`
+	Ts       string            `json:"ts,omitempty"` // request arrival time (RFC3339Nano) for load-time ordering
 	Method   string            `json:"method"`
 	Path     string            `json:"path"`
 	Headers  map[string]string `json:"headers,omitempty"`
@@ -133,5 +135,10 @@ func Read(path string) (Meta, []Entry, error) {
 			entries = append(entries, e)
 		}
 	}
-	return meta, entries, scanner.Err()
+	if err := scanner.Err(); err != nil {
+		return meta, nil, err
+	}
+	// passive capture writes in completion order; sort by request-arrival ts
+	sort.SliceStable(entries, func(i, j int) bool { return entries[i].Ts < entries[j].Ts })
+	return meta, entries, nil
 }

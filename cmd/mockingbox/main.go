@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"context"
 	"os"
 	"os/signal"
 	"strconv"
@@ -70,6 +71,8 @@ func cmdCollect(args []string) int {
 		return cmdSniff(args)
 	}
 	switch args[0] {
+	case "agent":
+		return cmdCollectAgent(args[1:])
 	case "sniff":
 		return cmdSniff(args[1:])
 	case "pcap":
@@ -82,6 +85,39 @@ func cmdCollect(args []string) int {
 		// 모드 생략하고 바로 플래그를 준 경우
 		return cmdSniff(args)
 	}
+}
+
+// cmdCollectAgent runs a long-lived collector controlled by the dashboard:
+// registers, heartbeats, and obeys start/stop/upload commands. Recordings are
+// streamed to --dir and uploaded on demand.
+func cmdCollectAgent(args []string) int {
+	fs := flag.NewFlagSet("collect agent", flag.ExitOnError)
+	dashboard := fs.String("dashboard", "", "dashboard URL to register with (required)")
+	token := fs.String("token", "", "shared secret for the dashboard")
+	name := fs.String("name", "", "collector display name (default: hostname)")
+	dir := fs.String("dir", "./recordings", "local directory for recordings")
+	iface := fs.String("iface", "", "default network interface for sniff (auto if empty)")
+	fs.Parse(args)
+	if *dashboard == "" {
+		fs.Usage()
+		return 2
+	}
+	if *iface == "" {
+		if d, err := sniff.DefaultInterface(); err == nil {
+			*iface = d
+		}
+	}
+	ctx := context.Background()
+	go func() {
+		sig := make(chan os.Signal, 1)
+		signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
+		<-sig
+		os.Exit(0)
+	}()
+	if err := agent.RunDaemon(ctx, *dashboard, *token, *name, *dir, nil, *iface); err != nil {
+		log.Fatalf("agent: %v", err)
+	}
+	return 0
 }
 
 // cmdCollectProxy runs the dev recording proxy headless (no UI) — for remote

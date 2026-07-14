@@ -22,17 +22,25 @@ import (
 // -- collector registry (Spring-Boot-Admin style: agents register inbound) ----
 
 type agentRecord struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	Mode      string    `json:"mode"`
-	Version   string    `json:"version"`
-	Out       string    `json:"out"`
-	State     string    `json:"state"`
-	Count     int       `json:"count"`
-	LastError string    `json:"last_error,omitempty"`
-	Remote    string    `json:"remote"`
-	FirstSeen time.Time `json:"first_seen"`
-	LastSeen  time.Time `json:"last_seen"`
+	ID            string           `json:"id"`
+	Name          string           `json:"name"`
+	Mode          string           `json:"mode"`
+	Version       string           `json:"version"`
+	Out           string           `json:"out"`
+	State         string           `json:"state"`
+	Count         int              `json:"count"`
+	Current       string           `json:"current,omitempty"`
+	RemainSec     int              `json:"remain_sec"`
+	Recordings    []map[string]any `json:"recordings,omitempty"`
+	CaptureOK     bool             `json:"capture_ok"`
+	CaptureDetail string           `json:"capture_detail"`
+	Iface         string           `json:"iface"`
+	LastError     string           `json:"last_error,omitempty"`
+	Remote        string           `json:"remote"`
+	FirstSeen     time.Time        `json:"first_seen"`
+	LastSeen      time.Time        `json:"last_seen"`
+
+	commands []map[string]any // queued commands handed back on next heartbeat
 }
 
 type agentRegistry struct {
@@ -79,21 +87,35 @@ func (s *Server) agentHeartbeat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		ID        string `json:"id"`
-		State     string `json:"state"`
-		Count     int    `json:"count"`
-		LastError string `json:"last_error"`
+		ID            string           `json:"id"`
+		State         string           `json:"state"`
+		Count         int              `json:"count"`
+		Current       string           `json:"current"`
+		RemainSec     int              `json:"remain_sec"`
+		Recordings    []map[string]any `json:"recordings"`
+		CaptureOK     bool             `json:"capture_ok"`
+		CaptureDetail string           `json:"capture_detail"`
+		Iface         string           `json:"iface"`
+		LastError     string           `json:"last_error"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		jsonError(w, http.StatusBadRequest, err.Error())
 		return
 	}
+	var commands []map[string]any
 	s.registry.mu.Lock()
 	if a, ok := s.registry.agents[req.ID]; ok {
 		a.State, a.Count, a.LastError, a.LastSeen = req.State, req.Count, req.LastError, time.Now()
+		a.Current, a.RemainSec, a.Recordings = req.Current, req.RemainSec, req.Recordings
+		a.CaptureOK, a.CaptureDetail, a.Iface = req.CaptureOK, req.CaptureDetail, req.Iface
+		commands = a.commands
+		a.commands = nil // hand off queued commands exactly once
 	}
 	s.registry.mu.Unlock()
-	writeJSON(w, map[string]bool{"ok": true})
+	if commands == nil {
+		commands = []map[string]any{}
+	}
+	writeJSON(w, map[string]any{"ok": true, "commands": commands})
 }
 
 func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
@@ -111,11 +133,36 @@ func (s *Server) agentList(w http.ResponseWriter, r *http.Request) {
 		out = append(out, map[string]any{
 			"id": a.ID, "name": a.Name, "mode": a.Mode, "state": a.State,
 			"count": a.Count, "last_error": a.LastError, "out": a.Out,
+			"current": a.Current, "remain_sec": a.RemainSec, "recordings": a.Recordings,
+			"capture_ok": a.CaptureOK, "capture_detail": a.CaptureDetail, "iface": a.Iface,
 			"last_seen_s": int(fresh.Seconds()), "health": health,
 		})
 	}
 	s.registry.mu.Unlock()
 	writeJSON(w, out)
+}
+
+// agentCommand queues a control command (start/stop/upload) for an agent; the
+// agent picks it up on its next heartbeat.
+func (s *Server) agentCommand(w http.ResponseWriter, r *http.Request) {
+	var cmd map[string]any
+	if err := json.NewDecoder(r.Body).Decode(&cmd); err != nil {
+		jsonError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	id, _ := cmd["id"].(string)
+	s.registry.mu.Lock()
+	a, ok := s.registry.agents[id]
+	if ok {
+		delete(cmd, "id")
+		a.commands = append(a.commands, cmd)
+	}
+	s.registry.mu.Unlock()
+	if !ok {
+		jsonError(w, http.StatusNotFound, "unknown agent")
+		return
+	}
+	writeJSON(w, map[string]bool{"queued": true})
 }
 
 // agentUpload receives a finished recording pushed by a collector.

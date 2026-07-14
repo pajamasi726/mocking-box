@@ -8,12 +8,14 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
 // RequestSpec is one replayable HTTP request.
 type RequestSpec struct {
 	Name    string            `json:"name"`
+	Ts      string            `json:"ts,omitempty"` // request arrival time for load-time ordering
 	Method  string            `json:"method"`
 	Path    string            `json:"path"` // path (+ query), joined onto each stack's base_url
 	Headers map[string]string `json:"headers"`
@@ -36,10 +38,18 @@ func (r RequestSpec) BodyBytes() (data []byte, isJSON bool, err error) {
 }
 
 func Load(path string) ([]RequestSpec, error) {
+	var specs []RequestSpec
+	var err error
 	if strings.EqualFold(filepath.Ext(path), ".har") {
-		return loadHAR(path)
+		specs, err = loadHAR(path)
+	} else {
+		specs, err = loadJSONL(path)
 	}
-	return loadJSONL(path)
+	if err != nil {
+		return nil, err
+	}
+	sort.SliceStable(specs, func(i, j int) bool { return specs[i].Ts < specs[j].Ts })
+	return specs, nil
 }
 
 func loadJSONL(path string) ([]RequestSpec, error) {

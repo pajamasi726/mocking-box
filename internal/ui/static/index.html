@@ -231,7 +231,11 @@ const MSG = {
     err_prefix: "오류: ",
     collectors: "수집기",
     collectors_desc: "구서버가 있는 곳(운영/스테이징) 옆에서 아래 한 줄을 실행하면 트래픽을 옆에서 녹화해 여기로 보냅니다. 요청 경로에 끼어들지 않습니다.",
-    collect_cmd_label: "수집 명령 (구서버 옆에서 실행) — 포트만 바꾸세요",
+    agent_cmd_label: "수집기 실행 (구서버 옆에서 한 번만 — 이후 아래에서 원격 제어)",
+    cap_port: "포트", cap_name: "파일명", cap_duration: "최대 녹화(분)",
+    cap_duration_hint: "지정 시간이 지나면 자동 중지됩니다 (방어장치, 미지정 시 최대 24시간).",
+    cap_ready: "패킷 캡처 가능", cap_blocked: "캡처 권한 없음", auto_stop_in: "자동중지", upload_use: "업로드", no_recordings: "녹화본 없음",
+    cmd_sent: "명령 전송됨", upload_sent: "업로드 요청됨 — 잠시 후 녹화본 목록에 나타납니다",
     no_collectors: "등록된 수집기가 없습니다",
     col_state: "상태", col_last_seen: "마지막 신호", ago_s: "초 전",
     import_file: "녹화본 파일 가져오기 (오프라인 수집분: .jsonl / .golden.jsonl / .har)",
@@ -312,7 +316,11 @@ const MSG = {
     err_prefix: "Error: ",
     collectors: "Collectors",
     collectors_desc: "Next to the old server (prod/staging), run the one-liner below. It records traffic passively — never in the request path — and sends it here.",
-    collect_cmd_label: "Collect command (run next to the old server) — just change the port",
+    agent_cmd_label: "Run the collector once next to the old server — then control it remotely below",
+    cap_port: "Port", cap_name: "File name", cap_duration: "Max record (min)",
+    cap_duration_hint: "Auto-stops after this long (safety guard; max 24h if unset).",
+    cap_ready: "capture ready", cap_blocked: "no capture permission", auto_stop_in: "auto-stop", upload_use: "Upload", no_recordings: "No recordings",
+    cmd_sent: "Command sent", upload_sent: "Upload requested — appears in Recordings shortly",
     no_collectors: "No collectors registered",
     col_state: "state", col_last_seen: "last seen", ago_s: "s ago",
     import_file: "Import a recording file (offline capture: .jsonl / .golden.jsonl / .har)",
@@ -651,26 +659,83 @@ async function renderAgents() {
   const box = document.getElementById("agents");
   if (!box) return;
   const dashHost = location.host;
-  const cmd = `mockingbox collect --port 8080 --out rec.golden.jsonl --dashboard http://${dashHost}`;
-  const cmdBlock = `<div class="hint">${esc(t("collect_cmd_label"))}</div>
-    <div class="flow" style="margin-bottom:10px">${esc(cmd)}</div>`;
+  const cmd = `mockingbox collect agent --dashboard http://${dashHost}`;
+  const cmdBlock = `<div class="hint">${esc(t("agent_cmd_label"))}</div>
+    <div class="flow" style="margin-bottom:12px">${esc(cmd)}</div>`;
   const agents = await api("/api/agents").catch(() => []);
   if (!agents.length) { box.innerHTML = cmdBlock + `<div class="empty" style="padding:12px 0">${esc(t("no_collectors"))}</div>`; return; }
   const dotColor = h => h === "green" ? "var(--good)" : h === "yellow" ? "var(--warning)" : "var(--critical)";
-  box.innerHTML = `<table class="t"><thead><tr>
-      <th></th><th>${esc(t("col_name"))}</th><th>mode</th><th>${esc(t("col_state"))}</th>
-      <th>${esc(t("col_count"))}</th><th>${esc(t("col_last_seen"))}</th><th>out</th></tr></thead>
-    <tbody>${agents.map(a => `<tr>
-      <td><span class="dot" style="background:${dotColor(a.health)}"></span></td>
-      <td>${esc(a.name)} <span class="muted mono">${esc(a.id)}</span></td>
-      <td class="mono">${esc(a.mode)}</td>
-      <td class="mono">${esc(a.state)}${a.last_error ? ` <span style="color:var(--critical-text)">${esc(a.last_error.slice(0,40))}</span>` : ""}</td>
-      <td class="num">${a.count}</td>
-      <td class="mono muted">${a.last_seen_s}${esc(t("ago_s"))}</td>
-      <td class="mono muted">${esc(a.out||"")}</td></tr>`).join("")}</tbody></table>`;
-  box.innerHTML = cmdBlock + box.innerHTML;
+  const fmtRemain = s => s > 3600 ? `${Math.floor(s/3600)}h${Math.floor((s%3600)/60)}m` : `${Math.floor(s/60)}m`;
+
+  box.innerHTML = cmdBlock + agents.map(a => {
+    const capturing = a.state === "capturing";
+    const recs = a.recordings || [];
+    const control = capturing ? `
+      <div class="status-line" style="margin-top:8px">
+        <span class="pulse"></span> <strong>${esc(t("capturing"))}</strong>
+        <span class="mono">${esc(a.current||"")} · ${a.count} ${esc(t("captured_n"))}</span>
+        ${a.remain_sec>0?`<span class="chip">⏱ ${esc(t("auto_stop_in"))} ${fmtRemain(a.remain_sec)}</span>`:""}
+        <button class="btn small danger agent-stop" data-id="${esc(a.id)}" style="margin-left:auto">${esc(t("stop_capture"))}</button>
+      </div>` : `
+      <div class="row" style="margin-top:8px">
+        <div style="max-width:150px"><label>${esc(t("cap_port"))}</label><input type="number" class="mono ag-port" value="8080"></div>
+        <div><label>${esc(t("cap_name"))}</label><input type="text" class="mono ag-name" value="rec-${new Date().toISOString().slice(0,10)}.golden.jsonl"></div>
+        <div style="max-width:140px"><label>${esc(t("cap_duration"))}</label><input type="number" class="mono ag-dur" value="180"></div>
+        <div style="flex:0"><button class="btn primary agent-start" data-id="${esc(a.id)}">${esc(t("start_capture"))}</button></div>
+      </div>
+      <div class="hint">${esc(t("cap_duration_hint"))}</div>`;
+    const recList = recs.length ? `
+      <table class="t" style="margin-top:8px"><thead><tr><th>${esc(t("corpus_name"))}</th><th>${esc(t("col_size"))}</th><th></th></tr></thead>
+      <tbody>${recs.map(r => `<tr>
+        <td class="mono">${esc(r.name)}${r.golden?` <span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${esc(t("type_golden"))}</span>`:""}</td>
+        <td class="num muted">${((r.size||0)/1024).toFixed(0)} KB</td>
+        <td style="text-align:right"><button class="btn small agent-upload" data-id="${esc(a.id)}" data-name="${esc(r.name)}">${esc(t("upload_use"))}</button></td>
+      </tr>`).join("")}</tbody></table>` : `<div class="hint" style="margin-top:8px">${esc(t("no_recordings"))}</div>`;
+
+    const capReady = a.capture_ok;
+    const capBadge = capReady
+      ? `<span class="chip" title="${esc(a.capture_detail||"")}"><span class="dot" style="background:var(--good)"></span>${esc(t("cap_ready"))}${a.iface?` (${esc(a.iface)})`:""}</span>`
+      : `<span class="chip" title="${esc(a.capture_detail||"")}"><span class="dot" style="background:var(--critical)"></span>${esc(t("cap_blocked"))}</span>`;
+    const capFix = !capReady && a.capture_detail
+      ? `<div class="hint" style="color:var(--critical-text)">${esc(a.capture_detail)}</div>` : "";
+    // when capture is blocked, only mirror mode (UDP receive, no CAP_NET_RAW) works
+    return `<div class="card" style="margin-bottom:10px">
+      <div class="status-line">
+        <span class="dot" style="background:${dotColor(a.health)}"></span>
+        <strong>${esc(a.name)}</strong> <span class="muted mono">${esc(a.mode)} · ${esc(a.id)}</span>
+        ${capBadge}
+        <span class="muted" style="margin-left:auto">${a.last_seen_s}${esc(t("ago_s"))}</span>
+      </div>
+      ${capFix}
+      ${a.last_error?`<div class="hint" style="color:var(--critical-text)">${esc(a.last_error)}</div>`:""}
+      ${control}
+      ${recList}
+    </div>`;
+  }).join("");
+
+  box.querySelectorAll(".agent-start").forEach(el => el.onclick = async () => {
+    const card = el.closest(".card");
+    await api("/api/agents/command", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({
+      id: el.dataset.id, action: "start", mode: "sniff",
+      port: +card.querySelector(".ag-port").value || 8080,
+      name: card.querySelector(".ag-name").value.trim(),
+      duration_min: +card.querySelector(".ag-dur").value || 0,
+      sample: 1,
+    })}).catch(e => toast(t("err_prefix")+e.message));
+    toast(t("cmd_sent"));
+  });
+  box.querySelectorAll(".agent-stop").forEach(el => el.onclick = async () => {
+    await api("/api/agents/command", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({id: el.dataset.id, action: "stop"})}).catch(e => toast(t("err_prefix")+e.message));
+    toast(t("cmd_sent"));
+  });
+  box.querySelectorAll(".agent-upload").forEach(el => el.onclick = async () => {
+    await api("/api/agents/command", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({id: el.dataset.id, action: "upload", name: el.dataset.name})}).catch(e => toast(t("err_prefix")+e.message));
+    toast(t("upload_sent"));
+    setTimeout(() => { renderCorpora(); }, 4000);
+  });
+
   clearTimeout(renderAgents._t);
-  if (tab === "capture") renderAgents._t = setTimeout(renderAgents, 5000);
+  if (tab === "capture") renderAgents._t = setTimeout(renderAgents, 3000);
 }
 
 function startCapturePoll() {
