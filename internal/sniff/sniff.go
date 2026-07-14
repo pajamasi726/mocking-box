@@ -13,7 +13,9 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -34,8 +36,12 @@ var skipHeaders = map[string]bool{
 	"accept-encoding": true, "cookie": true,
 }
 
-// Exchange is one reconstructed request/response pair.
+// Exchange is one reconstructed request/response pair. Ts is when the request
+// was parsed — exchanges are ordered by it before writing, so the replayable
+// sequence approximates the upstream's real execution order even when
+// concurrent responses complete out of order.
 type Exchange struct {
+	Ts      time.Time
 	Method  string
 	Path    string
 	Headers map[string]string
@@ -158,6 +164,7 @@ func errIsClosed(err error) bool {
 // -- request/response pairing (FIFO per connection) ---------------------------
 
 type pendingRequest struct {
+	ts      time.Time
 	method  string
 	path    string
 	headers map[string]string
@@ -215,7 +222,7 @@ func (p *pairer) addRequest(key string, req *http.Request, body []byte) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	c := p.get(key)
-	c.requests = append(c.requests, pendingRequest{req.Method, path, headers, parsedBody})
+	c.requests = append(c.requests, pendingRequest{time.Now(), req.Method, path, headers, parsedBody})
 	p.match(c)
 }
 
@@ -232,6 +239,7 @@ func (p *pairer) match(c *conn) {
 		req, resp := c.requests[0], c.responses[0]
 		c.requests, c.responses = c.requests[1:], c.responses[1:]
 		p.sink(Exchange{
+			Ts:     req.ts,
 			Method: req.method, Path: req.path, Headers: req.headers, Body: req.body,
 			Status: resp.status, RespBody: resp.body,
 		})
@@ -241,13 +249,23 @@ func (p *pairer) match(c *conn) {
 // -- output writers ------------------------------------------------------------
 
 // Output appends exchanges to a corpus (.jsonl) or golden (.golden.jsonl) file.
+//
+// Sampling: SampleRate < 1 keeps that fraction of READ exchanges. Writes
+// (non-GET/HEAD) are always kept by default (SampleAllWrites) — replaying the
+// full write sequence against a capture-time snapshot reproduces state
+// faithfully, while sampled-out reads never affect state.
 type Output struct {
 	mu      sync.Mutex
 	golden  *golden.Writer
 	rawPath string
 	rawFile io.WriteCloser
-	seq     int
+	buffer  []Exchange
 	Count   int
+	Skipped int
+
+	SampleRate      float64 // 0 < rate <= 1; 0 means 1.0 (keep all)
+	SampleAllWrites bool
+	rand            *rand.Rand
 }
 
 func NewOutput(path, upstreamLabel string) (*Output, error) {
@@ -272,43 +290,68 @@ func NewOutput(path, upstreamLabel string) (*Output, error) {
 	return o, nil
 }
 
+func (o *Output) sampledOut(method string) bool {
+	if o.SampleRate <= 0 || o.SampleRate >= 1 {
+		return false
+	}
+	isRead := method == "GET" || method == "HEAD"
+	if !isRead && o.SampleAllWrites {
+		return false
+	}
+	if o.rand == nil {
+		o.rand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
+	return o.rand.Float64() >= o.SampleRate
+}
+
+// Sink buffers exchanges; Close sorts them by request time and writes.
 func (o *Output) Sink(ex Exchange) {
 	o.mu.Lock()
 	defer o.mu.Unlock()
-	o.seq++
-	name := fmt.Sprintf("sniff-%d-%s-%s", o.seq, ex.Method, ex.Path)
-	if o.golden != nil {
-		if err := o.golden.Append(golden.Entry{
-			Name: name, Method: ex.Method, Path: ex.Path,
-			Headers: ex.Headers, Body: ex.Body,
-			Expected: golden.Expected{Status: ex.Status, Body: ex.RespBody},
-		}); err != nil {
-			log.Printf("[sniff] write: %v", err)
-			return
-		}
-	} else {
-		entry := map[string]any{"name": name, "method": ex.Method, "path": ex.Path}
-		if len(ex.Headers) > 0 {
-			entry["headers"] = ex.Headers
-		}
-		if ex.Body != nil {
-			entry["body"] = ex.Body
-		}
-		line, err := json.Marshal(entry)
-		if err != nil {
-			return
-		}
-		if _, err := o.rawFile.Write(append(line, '\n')); err != nil {
-			log.Printf("[sniff] write: %v", err)
-			return
-		}
+	if o.sampledOut(ex.Method) {
+		o.Skipped++
+		return
 	}
+	o.buffer = append(o.buffer, ex)
 	o.Count++
 }
 
 func (o *Output) Close() {
 	o.mu.Lock()
 	defer o.mu.Unlock()
+
+	// request-arrival order ≈ upstream execution order; completion order is not
+	sort.SliceStable(o.buffer, func(i, j int) bool { return o.buffer[i].Ts.Before(o.buffer[j].Ts) })
+
+	for i, ex := range o.buffer {
+		name := fmt.Sprintf("sniff-%d-%s-%s", i+1, ex.Method, ex.Path)
+		if o.golden != nil {
+			if err := o.golden.Append(golden.Entry{
+				Name: name, Method: ex.Method, Path: ex.Path,
+				Headers: ex.Headers, Body: ex.Body,
+				Expected: golden.Expected{Status: ex.Status, Body: ex.RespBody},
+			}); err != nil {
+				log.Printf("[sniff] write: %v", err)
+			}
+		} else {
+			entry := map[string]any{"name": name, "method": ex.Method, "path": ex.Path}
+			if len(ex.Headers) > 0 {
+				entry["headers"] = ex.Headers
+			}
+			if ex.Body != nil {
+				entry["body"] = ex.Body
+			}
+			line, err := json.Marshal(entry)
+			if err != nil {
+				continue
+			}
+			if _, err := o.rawFile.Write(append(line, '\n')); err != nil {
+				log.Printf("[sniff] write: %v", err)
+			}
+		}
+	}
+	o.buffer = nil
+
 	if o.golden != nil {
 		o.golden.Close()
 	}

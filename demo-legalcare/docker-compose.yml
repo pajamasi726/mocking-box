@@ -1,0 +1,43 @@
+# 리걸케어 축소판: MySQL 8.4 (lawkit-prod와 동일 메이저) + contract 서비스 구/신
+services:
+  mysql-old:
+    image: mysql:8.4
+    environment: { MYSQL_ROOT_PASSWORD: root }
+    command: --server-id=1
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql/my.cnf:/etc/mysql/conf.d/replay.cnf:ro
+    ports: ["13306:3306"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 2s
+      timeout: 2s
+      retries: 40
+
+  mysql-new:
+    image: mysql:8.4
+    environment: { MYSQL_ROOT_PASSWORD: root }
+    command: --server-id=2
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql/my.cnf:/etc/mysql/conf.d/replay.cnf:ro
+    ports: ["13307:3306"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 2s
+      timeout: 2s
+      retries: 40
+
+  app-old:
+    build: ./app_old
+    environment: { DB_HOST: mysql-old }
+    ports: ["10103:8080"]   # lawkit-contract 포트 매핑과 동일
+    depends_on:
+      mysql-old: { condition: service_healthy }
+
+  app-new:
+    build: ./app_new
+    environment: { DB_HOST: mysql-new }
+    ports: ["10104:8080"]
+    depends_on:
+      mysql-new: { condition: service_healthy }

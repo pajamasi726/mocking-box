@@ -121,6 +121,8 @@ func cmdSniff(args []string) int {
 	port := fs.Int("port", 0, "service TCP port (required)")
 	out := fs.String("out", "", "output file: .jsonl (requests) or .golden.jsonl (required)")
 	duration := fs.Duration("duration", 0, "stop after this long (default: until Ctrl-C)")
+	sample := fs.Float64("sample", 1.0, "keep this fraction of READ exchanges (writes always kept)")
+	sampleWrites := fs.Bool("sample-writes-too", false, "also sample non-GET requests (breaks state replay!)")
 	fs.Parse(args)
 	if *iface == "" || *port == 0 || *out == "" {
 		fs.Usage()
@@ -130,6 +132,7 @@ func cmdSniff(args []string) int {
 	if err != nil {
 		log.Fatalf("output: %v", err)
 	}
+	output.SampleRate, output.SampleAllWrites = *sample, !*sampleWrites
 	defer output.Close()
 	pipeline := sniff.NewPipeline(*port, output.Sink)
 
@@ -137,7 +140,7 @@ func cmdSniff(args []string) int {
 	if err := sniff.RunLive(*iface, *port, pipeline, stop); err != nil {
 		log.Fatalf("sniff: %v", err)
 	}
-	log.Printf("captured %d exchange(s) -> %s", output.Count, *out)
+	log.Printf("captured %d exchange(s), sampled out %d -> %s", output.Count, output.Skipped, *out)
 	return 0
 }
 
@@ -147,6 +150,8 @@ func cmdConvert(args []string) int {
 	port := fs.Int("port", 0, "service TCP port (required)")
 	out := fs.String("out", "", "output file: .jsonl or .golden.jsonl (required)")
 	vxlan := fs.Bool("vxlan", false, "packets are VXLAN-encapsulated (mirrored capture)")
+	sample := fs.Float64("sample", 1.0, "keep this fraction of READ exchanges (writes always kept)")
+	sampleWrites := fs.Bool("sample-writes-too", false, "also sample non-GET requests (breaks state replay!)")
 	fs.Parse(args)
 	if *pcapPath == "" || *port == 0 || *out == "" {
 		fs.Usage()
@@ -156,6 +161,7 @@ func cmdConvert(args []string) int {
 	if err != nil {
 		log.Fatalf("output: %v", err)
 	}
+	output.SampleRate, output.SampleAllWrites = *sample, !*sampleWrites
 	defer output.Close()
 	pipeline := sniff.NewPipeline(*port, output.Sink)
 	if err := sniff.RunFile(*pcapPath, *port, *vxlan, pipeline); err != nil {
@@ -171,6 +177,8 @@ func cmdMirror(args []string) int {
 	port := fs.Int("port", 0, "inner service TCP port (required)")
 	out := fs.String("out", "", "output file: .jsonl or .golden.jsonl (required)")
 	duration := fs.Duration("duration", 0, "stop after this long (default: until Ctrl-C)")
+	sample := fs.Float64("sample", 1.0, "keep this fraction of READ exchanges (writes always kept)")
+	sampleWrites := fs.Bool("sample-writes-too", false, "also sample non-GET requests (breaks state replay!)")
 	fs.Parse(args)
 	if *port == 0 || *out == "" {
 		fs.Usage()
@@ -180,6 +188,7 @@ func cmdMirror(args []string) int {
 	if err != nil {
 		log.Fatalf("output: %v", err)
 	}
+	output.SampleRate, output.SampleAllWrites = *sample, !*sampleWrites
 	defer output.Close()
 	pipeline := sniff.NewPipeline(*port, output.Sink)
 

@@ -1,0 +1,29 @@
+# 리걸케어 시뮬레이션 설정
+old:
+  base_url: "http://localhost:10103"
+  mysql: { host: 127.0.0.1, port: 13306, user: root, password: root }
+
+new:
+  base_url: "http://localhost:10104"
+  mysql: { host: 127.0.0.1, port: 13307, user: root, password: root }
+
+attribution:
+  quiet_ms: 300
+  timeout_ms: 5000
+
+noise:
+  response_paths:
+    - "**.updated_at"
+    - "**.created_at"
+  columns:
+    - "*.updated_at"
+    - "*.created_at"
+  tables_ignore: []
+
+# 매퍼(jOOQ ASC vs MyBatis DESC) 순서 차이 흡수 — 1차 verify에서 75건 diff 확인 후 활성화
+compare:
+  sort_arrays:
+    - { path: "contracts", by: "contract_id" }
+
+report: { dir: "./report" }
+corpus: { dir: "./corpus" }

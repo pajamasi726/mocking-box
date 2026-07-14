@@ -1,4 +1,0 @@
-{"headers":{"accept":"*/*","user-agent":"curl/8.7.1"},"method":"GET","name":"cap-1-GET-/wallet/1","path":"/wallet/1"}
-{"body":{"amount":3000},"headers":{"accept":"*/*","content-type":"application/json","user-agent":"curl/8.7.1"},"method":"POST","name":"cap-2-POST-/wallet/1/charge","path":"/wallet/1/charge"}
-{"headers":{"accept":"*/*","user-agent":"curl/8.7.1"},"method":"GET","name":"cap-3-GET-/wallet/2","path":"/wallet/2"}
-{"body":{"amount":1000},"headers":{"accept":"*/*","content-type":"application/json","user-agent":"curl/8.7.1"},"method":"POST","name":"cap-4-POST-/wallet/1/withdraw","path":"/wallet/1/withdraw"}

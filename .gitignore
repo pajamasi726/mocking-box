@@ -1,6 +1,9 @@
 bin/
 report/
 demo/report/
+demo-legalcare/report/
+demo-legalcare/corpus/
+demo/corpus/
 .venv/
 __pycache__/
 *.egg-info/

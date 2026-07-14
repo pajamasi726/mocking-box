@@ -34,7 +34,7 @@ func RunLive(iface string, port int, pipeline *Pipeline, stop <-chan struct{}) e
 
 	source := gopacket.NewPacketSource(handle, handle.LinkType())
 	source.NoCopy = true
-	ticker := time.NewTicker(30 * time.Second)
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 	for {
 		select {
@@ -42,7 +42,7 @@ func RunLive(iface string, port int, pipeline *Pipeline, stop <-chan struct{}) e
 			pipeline.Flush()
 			return nil
 		case <-ticker.C:
-			pipeline.FlushOld(2 * time.Minute)
+			pipeline.FlushOld(15 * time.Second)
 		case pkt, ok := <-source.Packets():
 			if !ok {
 				pipeline.Flush()
@@ -107,11 +107,13 @@ func RunMirror(listen string, port int, pipeline *Pipeline, stop <-chan struct{}
 		sock.Close()
 	}()
 
-	ticker := time.NewTicker(30 * time.Second)
+	// liveness for connections joined mid-stream (mirror session started after
+	// the TCP handshake): force out data the reassembler is still holding
+	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 	go func() {
 		for range ticker.C {
-			pipeline.FlushOld(2 * time.Minute)
+			pipeline.FlushOld(15 * time.Second)
 		}
 	}()
 
