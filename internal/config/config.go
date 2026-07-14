@@ -30,11 +30,12 @@ func (m *MySQL) DSN() string {
 // seeded from; Schemas/Exclude scope what gets copied and captured.
 type Datastore struct {
 	Name     string   `yaml:"name" json:"name"`
-	Type     string   `yaml:"type" json:"type"` // "mysql" (postgres: roadmap)
+	Type     string   `yaml:"type" json:"type"` // "mysql" | "postgres"
 	Host     string   `yaml:"host" json:"host"`
 	Port     int      `yaml:"port" json:"port"`
 	User     string   `yaml:"user" json:"user"`
 	Password string   `yaml:"password" json:"password"`
+	Database string   `yaml:"database" json:"database"` // postgres: the DB name (mysql ignores — schemas ARE databases)
 	Schemas  []string `yaml:"schemas" json:"schemas"`
 	Exclude  []string `yaml:"exclude_tables" json:"exclude_tables"`
 	SeedFrom *MySQL   `yaml:"seed_from" json:"seed_from,omitempty"`
@@ -211,11 +212,15 @@ func normalizeDatastores(datastores []*Datastore) error {
 		if d.Type == "" {
 			d.Type = "mysql"
 		}
-		if d.Type != "mysql" {
-			return fmt.Errorf("datastore %q: type %q는 아직 지원되지 않습니다 (현재 mysql만)", d.Name, d.Type)
+		if d.Type != "mysql" && d.Type != "postgres" {
+			return fmt.Errorf("datastore %q: type %q는 지원되지 않습니다 (mysql | postgres)", d.Name, d.Type)
 		}
 		if d.Port == 0 {
-			d.Port = 3306
+			if d.Type == "postgres" {
+				d.Port = 5432
+			} else {
+				d.Port = 3306
+			}
 		}
 		if d.Name == "" {
 			d.Name = fmt.Sprintf("db%d", i+1)

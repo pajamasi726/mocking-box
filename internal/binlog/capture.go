@@ -26,16 +26,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/pajamasi726/mocking-box/internal/config"
+	"github.com/pajamasi726/mocking-box/internal/writeset"
 )
-
-// RowChange is one committed row change, normalized from a binlog row event.
-type RowChange struct {
-	Table  string         `json:"table"` // schema.table
-	Op     string         `json:"op"`    // INSERT | UPDATE | DELETE
-	Before map[string]any `json:"before,omitempty"`
-	After  map[string]any `json:"after,omitempty"`
-	Query  string         `json:"query,omitempty"` // Rows_query text when available
-}
 
 var systemSchemas = map[string]bool{
 	"mysql": true, "sys": true, "information_schema": true, "performance_schema": true,
@@ -51,7 +43,7 @@ type Capture struct {
 	cancel context.CancelFunc
 
 	mu        sync.Mutex
-	changes   []RowChange
+	changes   []writeset.RowChange
 	lastEvent time.Time
 	err       error
 
@@ -192,7 +184,7 @@ func opOf(t replication.EventType) string {
 	return ""
 }
 
-func (c *Capture) normalize(t replication.EventType, e *replication.RowsEvent, schema, lastQuery string) []RowChange {
+func (c *Capture) normalize(t replication.EventType, e *replication.RowsEvent, schema, lastQuery string) []writeset.RowChange {
 	op := opOf(t)
 	if op == "" {
 		return nil
@@ -212,11 +204,11 @@ func (c *Capture) normalize(t replication.EventType, e *replication.RowsEvent, s
 		return m
 	}
 
-	var out []RowChange
+	var out []writeset.RowChange
 	if op == "UPDATE" {
 		// rows arrive as before/after pairs
 		for i := 0; i+1 < len(e.Rows); i += 2 {
-			out = append(out, RowChange{
+			out = append(out, writeset.RowChange{
 				Table: table, Op: op,
 				Before: rowMap(e.Rows[i]), After: rowMap(e.Rows[i+1]),
 				Query: lastQuery,
@@ -225,7 +217,7 @@ func (c *Capture) normalize(t replication.EventType, e *replication.RowsEvent, s
 		return out
 	}
 	for _, row := range e.Rows {
-		ch := RowChange{Table: table, Op: op, Query: lastQuery}
+		ch := writeset.RowChange{Table: table, Op: op, Query: lastQuery}
 		if op == "INSERT" {
 			ch.After = rowMap(row)
 		} else {
@@ -282,7 +274,7 @@ func (c *Capture) BeginWindow() {
 }
 
 // TakeWindow waits for quiesce, then returns (and clears) this window's changes.
-func (c *Capture) TakeWindow(attr config.Attribution) ([]RowChange, error) {
+func (c *Capture) TakeWindow(attr config.Attribution) ([]writeset.RowChange, error) {
 	quiet := time.Duration(attr.QuietMs) * time.Millisecond
 	deadline := time.Now().Add(time.Duration(attr.TimeoutMs) * time.Millisecond)
 	opened := time.Now()

@@ -24,10 +24,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pajamasi726/mocking-box/internal/binlog"
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/diff"
 	"github.com/pajamasi726/mocking-box/internal/golden"
+	"github.com/pajamasi726/mocking-box/internal/writeset"
 )
 
 const maxBodyBytes = 1 << 20
@@ -43,7 +43,7 @@ type Options struct {
 	// Serialize handles one request at a time so binlog write-sets can be
 	// attributed per request. Implied when Source is set.
 	Serialize    bool
-	Source       *config.MySQL // upstream's DB for expected write-sets (golden mode)
+	Source       writeset.Source // upstream DB write-set source (golden mode); nil = no write-sets
 	Attribution  config.Attribution
 	NoiseColumns []string
 	TablesIgnore []string
@@ -84,7 +84,7 @@ type Recorder struct {
 	srv       *http.Server
 	rawFile   *os.File       // requests-only mode
 	goldenW   *golden.Writer // golden mode
-	dbCapture *binlog.Capture
+	dbCapture writeset.Source
 }
 
 // Start launches a recording proxy on listen -> upstream.
@@ -120,7 +120,7 @@ func Start(listen, upstream, corpusPath string, opts Options) (*Recorder, error)
 	}
 
 	if opts.Source != nil {
-		r.dbCapture = binlog.New("capture", opts.Source, 5599)
+		r.dbCapture = opts.Source
 		if err := r.dbCapture.Start(); err != nil {
 			r.closeOutputs()
 			return nil, fmt.Errorf("write-set source: %w", err)

@@ -1,0 +1,39 @@
+# medilawyer 축소판: PostgreSQL 16 (wal_level=logical) + 리뷰 서비스 구/신
+services:
+  pg-old:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: postgres }
+    command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=8", "-c", "max_wal_senders=8"]
+    volumes:
+      - ./pg/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports: ["15432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 40
+
+  pg-new:
+    image: postgres:16
+    environment: { POSTGRES_PASSWORD: postgres }
+    command: ["postgres", "-c", "wal_level=logical", "-c", "max_replication_slots=8", "-c", "max_wal_senders=8"]
+    ports: ["15433:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 40
+
+  app-old:
+    build: ./app_old
+    environment: { DB_HOST: pg-old, DB_PORT: 5432 }
+    ports: ["10203:8080"]
+    depends_on:
+      pg-old: { condition: service_healthy }
+
+  app-new:
+    build: ./app_new
+    environment: { DB_HOST: pg-new, DB_PORT: 5432 }
+    ports: ["10204:8080"]
+    depends_on:
+      pg-new: { condition: service_healthy }

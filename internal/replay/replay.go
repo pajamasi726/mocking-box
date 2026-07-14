@@ -9,10 +9,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pajamasi726/mocking-box/internal/binlog"
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/corpus"
 	"github.com/pajamasi726/mocking-box/internal/diff"
+	"github.com/pajamasi726/mocking-box/internal/writeset"
+	"github.com/pajamasi726/mocking-box/internal/wscapture"
 )
 
 const maxBodyBytes = 1 << 20 // 1 MiB per response kept for the report
@@ -37,7 +38,7 @@ type Result struct {
 
 type stackRuntime struct {
 	cfg     config.Stack
-	capture *binlog.Capture
+	capture writeset.Source
 }
 
 type Runner struct {
@@ -53,8 +54,8 @@ type Runner struct {
 func NewRunner(cfg *config.Config) *Runner {
 	newRt := func(stack config.Stack, serverID uint32) *stackRuntime {
 		rt := &stackRuntime{cfg: stack}
-		if m := stack.PrimaryMySQL(); m != nil {
-			rt.capture = binlog.New(stack.Name, m, serverID)
+		if src, err := wscapture.For(stack.Name, &stack, serverID); err == nil {
+			rt.capture = src
 		}
 		return rt
 	}
@@ -104,7 +105,7 @@ type fired struct {
 	status  int
 	body    string
 	headers map[string]string
-	changes []binlog.RowChange
+	changes []writeset.RowChange
 }
 
 func (r *Runner) runOne(spec corpus.RequestSpec) Result {
@@ -158,7 +159,7 @@ func (r *Runner) fire(rt *stackRuntime, spec corpus.RequestSpec) (*fired, error)
 // attribution-window write changes. Shared by live-parallel and verify modes.
 func fireStack(
 	client *http.Client, baseURL string,
-	capture *binlog.Capture, attribution config.Attribution,
+	capture writeset.Source, attribution config.Attribution,
 	spec corpus.RequestSpec,
 ) (*fired, error) {
 	if capture != nil {

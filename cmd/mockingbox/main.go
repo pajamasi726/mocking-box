@@ -26,6 +26,7 @@ import (
 	"github.com/pajamasi726/mocking-box/internal/seed"
 	"github.com/pajamasi726/mocking-box/internal/sniff"
 	"github.com/pajamasi726/mocking-box/internal/ui"
+	"github.com/pajamasi726/mocking-box/internal/wscapture"
 )
 
 func main() {
@@ -110,7 +111,9 @@ func cmdCollectProxy(args []string) int {
 			*upstream = cfg.Old.BaseURL
 		}
 		if opts.Golden {
-			opts.Source = cfg.Old.PrimaryMySQL()
+			if src, err := wscapture.For("capture", &cfg.Old, 5599); err == nil {
+				opts.Source = src
+			}
 			opts.Attribution = cfg.Attribution
 			opts.NoiseColumns = cfg.Noise.Columns
 			opts.TablesIgnore = cfg.Noise.TablesIgnore

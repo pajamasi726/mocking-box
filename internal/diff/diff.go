@@ -10,7 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/pajamasi726/mocking-box/internal/binlog"
+	"github.com/pajamasi726/mocking-box/internal/writeset"
 )
 
 // Verdicts.
@@ -358,7 +358,7 @@ func colIsNoise(table, column string, patterns []string) bool {
 
 // NormalizeWriteset produces a canonical, order-insensitive write-set:
 // changed non-noise columns only for UPDATEs, rows keyed by their `id`.
-func NormalizeWriteset(changes []binlog.RowChange, noiseColumns, ignoreTables []string) []WriteEntry {
+func NormalizeWriteset(changes []writeset.RowChange, noiseColumns, ignoreTables []string) []WriteEntry {
 	ignored := map[string]bool{}
 	for _, t := range ignoreTables {
 		ignored[t] = true

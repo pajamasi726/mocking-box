@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pajamasi726/mocking-box/internal/config"
+	"github.com/pajamasi726/mocking-box/internal/pg"
 	"github.com/pajamasi726/mocking-box/internal/seed"
 )
 
@@ -62,8 +63,8 @@ func (s *Server) runSeed(cfg *config.Config) {
 // schemas+tables so the UI can show checkboxes with sizes.
 func (s *Server) seedDiscover(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Host, User, Password string
-		Port                 int
+		Type, Host, User, Password, Database string
+		Port                                 int
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		jsonError(w, http.StatusBadRequest, err.Error())
@@ -71,6 +72,20 @@ func (s *Server) seedDiscover(w http.ResponseWriter, r *http.Request) {
 	}
 	if req.Host == "" {
 		jsonError(w, http.StatusBadRequest, "host is required")
+		return
+	}
+	if req.Type == "postgres" {
+		if req.Port == 0 {
+			req.Port = 5432
+		}
+		d := &config.Datastore{Type: "postgres", Host: req.Host, Port: req.Port,
+			User: req.User, Password: req.Password, Database: req.Database}
+		schemas, err := pg.Discover(d)
+		if err != nil {
+			jsonError(w, http.StatusBadGateway, err.Error())
+			return
+		}
+		writeJSON(w, schemas)
 		return
 	}
 	if req.Port == 0 {

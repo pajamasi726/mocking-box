@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/pajamasi726/mocking-box/internal/binlog"
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/diff"
 	"github.com/pajamasi726/mocking-box/internal/golden"
+	"github.com/pajamasi726/mocking-box/internal/writeset"
+	"github.com/pajamasi726/mocking-box/internal/wscapture"
 )
 
 // Verifier replays a golden against the NEW stack only (Record & Verify mode):
@@ -17,7 +18,7 @@ import (
 type Verifier struct {
 	cfg     *config.Config
 	client  *http.Client
-	capture *binlog.Capture
+	capture writeset.Source
 
 	OnProgress func(done, total int, name string)
 }
@@ -27,8 +28,8 @@ func NewVerifier(cfg *config.Config) *Verifier {
 		cfg:    cfg,
 		client: &http.Client{Timeout: time.Duration(cfg.HTTPTimeoutS * float64(time.Second))},
 	}
-	if m := cfg.New.PrimaryMySQL(); m != nil {
-		v.capture = binlog.New("new", m, 5502)
+	if src, err := wscapture.For("new", &cfg.New, 5502); err == nil {
+		v.capture = src
 	}
 	return v
 }

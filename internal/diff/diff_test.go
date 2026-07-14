@@ -6,7 +6,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/pajamasi726/mocking-box/internal/binlog"
+	"github.com/pajamasi726/mocking-box/internal/writeset"
 )
 
 var noiseCols = []string{"*.created_at", "*.updated_at"}
@@ -90,8 +90,8 @@ func TestResponseDiffStatus(t *testing.T) {
 	}
 }
 
-func chargeChangesOld() []binlog.RowChange {
-	return []binlog.RowChange{
+func chargeChangesOld() []writeset.RowChange {
+	return []writeset.RowChange{
 		{
 			Table: "demo.wallet", Op: "UPDATE",
 			Before: map[string]any{"id": int64(1), "user_id": int64(101), "balance": dec("50000"),
@@ -109,8 +109,8 @@ func chargeChangesOld() []binlog.RowChange {
 	}
 }
 
-func chargeChangesNew() []binlog.RowChange {
-	return []binlog.RowChange{
+func chargeChangesNew() []writeset.RowChange {
+	return []writeset.RowChange{
 		{ // different execution order
 			Table: "demo.wallet_history", Op: "INSERT",
 			After: map[string]any{"id": int64(1), "wallet_id": int64(1), "type": "CHARGE",
@@ -169,7 +169,7 @@ func TestWritesetDetectsWrongValue(t *testing.T) {
 }
 
 func TestNoiseOnlyUpdateIsDropped(t *testing.T) {
-	touch := []binlog.RowChange{{
+	touch := []writeset.RowChange{{
 		Table: "demo.wallet", Op: "UPDATE",
 		Before: map[string]any{"id": int64(1), "balance": dec("50000"), "updated_at": "2026-07-14 10:00:00"},
 		After:  map[string]any{"id": int64(1), "balance": dec("50000"), "updated_at": "2026-07-14 10:00:05"},
@@ -180,10 +180,10 @@ func TestNoiseOnlyUpdateIsDropped(t *testing.T) {
 }
 
 func TestDecimalScaleInsensitive(t *testing.T) {
-	a := []binlog.RowChange{{Table: "demo.wallet", Op: "UPDATE",
+	a := []writeset.RowChange{{Table: "demo.wallet", Op: "UPDATE",
 		Before: map[string]any{"id": int64(1), "balance": dec("50000")},
 		After:  map[string]any{"id": int64(1), "balance": dec("55000")}}}
-	b := []binlog.RowChange{{Table: "demo.wallet", Op: "UPDATE",
+	b := []writeset.RowChange{{Table: "demo.wallet", Op: "UPDATE",
 		Before: map[string]any{"id": int64(1), "balance": dec("50000.0")},
 		After:  map[string]any{"id": int64(1), "balance": dec("55000.0")}}}
 	if diffs := DiffWritesets(NormalizeWriteset(a, nil, nil), NormalizeWriteset(b, nil, nil)); len(diffs) != 0 {
@@ -192,7 +192,7 @@ func TestDecimalScaleInsensitive(t *testing.T) {
 }
 
 func TestIgnoredTables(t *testing.T) {
-	changes := []binlog.RowChange{{
+	changes := []writeset.RowChange{{
 		Table: "demo._replay_marker", Op: "INSERT",
 		After: map[string]any{"id": int64(9), "rid": int64(1)},
 	}}

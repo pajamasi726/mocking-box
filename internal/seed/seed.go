@@ -15,6 +15,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/pajamasi726/mocking-box/internal/config"
+	"github.com/pajamasi726/mocking-box/internal/pg"
 )
 
 var systemSchemas = map[string]bool{
@@ -39,32 +40,41 @@ type Options struct {
 	GoldenName    string // recorded in the marker for preflight matching
 }
 
-// RunPairs seeds each new datastore from the old datastore of the same name:
-// the reference (old) DB IS the seed source. Scope (schemas/exclude) is read
-// from the old datastore, since that's where discovery happens.
+// RunPairs copies each new datastore from the old datastore of the same name:
+// the reference (old) DB IS the copy source. Scope (schemas/exclude) is read
+// from the old datastore, since that's where discovery happens. Branches on
+// datastore type (mysql | postgres).
 func RunPairs(oldStack, newStack *config.Stack, goldenName string) (*Stats, error) {
 	total := &Stats{}
 	seeded := 0
 	for _, nd := range newStack.Datastores {
-		dst := nd.MySQL()
-		if dst == nil {
-			continue
-		}
 		od := oldStack.DatastoreByName(nd.Name)
 		if od == nil {
 			return total, fmt.Errorf("datastore %q: no matching reference (old) DB — 설정에서 짝을 맞추세요", nd.Name)
 		}
-		src := od.MySQL()
-		if src == nil || src.Host == "" {
+		if od.Host == "" {
 			return total, fmt.Errorf("datastore %q: reference (old) connection is empty", nd.Name)
 		}
-		opts := Options{Schemas: od.Schemas, GoldenName: goldenName, ExcludeTables: map[string]bool{}}
+		exclude := map[string]bool{}
 		for _, t := range od.Exclude {
 			if t != "" {
-				opts.ExcludeTables[t] = true
+				exclude[t] = true
 			}
 		}
-		st, err := Run(src, dst, opts)
+
+		var st *Stats
+		var err error
+		switch nd.Type {
+		case "postgres":
+			var cs *pg.CopyStats
+			cs, err = pg.Copy(od, nd, od.Schemas, exclude)
+			if cs != nil {
+				st = &Stats{Schemas: cs.Schemas, Tables: cs.Tables, Rows: cs.Rows}
+			}
+		default: // mysql
+			opts := Options{Schemas: od.Schemas, GoldenName: goldenName, ExcludeTables: exclude}
+			st, err = Run(od.MySQL(), nd.MySQL(), opts)
+		}
 		if err != nil {
 			return total, fmt.Errorf("datastore %q: %w", nd.Name, err)
 		}

@@ -1,0 +1,30 @@
+new:
+  base_url: "http://localhost:10204"
+  datastores:
+    - name: booster-db
+      type: postgres
+      host: 127.0.0.1
+      port: 15433
+      user: postgres
+      password: postgres
+      database: postgres
+      schemas: [booster]
+old:
+  base_url: "http://localhost:10203"
+  datastores:
+    - name: booster-db
+      type: postgres
+      host: 127.0.0.1
+      port: 15432
+      user: postgres
+      password: postgres
+      database: postgres
+      schemas: [booster]
+attribution: { quiet_ms: 400, timeout_ms: 5000 }
+noise:
+  response_paths: ["**.updated_at", "**.created_at"]
+  columns: ["*.updated_at", "*.created_at"]
+compare:
+  sort_arrays: [{ path: "reviews", by: "review_id" }]
+report: { dir: "./report" }
+corpus: { dir: "./corpus" }

@@ -212,7 +212,7 @@ const MSG = {
     new_url_label: "검증 대상 서버 (신) Base URL",
     old_stack: "기준 서버 (구 — 녹화 대상)", new_stack: "검증 대상 서버 (신)",
     base_url: "Base URL",
-    db_type: "종류", soon: "준비중", db_pair_ref: "기준(구) DB — 복사 원본", db_pair_new: "검증대상(신) DB — 복사 대상",
+    db_type: "종류", db_name: "DB이름(PG)", soon: "준비중", db_pair_ref: "기준(구) DB — 복사 원본", db_pair_new: "검증대상(신) DB — 복사 대상",
     db_pair_hint: "이름이 같은 구↔신끼리 비교·시딩됩니다. DB가 하나면 이름은 자동입니다.",
     mysql_title: "MySQL (write-set 검증용 — 비우면 응답만 비교)",
     mysql_host: "호스트", mysql_port: "포트", mysql_user: "사용자", mysql_password: "비밀번호",
@@ -293,7 +293,7 @@ const MSG = {
     new_url_label: "Server under test (new) Base URL",
     old_stack: "Reference server (old — recording target)", new_stack: "Server under test (new)",
     base_url: "Base URL",
-    db_type: "Type", soon: "soon", db_pair_ref: "Reference (old) DB — copy source", db_pair_new: "DB under test (new) — copy target",
+    db_type: "Type", db_name: "DB name (PG)", soon: "soon", db_pair_ref: "Reference (old) DB — copy source", db_pair_new: "DB under test (new) — copy target",
     db_pair_hint: "Same-named old↔new are compared & seeded together. With one DB the name is automatic.",
     mysql_title: "MySQL (for write-set verification — leave empty to compare responses only)",
     mysql_host: "Host", mysql_port: "Port", mysql_user: "User", mysql_password: "Password",
@@ -805,7 +805,7 @@ async function renderSeed() {
 }
 
 async function discoverFor(name, od, card) {
-  const src = { host: od.host, port: od.port || 3306, user: od.user, password: od.password };
+  const src = { type: od.type||"mysql", host: od.host, port: od.port || (od.type==="postgres"?5432:3306), user: od.user, password: od.password, database: od.database||"" };
   if (!src.host) { toast(t("err_prefix") + "reference DB not set"); return; }
   const btn = card.querySelector(".discover-btn");
   btn.textContent = t("discovering"); btn.disabled = true;
@@ -937,7 +937,7 @@ async function renderSettings() {
   // old↔new DB pairs (one row = reference conn + target conn, matched by name)
   const pairsBox = document.getElementById("db-pairs");
   const typeOptions = sel => ["mysql","postgres","mongodb"].map(tp =>
-    `<option value="${tp}" ${sel===tp?"selected":""} ${tp!=="mysql"?"disabled":""}>${tp==="mysql"?"MySQL / MariaDB":tp==="postgres"?"PostgreSQL ("+t("soon")+")":"MongoDB ("+t("soon")+")"}</option>`).join("");
+    `<option value="${tp}" ${sel===tp?"selected":""} ${tp==="mongodb"?"disabled":""}>${tp==="mysql"?"MySQL / MariaDB":tp==="postgres"?"PostgreSQL":"MongoDB ("+t("soon")+")"}</option>`).join("");
   const connFields = (side, d) => `
     <div class="row" style="margin-top:4px">
       <div style="max-width:150px"><label>${esc(t("db_type"))}</label>
@@ -948,6 +948,7 @@ async function renderSettings() {
     <div class="row" style="margin-top:4px">
       <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono ${side}-user" value="${esc(d.user||"")}"></div>
       <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono ${side}-pw" value="${esc(d.password||"")}"></div>
+      <div><label>${esc(t("db_name"))}</label><input type="text" class="mono ${side}-db" value="${esc(d.database||"")}" placeholder="postgres"></div>
     </div>`;
   const refreshPairNames = () => {
     const rows = pairsBox.querySelectorAll(".pair-row");
@@ -1002,13 +1003,19 @@ async function renderSettings() {
     pairRows.forEach((row, i) => {
       let name = row.querySelector(".pair-name").value.trim();
       if (!name) name = pairRows.length > 1 ? "db" + (i+1) : "default";
-      const conn = side => ({
-        type: row.querySelector(`.${side}-type`).value || "mysql",
-        host: row.querySelector(`.${side}-host`).value.trim(),
-        port: +row.querySelector(`.${side}-port`).value || 3306,
-        user: row.querySelector(`.${side}-user`).value.trim(),
-        password: row.querySelector(`.${side}-pw`).value,
-      });
+      const conn = side => {
+        const type = row.querySelector(`.${side}-type`).value || "mysql";
+        const c = {
+          type,
+          host: row.querySelector(`.${side}-host`).value.trim(),
+          port: +row.querySelector(`.${side}-port`).value || (type === "postgres" ? 5432 : 3306),
+          user: row.querySelector(`.${side}-user`).value.trim(),
+          password: row.querySelector(`.${side}-pw`).value,
+        };
+        const db = row.querySelector(`.${side}-db`).value.trim();
+        if (db) c.database = db;
+        return c;
+      };
       const ref = conn("ref"), tgt = conn("tgt");
       if (ref.host) {
         const d = { name, ...ref };

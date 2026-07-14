@@ -8,3 +8,5 @@ demo/corpus/
 __pycache__/
 *.egg-info/
 .pytest_cache/
+demo-pg/report/
+demo-pg/corpus/

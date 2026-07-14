@@ -16,6 +16,7 @@ import (
 
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/golden"
+	"github.com/pajamasi726/mocking-box/internal/pg"
 )
 
 // -- collector registry (Spring-Boot-Admin style: agents register inbound) ----
@@ -188,10 +189,8 @@ func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 	add("new_api", func() healthItem { return checkHTTP(cfg.New.BaseURL) })
 	for _, d := range cfg.New.Datastores {
-		if m := d.MySQL(); m != nil {
-			name, mysql := "db:"+d.Name, m
-			add(name, func() healthItem { return checkMySQL(mysql) })
-		}
+		ds := d
+		add("db:"+ds.Name, func() healthItem { return checkDatastore(ds) })
 	}
 	wg.Wait()
 	writeJSON(w, out)
@@ -205,6 +204,14 @@ func checkHTTP(baseURL string) healthItem {
 	}
 	resp.Body.Close()
 	return healthItem{true, fmt.Sprintf("HTTP %d", resp.StatusCode)}
+}
+
+func checkDatastore(d *config.Datastore) healthItem {
+	if d.Type == "postgres" {
+		ok, detail := pg.Health(d)
+		return healthItem{ok, detail}
+	}
+	return checkMySQL(d.MySQL())
 }
 
 func checkMySQL(m *config.MySQL) healthItem {
