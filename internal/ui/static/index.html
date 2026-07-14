@@ -224,6 +224,14 @@ const MSG = {
     http_timeout: "HTTP 타임아웃 (초)",
     save: "저장", saved: "저장되었습니다",
     err_prefix: "오류: ",
+    collectors: "수집기 (원격 에이전트)",
+    collectors_desc: "collect 명령에 --dashboard 주소를 주면 수집기가 여기 등록되고, 완료 시 녹화본을 자동 업로드합니다. (예: mockingbox collector mirror --port 10103 --out r.golden.jsonl --dashboard http://이서버:8642)",
+    no_collectors: "등록된 수집기가 없습니다",
+    col_state: "상태", col_last_seen: "마지막 신호", ago_s: "초 전",
+    import_file: "녹화본 파일 가져오기 (오프라인 수집분: .jsonl / .golden.jsonl / .har)",
+    imported: "가져왔습니다",
+    health_title: "연결 상태",
+    h_old_api: "기준 API", h_new_api: "검증 API", h_old_db: "기준 DB", h_new_db: "검증 DB",
   },
   en: {
     tab_dashboard: "Dashboard", tab_capture: "Capture · Recordings", tab_settings: "Settings",
@@ -281,6 +289,14 @@ const MSG = {
     http_timeout: "HTTP timeout (s)",
     save: "Save", saved: "Saved",
     err_prefix: "Error: ",
+    collectors: "Collectors (remote agents)",
+    collectors_desc: "Run collect with --dashboard to register a collector here; finished recordings are uploaded automatically. (e.g. mockingbox collector mirror --port 10103 --out r.golden.jsonl --dashboard http://this-host:8642)",
+    no_collectors: "No collectors registered",
+    col_state: "state", col_last_seen: "last seen", ago_s: "s ago",
+    import_file: "Import a recording file (offline capture: .jsonl / .golden.jsonl / .har)",
+    imported: "Imported",
+    health_title: "Connections",
+    h_old_api: "Reference API", h_new_api: "API under test", h_old_db: "Reference DB", h_new_db: "DB under test",
   },
 };
 let lang = localStorage.getItem("mb-lang") || (navigator.language.startsWith("ko") ? "ko" : "en");
@@ -492,6 +508,12 @@ async function renderCapture() {
       <h2>${esc(t("intro_title"))}</h2>
       <p class="desc" style="margin-bottom:10px">${esc(t("intro_body"))}</p>
       <div class="flow">${esc(t("intro_flow"))}</div>
+      <div class="status-line" id="health-strip" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h2>${esc(t("collectors"))}</h2>
+      <p class="desc">${esc(t("collectors_desc"))}</p>
+      <div id="agents"></div>
     </div>
     <div class="card">
       <h2>${esc(t("capture_title"))}</h2>
@@ -501,9 +523,25 @@ async function renderCapture() {
     <div class="card">
       <h2>${esc(t("corpora"))}</h2>
       <p class="desc">${esc(t("corpora_desc"))}</p>
+      <label class="btn small" style="display:inline-block; margin-bottom:10px">
+        ${esc(t("import_file"))}
+        <input type="file" id="import-file" accept=".jsonl,.har" style="display:none">
+      </label>
       <div id="rp-status"></div>
       <div id="corpora"></div>
     </div>`;
+  renderHealth();
+  renderAgents();
+  document.getElementById("import-file").addEventListener("change", async ev => {
+    const file = ev.target.files[0];
+    if (!file) return;
+    try {
+      await api(`/api/corpora/upload?name=${encodeURIComponent(file.name)}`,
+        {method:"POST", body: await file.arrayBuffer()});
+      toast(t("imported") + ": " + file.name);
+      renderCorpora();
+    } catch (e) { toast(t("err_prefix") + e.message); }
+  });
 
   const body = document.getElementById("capture-body");
   if (st.running) {
@@ -559,6 +597,40 @@ async function renderCapture() {
   const st2 = await api("/api/replay/status").catch(() => ({running:false}));
   if (st2.running) startReplayPoll();
   else renderReplayStatus(st2);
+}
+
+async function renderHealth() {
+  const el = document.getElementById("health-strip");
+  if (!el) return;
+  const h = await api("/api/health").catch(() => null);
+  if (!h) { el.innerHTML = ""; return; }
+  const items = [["old_api","h_old_api"],["new_api","h_new_api"],["old_db","h_old_db"],["new_db","h_new_db"]];
+  el.innerHTML = `<strong style="font-size:12px">${esc(t("health_title"))}</strong>` + items
+    .filter(([k]) => h[k])
+    .map(([k, label]) => `<span class="chip" title="${esc(h[k].detail)}">
+      <span class="dot" style="background:${h[k].ok ? "var(--good)" : "var(--critical)"}"></span>
+      ${esc(t(label))}${h[k].ok ? "" : ` <span style="color:var(--critical-text)">${esc(h[k].detail.slice(0,48))}</span>`}</span>`).join("");
+}
+
+async function renderAgents() {
+  const box = document.getElementById("agents");
+  if (!box) return;
+  const agents = await api("/api/agents").catch(() => []);
+  if (!agents.length) { box.innerHTML = `<div class="empty" style="padding:12px 0">${esc(t("no_collectors"))}</div>`; return; }
+  const dotColor = h => h === "green" ? "var(--good)" : h === "yellow" ? "var(--warning)" : "var(--critical)";
+  box.innerHTML = `<table class="t"><thead><tr>
+      <th></th><th>${esc(t("col_name"))}</th><th>mode</th><th>${esc(t("col_state"))}</th>
+      <th>${esc(t("col_count"))}</th><th>${esc(t("col_last_seen"))}</th><th>out</th></tr></thead>
+    <tbody>${agents.map(a => `<tr>
+      <td><span class="dot" style="background:${dotColor(a.health)}"></span></td>
+      <td>${esc(a.name)} <span class="muted mono">${esc(a.id)}</span></td>
+      <td class="mono">${esc(a.mode)}</td>
+      <td class="mono">${esc(a.state)}${a.last_error ? ` <span style="color:var(--critical-text)">${esc(a.last_error.slice(0,40))}</span>` : ""}</td>
+      <td class="num">${a.count}</td>
+      <td class="mono muted">${a.last_seen_s}${esc(t("ago_s"))}</td>
+      <td class="mono muted">${esc(a.out||"")}</td></tr>`).join("")}</tbody></table>`;
+  clearTimeout(renderAgents._t);
+  if (tab === "capture") renderAgents._t = setTimeout(renderAgents, 5000);
 }
 
 function startCapturePoll() {

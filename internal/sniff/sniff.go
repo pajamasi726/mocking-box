@@ -316,6 +316,13 @@ func (o *Output) Sink(ex Exchange) {
 	o.Count++
 }
 
+// Stats returns live counters (thread-safe) for agent heartbeats.
+func (o *Output) Stats() (count, skipped int) {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	return o.Count, o.Skipped
+}
+
 func (o *Output) Close() {
 	o.mu.Lock()
 	defer o.mu.Unlock()

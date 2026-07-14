@@ -33,9 +33,12 @@ var (
 	corpusNamePattern = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
 )
 
-// Server is the long-running control plane behind `mockingbox ui`.
+// Server is the long-running control plane behind `mockingbox dashboard`.
 type Server struct {
 	configPath string
+	token      string // shared secret for collector registration/upload ("" = open)
+
+	registry *agentRegistry
 
 	mu       sync.Mutex
 	recorder *capture.Recorder
@@ -53,12 +56,14 @@ type replayStatus struct {
 	LastError  string `json:"last_error,omitempty"`
 }
 
-func NewServer(configPath string) *Server { return &Server{configPath: configPath} }
+func NewServer(configPath, token string) *Server {
+	return &Server{configPath: configPath, token: token, registry: newAgentRegistry()}
+}
 
 func (s *Server) loadConfig() (*config.Config, error) { return config.Load(s.configPath) }
 
-func Serve(addr, configPath string) error {
-	s := NewServer(configPath)
+func Serve(addr, configPath, token string) error {
+	s := NewServer(configPath, token)
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
@@ -78,6 +83,14 @@ func Serve(addr, configPath string) error {
 	mux.HandleFunc("POST /api/capture/stop", s.captureStop)
 	mux.HandleFunc("GET /api/replay/status", s.replayStatusHandler)
 	mux.HandleFunc("POST /api/replay/start", s.replayStart)
+
+	// collector registry (Spring-Boot-Admin style) + health + offline import
+	mux.HandleFunc("POST /api/agents/register", s.agentRegister)
+	mux.HandleFunc("POST /api/agents/heartbeat", s.agentHeartbeat)
+	mux.HandleFunc("GET /api/agents", s.agentList)
+	mux.HandleFunc("POST /api/agents/upload", s.agentUpload)
+	mux.HandleFunc("POST /api/corpora/upload", s.corpusUpload)
+	mux.HandleFunc("GET /api/health", s.healthCheck)
 
 	return http.ListenAndServe(addr, mux)
 }

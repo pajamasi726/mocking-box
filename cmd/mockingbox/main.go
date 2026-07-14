@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pajamasi726/mocking-box/internal/agent"
 	"github.com/pajamasi726/mocking-box/internal/capture"
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/corpus"
@@ -31,15 +32,15 @@ func main() {
 		os.Exit(2)
 	}
 	switch os.Args[1] {
-	// 분석기 (verifier)
+	// 분석기 (dashboard/verifier)
 	case "run":
 		os.Exit(cmdRun(os.Args[2:]))
 	case "verify":
 		os.Exit(cmdVerify(os.Args[2:]))
-	case "ui":
+	case "dashboard", "ui":
 		os.Exit(cmdUI(os.Args[2:]))
 	// 수집기 (collector)
-	case "collect":
+	case "collector", "collect":
 		os.Exit(cmdCollect(os.Args[2:]))
 	// deprecated aliases (pre-collect layout)
 	case "sniff":
@@ -126,7 +127,9 @@ func cmdCollectProxy(args []string) int {
 }
 
 func usage() {
-	fmt.Fprint(os.Stderr, `mockingbox — one binary, two roles.
+	fmt.Fprint(os.Stderr, `mockingbox — one binary, two roles:
+  mocking-box-collector  (collector …)  records traffic where it flows
+  mocking-box-dashboard  (dashboard)    manages recordings, runs verification, shows results
 
 COLLECTOR — record traffic into a portable recording file, where traffic flows:
   collect proxy  -c cfg.yaml --listen :9090 --out r.golden.jsonl   dev/staging: in-path proxy;
@@ -140,9 +143,14 @@ COLLECTOR — record traffic into a portable recording file, where traffic flows
                                                                    Mirroring receiver (VXLAN)
 
 VERIFIER — replay a recording and grade the new stack:
-  verify  -c cfg.yaml --golden r.golden.jsonl [--baseline run.json]  new stack only, vs answer sheet
-  run     -c cfg.yaml --corpus r.jsonl                               live-parallel: old AND new
-  ui      -c cfg.yaml [--addr :8642]                                 web console (dashboards, dev proxy)
+  verify    -c cfg.yaml --golden r.golden.jsonl [--baseline run.json]  new stack only, vs answer sheet
+  run       -c cfg.yaml --corpus r.jsonl                               live-parallel: old AND new
+  dashboard -c cfg.yaml [--addr :8642] [--token s]                     web console: results, health,
+                                                                       collector registry, config
+
+  Collectors register OUTBOUND to the dashboard (--dashboard http://host:8642 --token s):
+  live status turns green/yellow/red and finished recordings upload automatically.
+  No connectivity? run collectors standalone and import the file in the dashboard.
 
   --out *.golden.jsonl = answer sheet included (responses; +write-sets in proxy mode)
   --out *.jsonl        = requests only (for live-parallel runs)
@@ -212,6 +220,7 @@ func cmdSniff(args []string) int {
 	duration := fs.Duration("duration", 0, "stop after this long (default: until Ctrl-C)")
 	sample := fs.Float64("sample", 1.0, "keep this fraction of READ exchanges (writes always kept)")
 	sampleWrites := fs.Bool("sample-writes-too", false, "also sample non-GET requests (breaks state replay!)")
+	dashboard, token, name := agentFlags(fs)
 	fs.Parse(args)
 	if *iface == "" || *port == 0 || *out == "" {
 		fs.Usage()
@@ -222,14 +231,17 @@ func cmdSniff(args []string) int {
 		log.Fatalf("output: %v", err)
 	}
 	output.SampleRate, output.SampleAllWrites = *sample, !*sampleWrites
-	defer output.Close()
 	pipeline := sniff.NewPipeline(*port, output.Sink)
+	reporter := linkAgent(*dashboard, *token, *name, "sniff", *out, output)
 
 	stop := stopChannel(*duration)
 	if err := sniff.RunLive(*iface, *port, pipeline, stop); err != nil {
 		log.Fatalf("sniff: %v", err)
 	}
-	log.Printf("captured %d exchange(s), sampled out %d -> %s", output.Count, output.Skipped, *out)
+	output.Close()
+	count, skipped := output.Stats()
+	log.Printf("captured %d exchange(s), sampled out %d -> %s", count, skipped, *out)
+	reporter.Finish(*out)
 	return 0
 }
 
@@ -268,6 +280,7 @@ func cmdMirror(args []string) int {
 	duration := fs.Duration("duration", 0, "stop after this long (default: until Ctrl-C)")
 	sample := fs.Float64("sample", 1.0, "keep this fraction of READ exchanges (writes always kept)")
 	sampleWrites := fs.Bool("sample-writes-too", false, "also sample non-GET requests (breaks state replay!)")
+	dashboard, token, name := agentFlags(fs)
 	fs.Parse(args)
 	if *port == 0 || *out == "" {
 		fs.Usage()
@@ -278,16 +291,44 @@ func cmdMirror(args []string) int {
 		log.Fatalf("output: %v", err)
 	}
 	output.SampleRate, output.SampleAllWrites = *sample, !*sampleWrites
-	defer output.Close()
 	pipeline := sniff.NewPipeline(*port, output.Sink)
+	reporter := linkAgent(*dashboard, *token, *name, "mirror", *out, output)
 
 	stop := stopChannel(*duration)
 	if err := sniff.RunMirror(*listen, *port, pipeline, stop); err != nil {
 		log.Fatalf("mirror: %v", err)
 	}
-	log.Printf("captured %d exchange(s) -> %s", output.Count, *out)
+	output.Close()
+	count, _ := output.Stats()
+	log.Printf("captured %d exchange(s) -> %s", count, *out)
+	reporter.Finish(*out)
 	return 0
 }
+
+// agentFlags registers the dashboard-link flags shared by collector modes.
+func agentFlags(fs *flag.FlagSet) (dashboard, token, name *string) {
+	dashboard = fs.String("dashboard", "", "dashboard URL to register with (Spring-Boot-Admin style; optional)")
+	token = fs.String("token", "", "shared secret for the dashboard")
+	name = fs.String("name", "", "collector display name (default: hostname)")
+	return
+}
+
+// linkAgent connects to the dashboard and streams live counters from output.
+func linkAgent(dashboard, token, name, mode, out string, output *sniff.Output) *agent.Reporter {
+	reporter := agent.Connect(dashboard, token, name, mode, out, version)
+	if reporter != nil && output != nil {
+		go func() {
+			for {
+				time.Sleep(3 * time.Second)
+				count, _ := output.Stats()
+				reporter.Update(count, "")
+			}
+		}()
+	}
+	return reporter
+}
+
+const version = "0.4.0-dev"
 
 func stopChannel(after time.Duration) <-chan struct{} {
 	stop := make(chan struct{})
@@ -352,18 +393,19 @@ func cmdRun(args []string) int {
 }
 
 func cmdUI(args []string) int {
-	fs := flag.NewFlagSet("ui", flag.ExitOnError)
+	fs := flag.NewFlagSet("dashboard", flag.ExitOnError)
 	configPath := fs.String("c", "config.yaml", "config YAML path")
 	fs.StringVar(configPath, "config", *configPath, "config YAML path")
 	addr := fs.String("addr", ":8642", "listen address")
+	token := fs.String("token", "", "shared secret for collector registration/upload")
 	fs.Parse(args)
 
 	if _, err := config.Load(*configPath); err != nil {
 		log.Fatalf("config: %v", err)
 	}
-	log.Printf("mocking-box console: http://localhost%s  (config: %s)", *addr, *configPath)
-	if err := ui.Serve(*addr, *configPath); err != nil {
-		log.Fatalf("ui: %v", err)
+	log.Printf("mocking-box dashboard: http://localhost%s  (config: %s)", *addr, *configPath)
+	if err := ui.Serve(*addr, *configPath, *token); err != nil {
+		log.Fatalf("dashboard: %v", err)
 	}
 	return 0
 }
