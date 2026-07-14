@@ -207,8 +207,13 @@ const MSG = {
     /* 설정 */
     settings_desc: "저장하면 config 파일에 반영되고 다음 실행부터 적용됩니다.",
     sec_servers: "대상 서버", sec_compare: "비교 규칙", sec_advanced: "고급 (귀속 타이밍 · HTTP)",
+    sec_urls: "서버 주소", sec_dbs: "데이터베이스 (구↔신 짝)",
+    old_url_label: "기준 서버 (구) Base URL — 라이브 비교·기준선용, 선택",
+    new_url_label: "검증 대상 서버 (신) Base URL",
     old_stack: "기준 서버 (구 — 녹화 대상)", new_stack: "검증 대상 서버 (신)",
     base_url: "Base URL",
+    db_pair_ref: "기준(구) DB — 시딩 원본", db_pair_new: "검증대상(신) DB — 시딩 대상",
+    db_pair_hint: "이름이 같은 구↔신끼리 비교·시딩됩니다. DB가 하나면 이름은 자동입니다.",
     mysql_title: "MySQL (write-set 검증용 — 비우면 응답만 비교)",
     mysql_host: "호스트", mysql_port: "포트", mysql_user: "사용자", mysql_password: "비밀번호",
     noise_title: "노이즈 제외 규칙",
@@ -283,8 +288,13 @@ const MSG = {
     replaying: "Running", replay_done: "Finished — check the dashboard", view_result: "View result",
     settings_desc: "Saving writes the config file; the next run picks it up.",
     sec_servers: "Target servers", sec_compare: "Comparison rules", sec_advanced: "Advanced (attribution · HTTP)",
+    sec_urls: "Server URLs", sec_dbs: "Databases (old↔new pairs)",
+    old_url_label: "Reference (old) Base URL — for live/baseline, optional",
+    new_url_label: "Server under test (new) Base URL",
     old_stack: "Reference server (old — recording target)", new_stack: "Server under test (new)",
     base_url: "Base URL",
+    db_pair_ref: "Reference (old) DB — seed source", db_pair_new: "DB under test (new) — seed target",
+    db_pair_hint: "Same-named old↔new are compared & seeded together. With one DB the name is automatic.",
     mysql_title: "MySQL (for write-set verification — leave empty to compare responses only)",
     mysql_host: "Host", mysql_port: "Port", mysql_user: "User", mysql_password: "Password",
     noise_title: "Noise exclusion rules",
@@ -746,7 +756,7 @@ function startReplayPoll() {
 
 /* ------------------------------------------------------------------ seed */
 let seedPoll = null;
-// per-datastore seed source edits, keyed by datastore name (session-local)
+// per-datastore discovery/selection, keyed by datastore name (session-local)
 let seedEdits = {};
 async function renderSeed() {
   const main = document.getElementById("main");
@@ -754,8 +764,9 @@ async function renderSeed() {
   try { cfg = cfgCache = await api("/api/config"); }
   catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
 
-  const datastores = (cfg.new?.datastores || []);
-  if (!datastores.length) {
+  const newDS = (cfg.new?.datastores || []);
+  const olds = (cfg.old?.datastores || []);
+  if (!newDS.length) {
     main.innerHTML = `<div class="card"><h2>${esc(t("seed_title"))}</h2>
       <div class="empty">${esc(t("no_new_ds"))}</div></div>`;
     return;
@@ -767,26 +778,24 @@ async function renderSeed() {
     <div id="seed-status"></div>`;
 
   const box = document.getElementById("seed-cards");
-  datastores.forEach((d, i) => {
-    const sf = d.seed_from || {};
-    if (!seedEdits[d.name]) seedEdits[d.name] = { schemas: d.schemas || [], exclude: d.exclude_tables || [], discovered: null };
+  newDS.forEach(nd => {
+    // reference (old) DB = seed source, matched by name
+    const od = olds.find(o => o.name === nd.name) || {};
+    if (!seedEdits[nd.name]) seedEdits[nd.name] = { exclude: od.exclude_tables || [], discovered: null };
     const card = document.createElement("div");
     card.className = "card";
+    const srcLabel = od.host ? `${esc(od.host)}:${od.port}` : `<span style="color:var(--critical-text)">${esc(t("seed_src"))} 미설정 — 설정 탭</span>`;
     card.innerHTML = `
-      <h2>${esc(d.name)} <span class="muted" style="text-transform:none">${esc(d.type||"mysql")} · ${esc(d.host)}:${d.port}</span></h2>
-      <label>${esc(t("seed_src"))}</label>
-      <div class="row">
-        <div style="flex:2"><input type="text" class="mono sf-host" placeholder="host" value="${esc(sf.host||"")}"></div>
-        <div style="max-width:90px"><input type="number" class="mono sf-port" value="${sf.port||3306}"></div>
-        <div><input type="text" class="mono sf-user" placeholder="user" value="${esc(sf.user||"")}"></div>
-        <div><input type="password" class="mono sf-pw" placeholder="password" value="${esc(sf.password||"")}"></div>
-        <div style="flex:0"><button class="btn discover-btn" data-i="${i}">${esc(t("discover"))}</button></div>
+      <h2>${esc(nd.name)} <span class="muted" style="text-transform:none">
+        ${esc(od.host||"?")}:${od.port||"?"} → ${esc(nd.host)}:${nd.port}</span></h2>
+      <div class="status-line" style="margin-bottom:8px">
+        <span class="muted">${esc(t("db_pair_ref"))}: <span class="mono">${srcLabel}</span></span>
+        <button class="btn small discover-btn" ${od.host?"":"disabled"} style="margin-left:auto">${esc(t("discover"))}</button>
       </div>
-      <div class="hint">${esc(t("discover_hint"))}</div>
-      <div class="picker" data-name="${esc(d.name)}"></div>`;
+      <div class="picker" data-name="${esc(nd.name)}"></div>`;
     box.appendChild(card);
-    card.querySelector(".discover-btn").onclick = () => discoverFor(d.name, card);
-    if (seedEdits[d.name].discovered) renderPicker(d.name, card.querySelector(".picker"));
+    card.querySelector(".discover-btn").onclick = () => discoverFor(nd.name, od, card);
+    if (seedEdits[nd.name].discovered) renderPicker(nd.name, card.querySelector(".picker"));
   });
 
   document.getElementById("seed-run").onclick = () => runSeedAll(cfg);
@@ -795,20 +804,14 @@ async function renderSeed() {
   if (st.running) pollSeed();
 }
 
-async function discoverFor(name, card) {
-  const src = {
-    host: card.querySelector(".sf-host").value.trim(),
-    port: +card.querySelector(".sf-port").value || 3306,
-    user: card.querySelector(".sf-user").value.trim(),
-    password: card.querySelector(".sf-pw").value,
-  };
-  if (!src.host) { toast(t("err_prefix") + "host"); return; }
+async function discoverFor(name, od, card) {
+  const src = { host: od.host, port: od.port || 3306, user: od.user, password: od.password };
+  if (!src.host) { toast(t("err_prefix") + "reference DB not set"); return; }
   const btn = card.querySelector(".discover-btn");
   btn.textContent = t("discovering"); btn.disabled = true;
   try {
     const schemas = await api("/api/seed/discover", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(src)});
     seedEdits[name].discovered = schemas;
-    // default selection: everything, minus previously-excluded
     const ex = new Set(seedEdits[name].exclude);
     seedEdits[name].selected = {};
     schemas.forEach(s => s.tables.forEach(tb => { seedEdits[name].selected[s.name+"."+tb.name] = !ex.has(s.name+"."+tb.name) && !ex.has(tb.name); }));
@@ -839,30 +842,23 @@ function renderPicker(name, box) {
 }
 
 async function runSeedAll(cfg) {
-  // collect per-datastore seed_from + schemas/exclude from the pickers, save, seed
-  const cards = document.querySelectorAll("#seed-cards .card");
-  const newStack = JSON.parse(JSON.stringify(cfg.new));
-  cards.forEach((card, i) => {
-    const d = newStack.datastores[i];
-    d.seed_from = {
-      host: card.querySelector(".sf-host").value.trim(),
-      port: +card.querySelector(".sf-port").value || 3306,
-      user: card.querySelector(".sf-user").value.trim(),
-      password: card.querySelector(".sf-pw").value,
-    };
-    const edit = seedEdits[d.name];
-    if (edit && edit.discovered) {
-      const schemas = new Set(), exclude = [];
-      edit.discovered.forEach(s => s.tables.forEach(tb => {
-        const key = s.name + "." + tb.name;
-        if (edit.selected[key] !== false) schemas.add(s.name);
-        else exclude.push(key);
-      }));
-      d.schemas = [...schemas];
-      d.exclude_tables = exclude;
-    }
+  // save the picked scope (schemas/exclude) onto the OLD datastore (= seed source),
+  // since RunPairs reads scope from the reference DB. Then seed.
+  const oldStack = JSON.parse(JSON.stringify(cfg.old || { datastores: [] }));
+  oldStack.datastores = oldStack.datastores || [];
+  Object.keys(seedEdits).forEach(name => {
+    const edit = seedEdits[name];
+    if (!edit.discovered) return;
+    const schemas = new Set(), exclude = [];
+    edit.discovered.forEach(s => s.tables.forEach(tb => {
+      const key = s.name + "." + tb.name;
+      if (edit.selected[key] !== false) schemas.add(s.name);
+      else exclude.push(key);
+    }));
+    const od = oldStack.datastores.find(d => d.name === name);
+    if (od) { od.schemas = [...schemas]; od.exclude_tables = exclude; }
   });
-  const payload = { ...cfg, new: newStack };
+  const payload = { ...cfg, old: oldStack };
   try {
     cfgCache = await api("/api/config", {method:"PUT", headers:{"content-type":"application/json"}, body: JSON.stringify(payload)});
     await api("/api/seed/start", {method:"POST"});
@@ -900,25 +896,20 @@ async function renderSettings() {
   try { cfg = cfgCache = await api("/api/config"); }
   catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
 
-  const stackCard = (key, title, collapsible) => {
-    const st = cfg[key] || {};
-    const inner = `
-      <label>${esc(t("base_url"))}</label><input type="text" class="mono" id="${key}-url" value="${esc(st.base_url||"")}">
-      <label style="margin-top:12px">${esc(t("mysql_title"))}</label>
-      <div class="ds-list" data-stack="${key}"></div>
-      <button class="btn small ds-add" data-stack="${key}">${esc(t("ds_add"))}</button>`;
-    if (collapsible) {
-      return `<div class="card"><details><summary style="cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600">${esc(title)}</summary>
-        <div style="margin-top:10px">${inner}</div></details></div>`;
-    }
-    return `<div class="card"><h2>${esc(title)}</h2>${inner}</div>`;
-  };
-
   const sortRules = (cfg.compare?.sort_arrays || []);
   main.innerHTML = `
     <p class="desc muted" style="margin:0 0 12px; font-size:13px">${esc(t("settings_desc"))}</p>
-    <h2>${esc(t("sec_servers"))}</h2>
-    <div class="grid2">${stackCard("new", t("new_stack"), false)}${stackCard("old", t("old_stack"), true)}</div>
+    <h2>${esc(t("sec_urls"))}</h2>
+    <div class="card">
+      <label>${esc(t("new_url_label"))}</label><input type="text" class="mono" id="new-url" value="${esc(cfg.new?.base_url||"")}">
+      <label style="margin-top:12px">${esc(t("old_url_label"))}</label><input type="text" class="mono" id="old-url" value="${esc(cfg.old?.base_url||"")}">
+    </div>
+    <h2>${esc(t("sec_dbs"))}</h2>
+    <div class="card">
+      <p class="desc">${esc(t("db_pair_hint"))}</p>
+      <div id="db-pairs"></div>
+      <button class="btn small" id="pair-add">${esc(t("ds_add"))}</button>
+    </div>
     <h2>${esc(t("sec_compare"))}</h2>
     <div class="grid2">
       <div class="card"><h2>${esc(t("noise_title"))}</h2>
@@ -943,32 +934,46 @@ async function renderSettings() {
     </details>
     <button class="btn primary" id="save-settings" style="margin:14px 0 30px">${esc(t("save"))}</button>`;
 
-  // datastore rows per stack
-  const addDatastore = (stackKey, d = {}) => {
-    const list = document.querySelector(`.ds-list[data-stack="${stackKey}"]`);
+  // old↔new DB pairs (one row = reference conn + target conn, matched by name)
+  const pairsBox = document.getElementById("db-pairs");
+  const connFields = (side, d) => `
+    <div class="row" style="margin-top:4px">
+      <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono ${side}-host" value="${esc(d.host||"127.0.0.1")}"></div>
+      <div style="max-width:78px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono ${side}-port" value="${d.port||3306}"></div>
+      <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono ${side}-user" value="${esc(d.user||"")}"></div>
+      <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono ${side}-pw" value="${esc(d.password||"")}"></div>
+    </div>`;
+  const refreshPairNames = () => {
+    const rows = pairsBox.querySelectorAll(".pair-row");
+    rows.forEach(row => { row.querySelector(".pair-name-wrap").style.display = rows.length > 1 ? "" : "none"; });
+  };
+  const addPair = (od = {}, nd = {}) => {
     const div = document.createElement("div");
-    div.className = "ds-row";
-    div.style = "border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px";
+    div.className = "pair-row";
+    div.style = "border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px";
     div.innerHTML = `
       <div class="row">
-        <div style="flex:1.2"><label>${esc(t("ds_name"))}</label><input type="text" class="mono ds-name" value="${esc(d.name||"default")}"></div>
-        <div style="flex:0"><button class="btn small ds-rm danger" title="${esc(t("ds_remove"))}">✕</button></div>
+        <div class="pair-name-wrap" style="flex:1.4"><label>${esc(t("ds_name"))}</label>
+          <input type="text" class="mono pair-name" value="${esc(nd.name||od.name||"default")}"></div>
+        <div style="flex:1"></div>
+        <div style="flex:0"><button class="btn small pair-rm danger" title="${esc(t("ds_remove"))}">✕</button></div>
       </div>
-      <div class="row" style="margin-top:6px">
-        <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono ds-host" value="${esc(d.host||"127.0.0.1")}"></div>
-        <div style="max-width:90px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono ds-port" value="${d.port||3306}"></div>
-        <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono ds-user" value="${esc(d.user||"")}"></div>
-        <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono ds-pw" value="${esc(d.password||"")}"></div>
+      <div class="cols" style="margin-top:6px">
+        <div class="pane"><div class="pane-title">${esc(t("db_pair_ref"))}</div>${connFields("ref", od)}</div>
+        <div class="pane"><div class="pane-title">${esc(t("db_pair_new"))}</div>${connFields("tgt", nd)}</div>
       </div>`;
-    div._seedFrom = d.seed_from; div._schemas = d.schemas; div._exclude = d.exclude_tables;
-    div.querySelector(".ds-rm").onclick = () => div.remove();
-    list.appendChild(div);
+    div._schemas = od.schemas; div._exclude = od.exclude_tables;
+    div.querySelector(".pair-rm").onclick = () => { div.remove(); refreshPairNames(); };
+    pairsBox.appendChild(div);
+    refreshPairNames();
   };
-  ["new", "old"].forEach(key => {
-    (cfg[key]?.datastores || []).forEach(d => addDatastore(key, d));
-  });
-  document.querySelectorAll(".ds-add").forEach(btn =>
-    btn.addEventListener("click", () => addDatastore(btn.dataset.stack)));
+  {
+    const olds = cfg.old?.datastores || [], news = cfg.new?.datastores || [];
+    const names = [...new Set([...news.map(d=>d.name), ...olds.map(d=>d.name)])];
+    if (names.length) names.forEach(n => addPair(olds.find(d=>d.name===n)||{}, news.find(d=>d.name===n)||{}));
+    else addPair();
+  }
+  document.getElementById("pair-add").onclick = () => addPair();
 
   const rulesBox = document.getElementById("sort-rules");
   const addRule = (path = "", by = "") => {
@@ -985,25 +990,31 @@ async function renderSettings() {
 
   document.getElementById("save-settings").onclick = async () => {
     const lines = id => document.getElementById(id).value.split("\n").map(s => s.trim()).filter(Boolean);
-    const stack = key => {
-      const out = { base_url: document.getElementById(`${key}-url`).value.trim(), datastores: [] };
-      document.querySelectorAll(`.ds-list[data-stack="${key}"] .ds-row`).forEach(row => {
-        const host = row.querySelector(".ds-host").value.trim();
-        if (!host) return;
-        const d = {
-          name: row.querySelector(".ds-name").value.trim() || "default", type: "mysql",
-          host, port: +row.querySelector(".ds-port").value || 3306,
-          user: row.querySelector(".ds-user").value.trim(),
-          password: row.querySelector(".ds-pw").value,
-        };
-        // preserve seed_from/schemas/exclude set on the Seed tab
-        if (row._seedFrom) d.seed_from = row._seedFrom;
+    // build old & new datastores from the pair rows (matched by name)
+    const oldDS = [], newDS = [];
+    const pairRows = pairsBox.querySelectorAll(".pair-row");
+    pairRows.forEach((row, i) => {
+      let name = row.querySelector(".pair-name").value.trim();
+      if (!name) name = pairRows.length > 1 ? "db" + (i+1) : "default";
+      const conn = side => ({
+        host: row.querySelector(`.${side}-host`).value.trim(),
+        port: +row.querySelector(`.${side}-port`).value || 3306,
+        user: row.querySelector(`.${side}-user`).value.trim(),
+        password: row.querySelector(`.${side}-pw`).value,
+      });
+      const ref = conn("ref"), tgt = conn("tgt");
+      if (ref.host) {
+        const d = { name, type: "mysql", ...ref };
         if (row._schemas) d.schemas = row._schemas;
         if (row._exclude) d.exclude_tables = row._exclude;
-        out.datastores.push(d);
-      });
-      return out;
-    };
+        oldDS.push(d);
+      }
+      if (tgt.host) newDS.push({ name, type: "mysql", ...tgt });
+    });
+    const stack = key => ({
+      base_url: document.getElementById(`${key}-url`).value.trim(),
+      datastores: key === "old" ? oldDS : newDS,
+    });
     const rules = [...rulesBox.querySelectorAll(".sortrule")].map(div => ({
       path: div.querySelector(".sr-path").value.trim(),
       by: div.querySelector(".sr-by").value.trim() || "$canonical",

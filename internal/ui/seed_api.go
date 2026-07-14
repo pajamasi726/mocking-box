@@ -42,7 +42,7 @@ func (s *Server) seedStart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) runSeed(cfg *config.Config) {
-	stats, err := seed.RunDatastores(cfg.New.Datastores, "")
+	stats, err := seed.RunPairs(&cfg.Old, &cfg.New, "")
 	s.seedMu.Lock()
 	defer s.seedMu.Unlock()
 	s.seedST.Running = false

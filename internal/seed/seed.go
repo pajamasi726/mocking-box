@@ -39,25 +39,34 @@ type Options struct {
 	GoldenName    string // recorded in the marker for preflight matching
 }
 
-// RunDatastores seeds every mysql datastore of the `new` stack from its
-// SeedFrom source. Datastores without a SeedFrom are skipped.
-func RunDatastores(datastores []*config.Datastore, goldenName string) (*Stats, error) {
+// RunPairs seeds each new datastore from the old datastore of the same name:
+// the reference (old) DB IS the seed source. Scope (schemas/exclude) is read
+// from the old datastore, since that's where discovery happens.
+func RunPairs(oldStack, newStack *config.Stack, goldenName string) (*Stats, error) {
 	total := &Stats{}
 	seeded := 0
-	for _, d := range datastores {
-		dst := d.MySQL()
-		if dst == nil || d.SeedFrom == nil || d.SeedFrom.Host == "" {
+	for _, nd := range newStack.Datastores {
+		dst := nd.MySQL()
+		if dst == nil {
 			continue
 		}
-		opts := Options{Schemas: d.Schemas, GoldenName: goldenName, ExcludeTables: map[string]bool{}}
-		for _, t := range d.Exclude {
+		od := oldStack.DatastoreByName(nd.Name)
+		if od == nil {
+			return total, fmt.Errorf("datastore %q: no matching reference (old) DB — 설정에서 짝을 맞추세요", nd.Name)
+		}
+		src := od.MySQL()
+		if src == nil || src.Host == "" {
+			return total, fmt.Errorf("datastore %q: reference (old) connection is empty", nd.Name)
+		}
+		opts := Options{Schemas: od.Schemas, GoldenName: goldenName, ExcludeTables: map[string]bool{}}
+		for _, t := range od.Exclude {
 			if t != "" {
 				opts.ExcludeTables[t] = true
 			}
 		}
-		st, err := Run(d.SeedFrom, dst, opts)
+		st, err := Run(src, dst, opts)
 		if err != nil {
-			return total, fmt.Errorf("datastore %q: %w", d.Name, err)
+			return total, fmt.Errorf("datastore %q: %w", nd.Name, err)
 		}
 		total.Schemas = append(total.Schemas, st.Schemas...)
 		total.Tables += st.Tables
@@ -65,7 +74,7 @@ func RunDatastores(datastores []*config.Datastore, goldenName string) (*Stats, e
 		seeded++
 	}
 	if seeded == 0 {
-		return total, fmt.Errorf("no datastore has a seed source configured")
+		return total, fmt.Errorf("검증 대상(신) DB가 없습니다 — 설정에서 추가하세요")
 	}
 	return total, nil
 }
