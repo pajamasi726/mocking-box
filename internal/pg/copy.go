@@ -3,6 +3,8 @@ package pg
 import (
 	"context"
 	"fmt"
+	"io"
+	"log"
 	"strings"
 	"time"
 
@@ -22,7 +24,7 @@ type CopyStats struct {
 // (same database name). Pure pgx — recreates each schema, its tables (columns,
 // PK, defaults), and copies rows via COPY. Excluded tables are skipped.
 func Copy(src, dst *config.Datastore, schemas []string, exclude map[string]bool) (*CopyStats, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Hour)
 	defer cancel()
 
 	sconn, err := connect(ctx, src, databaseName(src))
@@ -80,6 +82,10 @@ func copySchema(ctx context.Context, sconn, dconn *pgx.Conn, schema string, excl
 	if _, err := dconn.Exec(ctx, fmt.Sprintf("CREATE SCHEMA %s", pgx.Identifier{schema}.Sanitize())); err != nil {
 		return err
 	}
+	// custom enum types must exist before tables that use them
+	if err := copyEnums(ctx, sconn, dconn, schema); err != nil {
+		return fmt.Errorf("enum types: %w", err)
+	}
 
 	tables, err := listTables(ctx, sconn, schema)
 	if err != nil {
@@ -89,12 +95,56 @@ func copySchema(ctx context.Context, sconn, dconn *pgx.Conn, schema string, excl
 		if exclude[table] || exclude[schema+"."+table] {
 			continue
 		}
+		log.Printf("[copy] %s.%s …", schema, table)
 		n, err := copyTable(ctx, sconn, dconn, schema, table)
 		if err != nil {
 			return fmt.Errorf("table %s: %w", table, err)
 		}
 		stats.Tables++
 		stats.Rows += n
+		log.Printf("[copy]   %s.%s: %d rows", schema, table, n)
+	}
+	return nil
+}
+
+// copyEnums recreates the schema's enum types on the target (labels in order).
+func copyEnums(ctx context.Context, sconn, dconn *pgx.Conn, schema string) error {
+	rows, err := sconn.Query(ctx, `
+		SELECT t.typname, array_agg(e.enumlabel ORDER BY e.enumsortorder)
+		FROM pg_type t
+		JOIN pg_enum e ON e.enumtypid = t.oid
+		JOIN pg_namespace n ON n.oid = t.typnamespace
+		WHERE n.nspname = $1
+		GROUP BY t.typname`, schema)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	type enumDef struct {
+		name   string
+		labels []string
+	}
+	var enums []enumDef
+	for rows.Next() {
+		var e enumDef
+		if err := rows.Scan(&e.name, &e.labels); err != nil {
+			return err
+		}
+		enums = append(enums, e)
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	for _, e := range enums {
+		quoted := make([]string, len(e.labels))
+		for i, l := range e.labels {
+			quoted[i] = "'" + strings.ReplaceAll(l, "'", "''") + "'"
+		}
+		stmt := fmt.Sprintf("CREATE TYPE %s AS ENUM (%s)",
+			pgx.Identifier{schema, e.name}.Sanitize(), strings.Join(quoted, ", "))
+		if _, err := dconn.Exec(ctx, stmt); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -171,45 +221,52 @@ func copyTable(ctx context.Context, sconn, dconn *pgx.Conn, schema, table string
 		_, _ = dconn.Exec(ctx, fmt.Sprintf("ALTER TABLE %s ADD PRIMARY KEY (%s)", qtable, strings.Join(quoted, ", ")))
 	}
 
-	// copy rows: read all, COPY into target
-	src, err := sconn.Query(ctx, fmt.Sprintf("SELECT * FROM %s", qtable))
-	if err != nil {
-		return 0, err
-	}
-	defer src.Close()
-	var data [][]any
-	for src.Next() {
-		vals, err := src.Values()
-		if err != nil {
-			return 0, err
-		}
-		data = append(data, vals)
-	}
-	if err := src.Err(); err != nil {
-		return 0, err
-	}
-	if len(data) == 0 {
-		return 0, nil
-	}
-	n, err := dconn.CopyFrom(ctx, pgx.Identifier{schema, table}, colNames, pgx.CopyFromRows(data))
+	// stream rows source→target via the COPY protocol (binary), piped — O(1)
+	// memory regardless of table size (18M-row tables must not buffer in Go).
+	copyN, err := streamCopy(ctx, sconn, dconn, qtable)
 	if err != nil {
 		return 0, err
 	}
 	// keep serial/identity sequences ahead of copied data
 	resetSequences(ctx, dconn, schema, table, cols)
-	return n, nil
+	return copyN, nil
+}
+
+// streamCopy pipes `COPY <tbl> TO STDOUT (FORMAT binary)` on the source into
+// `COPY <tbl> FROM STDIN (FORMAT binary)` on the target.
+func streamCopy(ctx context.Context, sconn, dconn *pgx.Conn, qtable string) (int64, error) {
+	pr, pw := io.Pipe()
+	errCh := make(chan error, 1)
+	go func() {
+		_, err := sconn.PgConn().CopyTo(ctx, pw, "COPY "+qtable+" TO STDOUT (FORMAT binary)")
+		pw.CloseWithError(err) // nil err → clean EOF for the reader
+		errCh <- err
+	}()
+	tag, err := dconn.PgConn().CopyFrom(ctx, pr, "COPY "+qtable+" FROM STDIN (FORMAT binary)")
+	pr.CloseWithError(err)
+	if srcErr := <-errCh; srcErr != nil {
+		return 0, fmt.Errorf("read source: %w", srcErr)
+	}
+	if err != nil {
+		return 0, fmt.Errorf("write target: %w", err)
+	}
+	return tag.RowsAffected(), nil
 }
 
 func tableColumns(ctx context.Context, conn *pgx.Conn, schema, table string) ([]columnDef, error) {
+	// pg_catalog.format_type renders the exact type text (arrays, enums, custom
+	// types, precision/length) — unlike information_schema which reports "ARRAY".
 	rows, err := conn.Query(ctx, `
-		SELECT column_name,
-		       CASE WHEN data_type = 'USER-DEFINED' THEN udt_name
-		            WHEN character_maximum_length IS NOT NULL THEN data_type || '(' || character_maximum_length || ')'
-		            WHEN numeric_precision IS NOT NULL AND data_type IN ('numeric','decimal') THEN data_type || '(' || numeric_precision || ',' || COALESCE(numeric_scale,0) || ')'
-		            ELSE data_type END,
-		       is_nullable = 'NO', column_default
-		FROM information_schema.columns
-		WHERE table_schema = $1 AND table_name = $2 ORDER BY ordinal_position`, schema, table)
+		SELECT a.attname,
+		       pg_catalog.format_type(a.atttypid, a.atttypmod),
+		       a.attnotnull,
+		       pg_catalog.pg_get_expr(d.adbin, d.adrelid)
+		FROM pg_attribute a
+		JOIN pg_class c ON c.oid = a.attrelid
+		JOIN pg_namespace n ON n.oid = c.relnamespace
+		LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
+		WHERE n.nspname = $1 AND c.relname = $2 AND a.attnum > 0 AND NOT a.attisdropped
+		ORDER BY a.attnum`, schema, table)
 	if err != nil {
 		return nil, err
 	}
