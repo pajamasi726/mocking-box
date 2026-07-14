@@ -22,6 +22,7 @@ import (
 	"github.com/pajamasi726/mocking-box/internal/corpus"
 	"github.com/pajamasi726/mocking-box/internal/diff"
 	"github.com/pajamasi726/mocking-box/internal/golden"
+	"github.com/pajamasi726/mocking-box/internal/mcp"
 	"github.com/pajamasi726/mocking-box/internal/replay"
 	"github.com/pajamasi726/mocking-box/internal/report"
 	"github.com/pajamasi726/mocking-box/internal/seed"
@@ -44,6 +45,8 @@ func main() {
 		os.Exit(cmdVerify(os.Args[2:]))
 	case "dashboard", "ui":
 		os.Exit(cmdUI(os.Args[2:]))
+	case "mcp":
+		os.Exit(cmdMCP(os.Args[2:]))
 	// 수집기 (collector)
 	case "collector", "collect":
 		os.Exit(cmdCollect(os.Args[2:]))
@@ -190,6 +193,7 @@ Typical use (assumes an internal/trusted network):
   # 3) back in the dashboard: pick the recording, click Verify. Done.
 
 More:
+  mcp         MCP server (stdio) — let an AI assistant drive it conversationally
   verify/run  run a verification from the CLI instead of the dashboard button
   collect pcap|mirror|proxy   other capture sources (tcpdump file / AWS mirror / dev proxy)
   seed        seed the DB from the CLI instead of the dashboard button
@@ -507,6 +511,19 @@ func cmdRun(args []string) int {
 		if r.Verdict != diff.Match {
 			return 1
 		}
+	}
+	return 0
+}
+
+// cmdMCP runs the MCP server (stdio) so an AI assistant can drive mocking-box
+// conversationally against a running dashboard.
+func cmdMCP(args []string) int {
+	fs := flag.NewFlagSet("mcp", flag.ExitOnError)
+	dashboard := fs.String("dashboard", "http://localhost:8642", "dashboard URL to drive")
+	token := fs.String("token", "", "dashboard shared secret")
+	fs.Parse(args)
+	if err := mcp.NewServer(*dashboard, *token).Run(); err != nil {
+		log.Fatalf("mcp: %v", err)
 	}
 	return 0
 }

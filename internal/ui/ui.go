@@ -107,6 +107,7 @@ func Serve(addr, configPath, token string) error {
 	mux.HandleFunc("GET /api/seed/status", s.seedStatusHandler)
 	mux.HandleFunc("POST /api/seed/start", s.seedStart)
 	mux.HandleFunc("POST /api/seed/discover", s.seedDiscover)
+	mux.HandleFunc("POST /api/test-connection", s.testConnection)
 
 	return http.ListenAndServe(addr, mux)
 }
