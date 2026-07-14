@@ -149,8 +149,18 @@ func (r *Runner) runOne(spec corpus.RequestSpec) Result {
 }
 
 func (r *Runner) fire(rt *stackRuntime, spec corpus.RequestSpec) (*fired, error) {
-	if rt.capture != nil {
-		rt.capture.BeginWindow()
+	return fireStack(r.client, rt.cfg.BaseURL, rt.capture, r.cfg.Attribution, spec)
+}
+
+// fireStack sends one request to a stack and collects its response and
+// attribution-window write changes. Shared by live-parallel and verify modes.
+func fireStack(
+	client *http.Client, baseURL string,
+	capture *binlog.Capture, attribution config.Attribution,
+	spec corpus.RequestSpec,
+) (*fired, error) {
+	if capture != nil {
+		capture.BeginWindow()
 	}
 
 	bodyBytes, isJSON, err := spec.BodyBytes()
@@ -161,7 +171,7 @@ func (r *Runner) fire(rt *stackRuntime, spec corpus.RequestSpec) (*fired, error)
 	if bodyBytes != nil {
 		bodyReader = bytes.NewReader(bodyBytes)
 	}
-	req, err := http.NewRequest(spec.Method, rt.cfg.BaseURL+spec.Path, bodyReader)
+	req, err := http.NewRequest(spec.Method, baseURL+spec.Path, bodyReader)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +182,7 @@ func (r *Runner) fire(rt *stackRuntime, spec corpus.RequestSpec) (*fired, error)
 		req.Header.Set("content-type", "application/json")
 	}
 
-	resp, err := r.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -188,8 +198,8 @@ func (r *Runner) fire(rt *stackRuntime, spec corpus.RequestSpec) (*fired, error)
 	}
 
 	out := &fired{status: resp.StatusCode, body: string(body), headers: headers}
-	if rt.capture != nil {
-		out.changes, err = rt.capture.TakeWindow(r.cfg.Attribution)
+	if capture != nil {
+		out.changes, err = capture.TakeWindow(attribution)
 		if err != nil {
 			return nil, err
 		}

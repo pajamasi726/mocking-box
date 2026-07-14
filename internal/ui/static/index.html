@@ -174,6 +174,9 @@ const MSG = {
     corpus_name: "코퍼스 이름", start_capture: "수집 시작", stop_capture: "수집 중지",
     capturing: "수집 중", captured_n: "건 녹화됨", proxy_hint: "이 주소로 요청을 보내면 녹화됩니다",
     use_old: "구 서버로", use_new: "신 서버로",
+    golden_mode: "골든 녹화 (Record & Verify)",
+    golden_hint: "응답과 write-set까지 저장 — 검증 때 구서버가 필요 없어집니다. 요청을 한 건씩 순차 처리하므로 dev/스테이징 수집용.",
+    golden_tag: "골든", verify_mode_hint: "골든 검증 모드 — 신서버에만 재생하고 녹화된 기대값과 비교합니다",
     corpora: "코퍼스 목록", col_count: "요청 수", col_size: "크기", col_modified: "수정",
     no_corpora: "코퍼스가 없습니다 — 수집을 시작하거나 .jsonl/.har 파일을 corpus 디렉토리에 넣으세요",
     replay_this: "리플레이",
@@ -207,6 +210,9 @@ const MSG = {
     corpus_name: "Corpus name", start_capture: "Start capture", stop_capture: "Stop capture",
     capturing: "Recording", captured_n: "recorded", proxy_hint: "Send requests to this address to record them",
     use_old: "old server", use_new: "new server",
+    golden_mode: "Golden recording (Record & Verify)",
+    golden_hint: "Also saves responses and write-sets — verification then needs no old server. Requests are serialized; meant for dev/staging capture.",
+    golden_tag: "golden", verify_mode_hint: "Golden verify mode — replays against the new stack only, compared to recorded expectations",
     corpora: "Corpora", col_count: "requests", col_size: "size", col_modified: "modified",
     no_corpora: "No corpora yet — start a capture, or drop .jsonl/.har files into the corpus directory",
     replay_this: "Replay",
@@ -410,7 +416,12 @@ async function renderCapture() {
         <div><label>${esc(t("corpus_name"))}</label>
           <input type="text" id="cap-corpus" value="captured-${new Date().toISOString().slice(0,10)}" class="mono"></div>
         <div style="flex:0"><button class="btn primary" id="start-capture">${esc(t("start_capture"))}</button></div>
-      </div>`;
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;cursor:pointer">
+        <input type="checkbox" id="cap-golden" checked style="width:auto">
+        <span>${esc(t("golden_mode"))}</span>
+      </label>
+      <div class="hint">${esc(t("golden_hint"))}</div>`;
     document.getElementById("preset-old").onclick = () => document.getElementById("cap-upstream").value = oldURL;
     document.getElementById("preset-new").onclick = () => document.getElementById("cap-upstream").value = newURL;
     document.getElementById("start-capture").onclick = async () => {
@@ -420,6 +431,7 @@ async function renderCapture() {
             listen: document.getElementById("cap-listen").value.trim(),
             upstream: document.getElementById("cap-upstream").value.trim(),
             corpus: document.getElementById("cap-corpus").value.trim(),
+            golden: document.getElementById("cap-golden").checked,
           })});
         renderCapture();
       } catch (e) { toast(t("err_prefix") + e.message); }
@@ -462,7 +474,8 @@ async function renderCorpora() {
       <th>${esc(t("corpus_name"))}</th><th>${esc(t("col_count"))}</th><th>${esc(t("col_size"))}</th>
       <th>${esc(t("col_modified"))}</th><th></th></tr></thead>
     <tbody>${corpora.map(c => `<tr>
-      <td class="mono">${esc(c.name)}</td><td class="num">${c.count}</td>
+      <td class="mono">${esc(c.name)}${c.golden ? ` <span class="chip v-MATCH"><span class="dot" style="background:var(--good)"></span>${esc(t("golden_tag"))}</span>` : ""}</td>
+      <td class="num">${c.count}</td>
       <td class="num muted">${(c.size/1024).toFixed(1)} KB</td>
       <td class="mono muted">${esc(c.modified_at||"")}</td>
       <td><button class="btn" data-corpus="${esc(c.name)}">${esc(t("replay_this"))}</button></td>
@@ -492,8 +505,16 @@ async function renderReplay(preselect) {
           </select></div>
         <div style="flex:0"><button class="btn primary" id="start-replay" ${st.running||!corpora.length?"disabled":""}>${esc(t("start_replay"))}</button></div>
       </div>
+      <div class="hint" id="rp-mode-hint" style="margin-top:6px"></div>
       <div id="rp-status"></div>
     </div>`;
+  const modeHint = () => {
+    const sel = document.getElementById("rp-corpus");
+    const hint = document.getElementById("rp-mode-hint");
+    if (sel && hint) hint.textContent = (sel.value || "").endsWith(".golden.jsonl") ? t("verify_mode_hint") : "";
+  };
+  document.getElementById("rp-corpus")?.addEventListener("change", modeHint);
+  modeHint();
   if (!corpora.length) main.querySelector(".card").insertAdjacentHTML("beforeend", `<div class="empty">${esc(t("no_corpora"))}</div>`);
 
   document.getElementById("start-replay").onclick = async () => {

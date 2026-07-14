@@ -14,26 +14,41 @@ Single Go binary. Zero code changes in the systems under test. Any language, any
 > See [research/01](research/01-differential-testing-tools.md) (tool landscape) and
 > [research/02](research/02-architecture.md) (architecture).
 
-## How it works
+## Two verification modes
+
+**Record & Verify** (Keploy-style, recommended) — capture once, verify forever.
+The golden stores requests + recorded responses + per-request write-sets, so
+verification needs **only the new stack running**:
 
 ```
-corpus (JSONL/HAR) ──▶ Replayer ──▶ old stack ──▶ MySQL-old ─┐ binlog
-   (sequential)          │  └─────▶ new stack ──▶ MySQL-new ─┤ (ROW)
-                         ▼                                   ▼
-                   response diff  ◀──────────────  write-set capture
-                         └──────────▶ verdict per request ◀──┘
-        MATCH | RESPONSE_DIFF | WRITESET_DIFF | BOTH_DIFF | ERROR
+[capture, once]  traffic ─▶ recording input ─▶ old stack ─▶ old DB ─ binlog ┐
+                              └── golden = requests + responses + write-sets ◀┘
+[verify, ∞]      golden ─▶ Replayer ─▶ new stack ─▶ new DB (seeded to capture-time state)
+                       compare: recorded expectations vs live behavior
 ```
 
-1. Each request is sent to the old stack, then the new stack (sequential, deterministic).
-2. A binlog *attribution window* collects every row change committed until the DB
-   quiesces (no binlog events for `quiet_ms` + no active InnoDB transactions).
-3. Responses are deep-compared as JSON with noise rules (`**.updated_at`, …).
-4. Write-sets are canonicalized (changed columns only, noise columns dropped,
-   order-insensitive) and compared.
+**Live parallel** (Diffy-style) — both stacks running, same request sent to each,
+responses + write-sets diffed in real time.
 
-Both MySQL instances should start from the **same seed/snapshot** so auto-increment
-counters line up.
+Verdicts: `MATCH | RESPONSE_DIFF | WRITESET_DIFF | BOTH_DIFF | ERROR`.
+Write-sets are read from the MySQL ROW binlog via an *attribution window*
+(quiesce detection), canonicalized (changed columns only, noise columns dropped,
+order-insensitive), and compared. See `research/02` and `research/03`.
+
+## Capture inputs (box philosophy — never required in the request path)
+
+| input | intrusion | command |
+|---|---|---|
+| recording proxy | in-path (dev/staging) | UI capture tab, golden checkbox |
+| live NIC sniffing | side-car, `CAP_NET_RAW` | `mockingbox sniff --iface eth0 --port 8080 --out x.golden.jsonl` |
+| tcpdump .pcap conversion | zero (offline) | `mockingbox convert --pcap dump.pcap --port 8080 --out x.golden.jsonl` |
+| AWS VPC Traffic Mirroring | zero-touch on hosts | `mockingbox mirror --listen :4789 --port 8080 --out x.golden.jsonl` |
+
+`--out *.golden.jsonl` records responses (Record & Verify); plain `.jsonl`
+records requests only (live-parallel corpus). Passive inputs can't attribute
+write-sets per request (concurrent traffic) — those goldens verify responses;
+per-request write-set goldens come from the serialized recording proxy.
+VPC Traffic Mirroring setup (console + Terraform): `research/03`.
 
 ## Quickstart (self-contained demo)
 
@@ -47,8 +62,13 @@ go build -o bin/mockingbox ./cmd/mockingbox
 
 cd demo
 docker compose up -d --build
-../bin/mockingbox run -c config.yaml --corpus corpus.jsonl   # CI mode
+../bin/mockingbox run -c config.yaml --corpus corpus.jsonl   # live-parallel, CI mode
 ../bin/mockingbox ui  -c config.yaml                         # → http://localhost:8642
+
+# Record & Verify: capture a golden through the UI (or API), then the old
+# stack can be OFF — verification hits the new stack only:
+docker stop demo-app-old-1 demo-mysql-old-1
+../bin/mockingbox verify -c config.yaml --golden corpus/golden-demo.golden.jsonl
 ```
 
 Expected: 7 × `MATCH` (different SQL, same behavior) and 1 × `WRITESET_DIFF`

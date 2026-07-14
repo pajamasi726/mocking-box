@@ -20,6 +20,7 @@ import (
 	"github.com/pajamasi726/mocking-box/internal/capture"
 	"github.com/pajamasi726/mocking-box/internal/config"
 	"github.com/pajamasi726/mocking-box/internal/corpus"
+	"github.com/pajamasi726/mocking-box/internal/golden"
 	"github.com/pajamasi726/mocking-box/internal/replay"
 	"github.com/pajamasi726/mocking-box/internal/report"
 )
@@ -252,10 +253,15 @@ func (s *Server) listCorpora(w http.ResponseWriter, r *http.Request) {
 		}
 		info, _ := e.Info()
 		count := 0
-		if specs, err := corpus.Load(filepath.Join(dir, e.Name())); err == nil {
+		isGolden := golden.IsGoldenFile(e.Name())
+		if isGolden {
+			if _, entries, err := golden.Read(filepath.Join(dir, e.Name())); err == nil {
+				count = len(entries)
+			}
+		} else if specs, err := corpus.Load(filepath.Join(dir, e.Name())); err == nil {
 			count = len(specs)
 		}
-		entry := map[string]any{"name": e.Name(), "count": count}
+		entry := map[string]any{"name": e.Name(), "count": count, "golden": isGolden}
 		if info != nil {
 			entry["size"] = info.Size()
 			entry["modified_at"] = info.ModTime().Format("2006-01-02 15:04:05")
@@ -297,6 +303,7 @@ func (s *Server) captureStart(w http.ResponseWriter, r *http.Request) {
 		Listen   string `json:"listen"`
 		Upstream string `json:"upstream"`
 		Corpus   string `json:"corpus"`
+		Golden   bool   `json:"golden"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		jsonError(w, http.StatusBadRequest, err.Error())
@@ -306,7 +313,10 @@ func (s *Server) captureStart(w http.ResponseWriter, r *http.Request) {
 		jsonError(w, http.StatusBadRequest, "listen, upstream, corpus are required")
 		return
 	}
-	if !strings.HasSuffix(req.Corpus, ".jsonl") {
+	req.Corpus = strings.TrimSuffix(strings.TrimSuffix(req.Corpus, ".jsonl"), ".golden")
+	if req.Golden {
+		req.Corpus += golden.Ext
+	} else {
 		req.Corpus += ".jsonl"
 	}
 	if !corpusNamePattern.MatchString(req.Corpus) {
@@ -317,18 +327,32 @@ func (s *Server) captureStart(w http.ResponseWriter, r *http.Request) {
 		req.Listen = ":" + req.Listen
 	}
 
+	cfg, err := s.loadConfig()
+	if err != nil {
+		jsonError(w, http.StatusInternalServerError, "config: "+err.Error())
+		return
+	}
+	opts := capture.Options{Golden: req.Golden}
+	if req.Golden {
+		// expected write-sets come from the upstream (old) stack's DB when configured
+		opts.Source = cfg.Old.MySQL
+		opts.Attribution = cfg.Attribution
+		opts.NoiseColumns = cfg.Noise.Columns
+		opts.TablesIgnore = cfg.Noise.TablesIgnore
+	}
+
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if s.recorder != nil && s.recorder.Status().Running {
 		jsonError(w, http.StatusConflict, "capture already running")
 		return
 	}
-	dir := s.corpusDir()
+	dir := cfg.Corpus.Dir
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		jsonError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	rec, err := capture.Start(req.Listen, req.Upstream, filepath.Join(dir, req.Corpus))
+	rec, err := capture.Start(req.Listen, req.Upstream, filepath.Join(dir, req.Corpus), opts)
 	if err != nil {
 		jsonError(w, http.StatusBadRequest, err.Error())
 		return
@@ -377,6 +401,26 @@ func (s *Server) replayStart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	corpusPath := filepath.Join(cfg.Corpus.Dir, req.Corpus)
+
+	if golden.IsGoldenFile(req.Corpus) {
+		meta, entries, err := golden.Read(corpusPath)
+		if err != nil {
+			jsonError(w, http.StatusBadRequest, "golden: "+err.Error())
+			return
+		}
+		if len(entries) == 0 {
+			jsonError(w, http.StatusBadRequest, "golden is empty")
+			return
+		}
+		if !s.startReplayState(req.Corpus, len(entries)) {
+			jsonError(w, http.StatusConflict, "replay already running")
+			return
+		}
+		go s.runVerify(cfg, meta, entries, req.Corpus)
+		writeJSON(w, map[string]any{"started": true, "total": len(entries), "mode": "verify"})
+		return
+	}
+
 	specs, err := corpus.Load(corpusPath)
 	if err != nil {
 		jsonError(w, http.StatusBadRequest, "corpus: "+err.Error())
@@ -386,18 +430,56 @@ func (s *Server) replayStart(w http.ResponseWriter, r *http.Request) {
 		jsonError(w, http.StatusBadRequest, "corpus is empty")
 		return
 	}
-
-	s.replayMu.Lock()
-	if s.replayST.Running {
-		s.replayMu.Unlock()
+	if !s.startReplayState(req.Corpus, len(specs)) {
 		jsonError(w, http.StatusConflict, "replay already running")
 		return
 	}
-	s.replayST = replayStatus{Running: true, Corpus: req.Corpus, Total: len(specs)}
-	s.replayMu.Unlock()
-
 	go s.runReplay(cfg, specs, req.Corpus)
-	writeJSON(w, map[string]any{"started": true, "total": len(specs)})
+	writeJSON(w, map[string]any{"started": true, "total": len(specs), "mode": "live"})
+}
+
+func (s *Server) startReplayState(corpusName string, total int) bool {
+	s.replayMu.Lock()
+	defer s.replayMu.Unlock()
+	if s.replayST.Running {
+		return false
+	}
+	s.replayST = replayStatus{Running: true, Corpus: corpusName, Total: total}
+	return true
+}
+
+func (s *Server) runVerify(cfg *config.Config, meta golden.Meta, entries []golden.Entry, corpusName string) {
+	finish := func(reportPath, errMsg string) {
+		s.replayMu.Lock()
+		s.replayST.Running = false
+		s.replayST.Current = ""
+		if reportPath != "" {
+			s.replayST.LastReport = filepath.Base(reportPath)
+		}
+		s.replayST.LastError = errMsg
+		s.replayMu.Unlock()
+	}
+
+	verifier := replay.NewVerifier(cfg)
+	verifier.OnProgress = func(done, total int, name string) {
+		s.replayMu.Lock()
+		s.replayST.Done, s.replayST.Total, s.replayST.Current = done, total, name
+		s.replayMu.Unlock()
+	}
+	if err := verifier.Start(); err != nil {
+		finish("", err.Error())
+		return
+	}
+	defer verifier.Stop()
+
+	results := verifier.Run(meta, entries)
+	path, err := report.WriteJSON(results, cfg.Report.Dir, corpusName+" (verify)", "golden:"+corpusName, cfg.New.BaseURL)
+	if err != nil {
+		finish("", err.Error())
+		return
+	}
+	log.Printf("[verify] finished %s -> %s", corpusName, path)
+	finish(path, "")
 }
 
 func (s *Server) runReplay(cfg *config.Config, specs []corpus.RequestSpec, corpusName string) {
