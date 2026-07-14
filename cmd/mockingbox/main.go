@@ -110,7 +110,7 @@ func cmdCollectProxy(args []string) int {
 			*upstream = cfg.Old.BaseURL
 		}
 		if opts.Golden {
-			opts.Source = cfg.Old.MySQL
+			opts.Source = cfg.Old.PrimaryMySQL()
 			opts.Attribution = cfg.Attribution
 			opts.NoiseColumns = cfg.Noise.Columns
 			opts.TablesIgnore = cfg.Noise.TablesIgnore
@@ -182,8 +182,8 @@ func cmdVerify(args []string) int {
 		len(entries), cfg.New.BaseURL, meta.Serialized)
 
 	// preflight: 검증 DB가 시딩된 적 있는지 (T0 정합의 최소 확인)
-	if cfg.New.MySQL != nil {
-		if marker, _ := seed.ReadMarker(cfg.New.MySQL); marker == nil {
+	if m := cfg.New.PrimaryMySQL(); m != nil {
+		if marker, _ := seed.ReadMarker(m); marker == nil {
 			log.Printf("⚠ 검증 DB에 seed 이력이 없습니다 — 골든의 T0 상태와 다르면 diff가 어긋납니다 (mockingbox seed 참고)")
 		} else {
 			log.Printf("seed marker: %s에 %s에서 시딩됨 (schemas=%s, golden=%s)",
@@ -346,8 +346,9 @@ func cmdSeed(args []string) int {
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
-	if cfg.New.MySQL == nil {
-		log.Fatalf("config new.mysql is required as the seed target")
+	dst := cfg.New.PrimaryMySQL()
+	if dst == nil {
+		log.Fatalf("config new needs a mysql datastore as the seed target")
 	}
 
 	host, port := *fromHost, 3306
@@ -370,9 +371,9 @@ func cmdSeed(args []string) int {
 	}
 
 	log.Printf("seed: %s -> %s (검증용 DB를 소스 상태로 재구성 — 대상의 해당 스키마는 재생성됩니다)",
-		src.Addr(), cfg.New.MySQL.Addr())
+		src.Addr(), dst.Addr())
 	started := time.Now()
-	stats, err := seed.Run(src, cfg.New.MySQL, opts)
+	stats, err := seed.Run(src, dst, opts)
 	if err != nil {
 		log.Fatalf("seed: %v", err)
 	}

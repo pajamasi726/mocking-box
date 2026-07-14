@@ -27,8 +27,8 @@ func NewVerifier(cfg *config.Config) *Verifier {
 		cfg:    cfg,
 		client: &http.Client{Timeout: time.Duration(cfg.HTTPTimeoutS * float64(time.Second))},
 	}
-	if cfg.New.MySQL != nil {
-		v.capture = binlog.New("new", cfg.New.MySQL, 5502)
+	if m := cfg.New.PrimaryMySQL(); m != nil {
+		v.capture = binlog.New("new", m, 5502)
 	}
 	return v
 }

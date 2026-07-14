@@ -39,6 +39,37 @@ type Options struct {
 	GoldenName    string // recorded in the marker for preflight matching
 }
 
+// RunDatastores seeds every mysql datastore of the `new` stack from its
+// SeedFrom source. Datastores without a SeedFrom are skipped.
+func RunDatastores(datastores []*config.Datastore, goldenName string) (*Stats, error) {
+	total := &Stats{}
+	seeded := 0
+	for _, d := range datastores {
+		dst := d.MySQL()
+		if dst == nil || d.SeedFrom == nil || d.SeedFrom.Host == "" {
+			continue
+		}
+		opts := Options{Schemas: d.Schemas, GoldenName: goldenName, ExcludeTables: map[string]bool{}}
+		for _, t := range d.Exclude {
+			if t != "" {
+				opts.ExcludeTables[t] = true
+			}
+		}
+		st, err := Run(d.SeedFrom, dst, opts)
+		if err != nil {
+			return total, fmt.Errorf("datastore %q: %w", d.Name, err)
+		}
+		total.Schemas = append(total.Schemas, st.Schemas...)
+		total.Tables += st.Tables
+		total.Rows += st.Rows
+		seeded++
+	}
+	if seeded == 0 {
+		return total, fmt.Errorf("no datastore has a seed source configured")
+	}
+	return total, nil
+}
+
 func Run(src, dst *config.MySQL, opts Options) (*Stats, error) {
 	srcDB, err := open(src)
 	if err != nil {
@@ -278,4 +309,52 @@ func ReadMarker(m *config.MySQL) (*Marker, error) {
 		return nil, nil // no marker (or table missing) — treated as "never seeded"
 	}
 	return mk, nil
+}
+
+// -- discovery: list schemas and tables (with size) for the UI checkbox picker
+
+type TableInfo struct {
+	Name   string `json:"name"`
+	Rows   int64  `json:"rows"`
+	SizeMB int64  `json:"size_mb"`
+}
+
+type SchemaInfo struct {
+	Name   string      `json:"name"`
+	Tables []TableInfo `json:"tables"`
+}
+
+// Discover connects to a source MySQL and returns its non-system schemas with
+// each table's approximate row count and size — powers the seed picker.
+func Discover(src *config.MySQL) ([]SchemaInfo, error) {
+	db, err := open(src)
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	schemas, err := discoverSchemas(db)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]SchemaInfo, 0, len(schemas))
+	for _, schema := range schemas {
+		rows, err := db.Query(
+			"SELECT TABLE_NAME, COALESCE(TABLE_ROWS,0), COALESCE(ROUND((DATA_LENGTH+INDEX_LENGTH)/1048576),0)"+
+				" FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_TYPE='BASE TABLE'"+
+				" ORDER BY (DATA_LENGTH+INDEX_LENGTH) DESC", schema)
+		if err != nil {
+			return nil, err
+		}
+		si := SchemaInfo{Name: schema}
+		for rows.Next() {
+			var ti TableInfo
+			if rows.Scan(&ti.Name, &ti.Rows, &ti.SizeMB) == nil {
+				si.Tables = append(si.Tables, ti)
+			}
+		}
+		rows.Close()
+		out = append(out, si)
+	}
+	return out, nil
 }

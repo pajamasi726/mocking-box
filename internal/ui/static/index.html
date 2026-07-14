@@ -234,11 +234,15 @@ const MSG = {
     health_title: "연결 상태",
     h_old_api: "기준 API", h_new_api: "검증 API", h_old_db: "기준 DB", h_new_db: "검증 DB",
     tab_seed: "DB 준비", seed_title: "검증 DB 준비 (시딩)",
-    seed_desc: "검증 대상 DB를 원본과 같은 상태로 채웁니다. 원본 DB 접속 정보만 입력하고 [시딩]을 누르면 스키마·데이터를 알아서 복사합니다 (테이블 생성 포함).",
+    seed_desc: "검증 대상의 각 DB를 원본과 같은 상태로 채웁니다. 원본 접속 정보를 넣고 [탐색]으로 스키마·테이블을 확인한 뒤 체크한 것만 복사합니다 (테이블 생성 포함).",
     seed_src: "원본 DB (dev/복제본/복원 인스턴스 — 접속만 되면 됨)",
-    seed_schemas: "스키마 (쉼표 구분, 비우면 자동 발견)",
-    seed_exclude: "제외 테이블 (쉼표 구분, 예: 대용량 이미지 테이블)",
-    seed_run: "시딩 실행", seeding: "시딩 중…", seed_done: "시딩 완료",
+    seed_run: "전체 시딩 실행", seeding: "시딩 중…", seed_done: "시딩 완료",
+    no_new_ds: "검증 대상 DB가 없습니다 — [설정] 탭에서 datastore를 추가하세요",
+    discover: "탐색", discovering: "탐색 중…", discover_hint: "접속해서 스키마·테이블 목록을 불러옵니다",
+    pick_schemas: "복사할 스키마·테이블 (체크 해제 = 제외)",
+    ds_name: "이름 (구/신 매칭 키)", ds_add: "+ DB 추가", ds_remove: "삭제",
+    ds_none: "DB 없음 (응답만 비교) — 필요하면 추가하세요",
+    tables_n: "개 테이블", size_mb: "MB",
   },
   en: {
     tab_dashboard: "Dashboard", tab_capture: "Capture · Recordings", tab_settings: "Settings",
@@ -306,11 +310,15 @@ const MSG = {
     health_title: "Connections",
     h_old_api: "Reference API", h_new_api: "API under test", h_old_db: "Reference DB", h_new_db: "DB under test",
     tab_seed: "Prepare DB", seed_title: "Prepare the verification DB (seed)",
-    seed_desc: "Fills the DB under test with the same state as the original. Enter the source DB connection only and click Seed — schemas and data are copied automatically (tables created for you).",
+    seed_desc: "Fills each DB under test with the same state as the original. Enter the source connection, click Discover to see schemas/tables, then only the checked ones are copied (tables created for you).",
     seed_src: "Source DB (dev / replica / restored instance — just needs to be reachable)",
-    seed_schemas: "Schemas (comma-separated; empty = auto-discover)",
-    seed_exclude: "Exclude tables (comma-separated, e.g. huge blob tables)",
-    seed_run: "Run seed", seeding: "Seeding…", seed_done: "Seed complete",
+    seed_run: "Seed all", seeding: "Seeding…", seed_done: "Seed complete",
+    no_new_ds: "No DB under test — add a datastore in the Settings tab",
+    discover: "Discover", discovering: "Discovering…", discover_hint: "Connect and load the schema/table list",
+    pick_schemas: "Schemas & tables to copy (unchecked = excluded)",
+    ds_name: "Name (old↔new matching key)", ds_add: "+ Add DB", ds_remove: "Remove",
+    ds_none: "No DB (responses-only) — add one if needed",
+    tables_n: "tables", size_mb: "MB",
   },
 };
 let lang = localStorage.getItem("mb-lang") || (navigator.language.startsWith("ko") ? "ko" : "en");
@@ -531,11 +539,6 @@ async function renderCapture() {
       <div id="agents"></div>
     </div>
     <div class="card">
-      <h2>${esc(t("capture_title"))}</h2>
-      <p class="desc">${esc(t("capture_desc"))}</p>
-      <div id="capture-body"></div>
-    </div>
-    <div class="card">
       <h2>${esc(t("corpora"))}</h2>
       <p class="desc">${esc(t("corpora_desc"))}</p>
       <label class="btn small" style="display:inline-block; margin-bottom:10px">
@@ -544,7 +547,14 @@ async function renderCapture() {
       </label>
       <div id="rp-status"></div>
       <div id="corpora"></div>
-    </div>`;
+    </div>
+    <details class="adv">
+      <summary>${esc(t("capture_title"))}</summary>
+      <div class="card" style="margin-top:8px">
+        <p class="desc">${esc(t("capture_desc"))}</p>
+        <div id="capture-body"></div>
+      </div>
+    </details>`;
   renderHealth();
   renderAgents();
   document.getElementById("import-file").addEventListener("change", async ev => {
@@ -736,54 +746,128 @@ function startReplayPoll() {
 
 /* ------------------------------------------------------------------ seed */
 let seedPoll = null;
+// per-datastore seed source edits, keyed by datastore name (session-local)
+let seedEdits = {};
 async function renderSeed() {
   const main = document.getElementById("main");
   let cfg;
   try { cfg = cfgCache = await api("/api/config"); }
   catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
-  const src = cfg.seed_source || {};
+
+  const datastores = (cfg.new?.datastores || []);
+  if (!datastores.length) {
+    main.innerHTML = `<div class="card"><h2>${esc(t("seed_title"))}</h2>
+      <div class="empty">${esc(t("no_new_ds"))}</div></div>`;
+    return;
+  }
   main.innerHTML = `
-    <div class="card">
-      <h2>${esc(t("seed_title"))}</h2>
-      <p class="desc">${esc(t("seed_desc"))}</p>
+    <p class="desc muted" style="margin:0 0 12px; font-size:13px">${esc(t("seed_desc"))}</p>
+    <div id="seed-cards"></div>
+    <button class="btn primary" id="seed-run" style="margin:4px 0 12px">${esc(t("seed_run"))}</button>
+    <div id="seed-status"></div>`;
+
+  const box = document.getElementById("seed-cards");
+  datastores.forEach((d, i) => {
+    const sf = d.seed_from || {};
+    if (!seedEdits[d.name]) seedEdits[d.name] = { schemas: d.schemas || [], exclude: d.exclude_tables || [], discovered: null };
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <h2>${esc(d.name)} <span class="muted" style="text-transform:none">${esc(d.type||"mysql")} · ${esc(d.host)}:${d.port}</span></h2>
       <label>${esc(t("seed_src"))}</label>
       <div class="row">
-        <div style="flex:2"><input type="text" class="mono" id="sd-host" placeholder="host" value="${esc(src.host||"")}"></div>
-        <div style="max-width:100px"><input type="number" class="mono" id="sd-port" value="${src.port||3306}"></div>
-        <div><input type="text" class="mono" id="sd-user" placeholder="user" value="${esc(src.user||"")}"></div>
-        <div><input type="password" class="mono" id="sd-pw" placeholder="password" value="${esc(src.password||"")}"></div>
+        <div style="flex:2"><input type="text" class="mono sf-host" placeholder="host" value="${esc(sf.host||"")}"></div>
+        <div style="max-width:90px"><input type="number" class="mono sf-port" value="${sf.port||3306}"></div>
+        <div><input type="text" class="mono sf-user" placeholder="user" value="${esc(sf.user||"")}"></div>
+        <div><input type="password" class="mono sf-pw" placeholder="password" value="${esc(sf.password||"")}"></div>
+        <div style="flex:0"><button class="btn discover-btn" data-i="${i}">${esc(t("discover"))}</button></div>
       </div>
-      <label>${esc(t("seed_schemas"))}</label>
-      <input type="text" class="mono" id="sd-schemas" value="${esc((src.schemas||[]).join(", "))}">
-      <label>${esc(t("seed_exclude"))}</label>
-      <input type="text" class="mono" id="sd-exclude" value="${esc((src.exclude_tables||[]).join(", "))}">
-      <div style="margin-top:14px"><button class="btn primary" id="seed-run">${esc(t("seed_run"))}</button></div>
-      <div id="seed-status" style="margin-top:12px"></div>
-    </div>`;
+      <div class="hint">${esc(t("discover_hint"))}</div>
+      <div class="picker" data-name="${esc(d.name)}"></div>`;
+    box.appendChild(card);
+    card.querySelector(".discover-btn").onclick = () => discoverFor(d.name, card);
+    if (seedEdits[d.name].discovered) renderPicker(d.name, card.querySelector(".picker"));
+  });
 
-  document.getElementById("seed-run").onclick = async () => {
-    const csv = id => document.getElementById(id).value.split(",").map(s=>s.trim()).filter(Boolean);
-    const payload = {
-      old: cfg.old, new: cfg.new, attribution: cfg.attribution, noise: cfg.noise,
-      compare: cfg.compare, http_timeout_s: cfg.http_timeout_s, compare_headers: cfg.compare_headers,
-      report: cfg.report, corpus: cfg.corpus,
-      seed_source: {
-        host: document.getElementById("sd-host").value.trim(),
-        port: +document.getElementById("sd-port").value || 3306,
-        user: document.getElementById("sd-user").value.trim(),
-        password: document.getElementById("sd-pw").value,
-        schemas: csv("sd-schemas"), exclude_tables: csv("sd-exclude"),
-      },
-    };
-    try {
-      cfgCache = await api("/api/config", {method:"PUT", headers:{"content-type":"application/json"}, body: JSON.stringify(payload)});
-      await api("/api/seed/start", {method:"POST"});
-      pollSeed();
-    } catch (e) { toast(t("err_prefix") + e.message); }
-  };
+  document.getElementById("seed-run").onclick = () => runSeedAll(cfg);
   const st = await api("/api/seed/status").catch(()=>({}));
   renderSeedStatus(st);
   if (st.running) pollSeed();
+}
+
+async function discoverFor(name, card) {
+  const src = {
+    host: card.querySelector(".sf-host").value.trim(),
+    port: +card.querySelector(".sf-port").value || 3306,
+    user: card.querySelector(".sf-user").value.trim(),
+    password: card.querySelector(".sf-pw").value,
+  };
+  if (!src.host) { toast(t("err_prefix") + "host"); return; }
+  const btn = card.querySelector(".discover-btn");
+  btn.textContent = t("discovering"); btn.disabled = true;
+  try {
+    const schemas = await api("/api/seed/discover", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(src)});
+    seedEdits[name].discovered = schemas;
+    // default selection: everything, minus previously-excluded
+    const ex = new Set(seedEdits[name].exclude);
+    seedEdits[name].selected = {};
+    schemas.forEach(s => s.tables.forEach(tb => { seedEdits[name].selected[s.name+"."+tb.name] = !ex.has(s.name+"."+tb.name) && !ex.has(tb.name); }));
+    renderPicker(name, card.querySelector(".picker"));
+  } catch (e) { toast(t("err_prefix") + e.message); }
+  finally { btn.textContent = t("discover"); btn.disabled = false; }
+}
+
+function renderPicker(name, box) {
+  const schemas = seedEdits[name].discovered || [];
+  const sel = seedEdits[name].selected || {};
+  box.innerHTML = `<label>${esc(t("pick_schemas"))}</label>` + schemas.map(s => {
+    const rows = s.tables.map(tb => {
+      const key = s.name + "." + tb.name;
+      return `<label style="display:flex;align-items:center;gap:8px;padding:2px 0;font-size:12.5px">
+        <input type="checkbox" class="tbl-cb" data-key="${esc(key)}" ${sel[key]!==false?"checked":""} style="width:auto">
+        <span class="mono">${esc(tb.name)}</span>
+        <span class="muted mono" style="margin-left:auto">${tb.rows.toLocaleString()} rows · ${tb.size_mb} ${esc(t("size_mb"))}</span>
+      </label>`;
+    }).join("");
+    return `<div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin:6px 0">
+      <div class="mono" style="font-weight:600;margin-bottom:4px">${esc(s.name)}
+        <span class="muted" style="font-weight:400">· ${s.tables.length} ${esc(t("tables_n"))}</span></div>
+      ${rows}</div>`;
+  }).join("");
+  box.querySelectorAll(".tbl-cb").forEach(cb =>
+    cb.addEventListener("change", () => { seedEdits[name].selected[cb.dataset.key] = cb.checked; }));
+}
+
+async function runSeedAll(cfg) {
+  // collect per-datastore seed_from + schemas/exclude from the pickers, save, seed
+  const cards = document.querySelectorAll("#seed-cards .card");
+  const newStack = JSON.parse(JSON.stringify(cfg.new));
+  cards.forEach((card, i) => {
+    const d = newStack.datastores[i];
+    d.seed_from = {
+      host: card.querySelector(".sf-host").value.trim(),
+      port: +card.querySelector(".sf-port").value || 3306,
+      user: card.querySelector(".sf-user").value.trim(),
+      password: card.querySelector(".sf-pw").value,
+    };
+    const edit = seedEdits[d.name];
+    if (edit && edit.discovered) {
+      const schemas = new Set(), exclude = [];
+      edit.discovered.forEach(s => s.tables.forEach(tb => {
+        const key = s.name + "." + tb.name;
+        if (edit.selected[key] !== false) schemas.add(s.name);
+        else exclude.push(key);
+      }));
+      d.schemas = [...schemas];
+      d.exclude_tables = exclude;
+    }
+  });
+  const payload = { ...cfg, new: newStack };
+  try {
+    cfgCache = await api("/api/config", {method:"PUT", headers:{"content-type":"application/json"}, body: JSON.stringify(payload)});
+    await api("/api/seed/start", {method:"POST"});
+    pollSeed();
+  } catch (e) { toast(t("err_prefix") + e.message); }
 }
 
 function renderSeedStatus(st) {
@@ -816,25 +900,25 @@ async function renderSettings() {
   try { cfg = cfgCache = await api("/api/config"); }
   catch (e) { main.innerHTML = `<div class="empty">${esc(t("err_prefix"))}${esc(e.message)}</div>`; return; }
 
-  const stackForm = (key, title) => {
+  const stackCard = (key, title, collapsible) => {
     const st = cfg[key] || {};
-    const my = st.mysql || {};
-    return `<div class="card"><h2>${esc(title)}</h2>
+    const inner = `
       <label>${esc(t("base_url"))}</label><input type="text" class="mono" id="${key}-url" value="${esc(st.base_url||"")}">
       <label style="margin-top:12px">${esc(t("mysql_title"))}</label>
-      <div class="row">
-        <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono" id="${key}-mh" value="${esc(my.host||"")}"></div>
-        <div style="max-width:100px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono" id="${key}-mp" value="${my.port||3306}"></div>
-        <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono" id="${key}-mu" value="${esc(my.user||"")}"></div>
-        <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono" id="${key}-mw" value="${esc(my.password||"")}"></div>
-      </div></div>`;
+      <div class="ds-list" data-stack="${key}"></div>
+      <button class="btn small ds-add" data-stack="${key}">${esc(t("ds_add"))}</button>`;
+    if (collapsible) {
+      return `<div class="card"><details><summary style="cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600">${esc(title)}</summary>
+        <div style="margin-top:10px">${inner}</div></details></div>`;
+    }
+    return `<div class="card"><h2>${esc(title)}</h2>${inner}</div>`;
   };
 
   const sortRules = (cfg.compare?.sort_arrays || []);
   main.innerHTML = `
     <p class="desc muted" style="margin:0 0 12px; font-size:13px">${esc(t("settings_desc"))}</p>
     <h2>${esc(t("sec_servers"))}</h2>
-    <div class="grid2">${stackForm("old", t("old_stack"))}${stackForm("new", t("new_stack"))}</div>
+    <div class="grid2">${stackCard("new", t("new_stack"), false)}${stackCard("old", t("old_stack"), true)}</div>
     <h2>${esc(t("sec_compare"))}</h2>
     <div class="grid2">
       <div class="card"><h2>${esc(t("noise_title"))}</h2>
@@ -859,6 +943,33 @@ async function renderSettings() {
     </details>
     <button class="btn primary" id="save-settings" style="margin:14px 0 30px">${esc(t("save"))}</button>`;
 
+  // datastore rows per stack
+  const addDatastore = (stackKey, d = {}) => {
+    const list = document.querySelector(`.ds-list[data-stack="${stackKey}"]`);
+    const div = document.createElement("div");
+    div.className = "ds-row";
+    div.style = "border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px";
+    div.innerHTML = `
+      <div class="row">
+        <div style="flex:1.2"><label>${esc(t("ds_name"))}</label><input type="text" class="mono ds-name" value="${esc(d.name||"default")}"></div>
+        <div style="flex:0"><button class="btn small ds-rm danger" title="${esc(t("ds_remove"))}">✕</button></div>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <div><label>${esc(t("mysql_host"))}</label><input type="text" class="mono ds-host" value="${esc(d.host||"127.0.0.1")}"></div>
+        <div style="max-width:90px"><label>${esc(t("mysql_port"))}</label><input type="number" class="mono ds-port" value="${d.port||3306}"></div>
+        <div><label>${esc(t("mysql_user"))}</label><input type="text" class="mono ds-user" value="${esc(d.user||"")}"></div>
+        <div><label>${esc(t("mysql_password"))}</label><input type="password" class="mono ds-pw" value="${esc(d.password||"")}"></div>
+      </div>`;
+    div._seedFrom = d.seed_from; div._schemas = d.schemas; div._exclude = d.exclude_tables;
+    div.querySelector(".ds-rm").onclick = () => div.remove();
+    list.appendChild(div);
+  };
+  ["new", "old"].forEach(key => {
+    (cfg[key]?.datastores || []).forEach(d => addDatastore(key, d));
+  });
+  document.querySelectorAll(".ds-add").forEach(btn =>
+    btn.addEventListener("click", () => addDatastore(btn.dataset.stack)));
+
   const rulesBox = document.getElementById("sort-rules");
   const addRule = (path = "", by = "") => {
     const div = document.createElement("div");
@@ -875,13 +986,22 @@ async function renderSettings() {
   document.getElementById("save-settings").onclick = async () => {
     const lines = id => document.getElementById(id).value.split("\n").map(s => s.trim()).filter(Boolean);
     const stack = key => {
-      const out = { base_url: document.getElementById(`${key}-url`).value.trim() };
-      const host = document.getElementById(`${key}-mh`).value.trim();
-      if (host) out.mysql = {
-        host, port: +document.getElementById(`${key}-mp`).value || 3306,
-        user: document.getElementById(`${key}-mu`).value.trim(),
-        password: document.getElementById(`${key}-mw`).value,
-      };
+      const out = { base_url: document.getElementById(`${key}-url`).value.trim(), datastores: [] };
+      document.querySelectorAll(`.ds-list[data-stack="${key}"] .ds-row`).forEach(row => {
+        const host = row.querySelector(".ds-host").value.trim();
+        if (!host) return;
+        const d = {
+          name: row.querySelector(".ds-name").value.trim() || "default", type: "mysql",
+          host, port: +row.querySelector(".ds-port").value || 3306,
+          user: row.querySelector(".ds-user").value.trim(),
+          password: row.querySelector(".ds-pw").value,
+        };
+        // preserve seed_from/schemas/exclude set on the Seed tab
+        if (row._seedFrom) d.seed_from = row._seedFrom;
+        if (row._schemas) d.schemas = row._schemas;
+        if (row._exclude) d.exclude_tables = row._exclude;
+        out.datastores.push(d);
+      });
       return out;
     };
     const rules = [...rulesBox.querySelectorAll(".sortrule")].map(div => ({

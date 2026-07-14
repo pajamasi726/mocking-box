@@ -187,11 +187,11 @@ func (s *Server) healthCheck(w http.ResponseWriter, r *http.Request) {
 		add("old_api", func() healthItem { return checkHTTP(cfg.Old.BaseURL) })
 	}
 	add("new_api", func() healthItem { return checkHTTP(cfg.New.BaseURL) })
-	if cfg.Old.MySQL != nil {
-		add("old_db", func() healthItem { return checkMySQL(cfg.Old.MySQL) })
-	}
-	if cfg.New.MySQL != nil {
-		add("new_db", func() healthItem { return checkMySQL(cfg.New.MySQL) })
+	for _, d := range cfg.New.Datastores {
+		if m := d.MySQL(); m != nil {
+			name, mysql := "db:"+d.Name, m
+			add(name, func() healthItem { return checkMySQL(mysql) })
+		}
 	}
 	wg.Wait()
 	writeJSON(w, out)

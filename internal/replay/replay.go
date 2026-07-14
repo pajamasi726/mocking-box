@@ -53,8 +53,8 @@ type Runner struct {
 func NewRunner(cfg *config.Config) *Runner {
 	newRt := func(stack config.Stack, serverID uint32) *stackRuntime {
 		rt := &stackRuntime{cfg: stack}
-		if stack.MySQL != nil {
-			rt.capture = binlog.New(stack.Name, stack.MySQL, serverID)
+		if m := stack.PrimaryMySQL(); m != nil {
+			rt.capture = binlog.New(stack.Name, m, serverID)
 		}
 		return rt
 	}

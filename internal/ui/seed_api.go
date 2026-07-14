@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -14,21 +15,16 @@ func (s *Server) seedStatusHandler(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, s.seedST)
 }
 
-// seedStart runs the seed engine using config's seed_source (or an override in
-// the request body). The user gives DB connection info only — no CLI, no AWS.
+// seedStart seeds every new datastore from its configured source. The user
+// gives DB connection info only (in Settings) — no CLI, no AWS.
 func (s *Server) seedStart(w http.ResponseWriter, r *http.Request) {
 	cfg, err := s.loadConfig()
 	if err != nil {
 		jsonError(w, http.StatusInternalServerError, "config: "+err.Error())
 		return
 	}
-	if cfg.New.MySQL == nil {
-		jsonError(w, http.StatusBadRequest, "검증 대상 DB(new.mysql)가 설정되어 있어야 합니다")
-		return
-	}
-	src := cfg.SeedSource
-	if src == nil || src.Host == "" {
-		jsonError(w, http.StatusBadRequest, "시딩 소스 DB 정보가 없습니다 — 설정에서 입력하세요")
+	if len(cfg.New.Datastores) == 0 {
+		jsonError(w, http.StatusBadRequest, "검증 대상 datastore가 없습니다 — 설정에서 추가하세요")
 		return
 	}
 
@@ -41,24 +37,12 @@ func (s *Server) seedStart(w http.ResponseWriter, r *http.Request) {
 	s.seedST = seedStatus{Running: true, Log: "시딩 시작…"}
 	s.seedMu.Unlock()
 
-	go s.runSeed(cfg, src)
+	go s.runSeed(cfg)
 	writeJSON(w, map[string]bool{"started": true})
 }
 
-func (s *Server) runSeed(cfg *config.Config, src *config.SeedSource) {
-	port := src.Port
-	if port == 0 {
-		port = 3306
-	}
-	srcDB := &config.MySQL{Host: src.Host, Port: port, User: src.User, Password: src.Password}
-	opts := seed.Options{Schemas: src.Schemas, ExcludeTables: map[string]bool{}}
-	for _, t := range src.Exclude {
-		if t != "" {
-			opts.ExcludeTables[t] = true
-		}
-	}
-
-	stats, err := seed.Run(srcDB, cfg.New.MySQL, opts)
+func (s *Server) runSeed(cfg *config.Config) {
+	stats, err := seed.RunDatastores(cfg.New.Datastores, "")
 	s.seedMu.Lock()
 	defer s.seedMu.Unlock()
 	s.seedST.Running = false
@@ -72,4 +56,31 @@ func (s *Server) runSeed(cfg *config.Config, src *config.SeedSource) {
 	s.seedST.Tables, s.seedST.Rows = stats.Tables, stats.Rows
 	s.seedST.Log = "시딩 완료"
 	log.Printf("[seed] done: schemas=%v tables=%d rows=%d", stats.Schemas, stats.Tables, stats.Rows)
+}
+
+// seedDiscover connects to a source DB (from the request body) and returns its
+// schemas+tables so the UI can show checkboxes with sizes.
+func (s *Server) seedDiscover(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Host, User, Password string
+		Port                 int
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		jsonError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	if req.Host == "" {
+		jsonError(w, http.StatusBadRequest, "host is required")
+		return
+	}
+	if req.Port == 0 {
+		req.Port = 3306
+	}
+	src := &config.MySQL{Host: req.Host, Port: req.Port, User: req.User, Password: req.Password}
+	schemas, err := seed.Discover(src)
+	if err != nil {
+		jsonError(w, http.StatusBadGateway, err.Error())
+		return
+	}
+	writeJSON(w, schemas)
 }

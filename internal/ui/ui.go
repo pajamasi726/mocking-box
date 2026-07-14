@@ -104,6 +104,7 @@ func Serve(addr, configPath, token string) error {
 	mux.HandleFunc("GET /api/health", s.healthCheck)
 	mux.HandleFunc("GET /api/seed/status", s.seedStatusHandler)
 	mux.HandleFunc("POST /api/seed/start", s.seedStart)
+	mux.HandleFunc("POST /api/seed/discover", s.seedDiscover)
 
 	return http.ListenAndServe(addr, mux)
 }
@@ -219,22 +220,12 @@ func (s *Server) putConfig(w http.ResponseWriter, r *http.Request) {
 
 // configToJSON renders the config in the same shape the YAML file uses.
 func configToJSON(cfg *config.Config) map[string]any {
-	stack := func(st config.Stack) map[string]any {
-		m := map[string]any{"base_url": st.BaseURL}
-		if st.MySQL != nil {
-			m["mysql"] = map[string]any{
-				"host": st.MySQL.Host, "port": st.MySQL.Port,
-				"user": st.MySQL.User, "password": st.MySQL.Password,
-			}
-		}
-		return m
-	}
 	sortRules := []map[string]string{}
 	for _, sr := range cfg.Compare.SortArrays {
 		sortRules = append(sortRules, map[string]string{"path": sr.Path, "by": sr.By})
 	}
 	return map[string]any{
-		"old": stack(cfg.Old), "new": stack(cfg.New),
+		"old": stackJSON(cfg.Old), "new": stackJSON(cfg.New),
 		"attribution": map[string]any{
 			"quiet_ms": cfg.Attribution.QuietMs, "timeout_ms": cfg.Attribution.TimeoutMs,
 			"check_innodb_trx": cfg.Attribution.TrxCheck(),
@@ -249,22 +240,26 @@ func configToJSON(cfg *config.Config) map[string]any {
 		"compare_headers": orEmpty(cfg.CompareHeaders),
 		"report":          map[string]any{"dir": cfg.Report.Dir},
 		"corpus":          map[string]any{"dir": cfg.Corpus.Dir},
-		"seed_source":     seedSourceJSON(cfg.SeedSource),
 	}
 }
 
-func seedSourceJSON(src *config.SeedSource) map[string]any {
-	if src == nil {
-		return map[string]any{"host": "", "port": 3306, "user": "", "password": "", "schemas": []string{}, "exclude_tables": []string{}}
+func stackJSON(st config.Stack) map[string]any {
+	datastores := []map[string]any{}
+	for _, d := range st.Datastores {
+		item := map[string]any{
+			"name": d.Name, "type": d.Type, "host": d.Host, "port": d.Port,
+			"user": d.User, "password": d.Password,
+			"schemas": orEmpty(d.Schemas), "exclude_tables": orEmpty(d.Exclude),
+		}
+		if d.SeedFrom != nil {
+			item["seed_from"] = map[string]any{
+				"host": d.SeedFrom.Host, "port": d.SeedFrom.Port,
+				"user": d.SeedFrom.User, "password": d.SeedFrom.Password,
+			}
+		}
+		datastores = append(datastores, item)
 	}
-	port := src.Port
-	if port == 0 {
-		port = 3306
-	}
-	return map[string]any{
-		"host": src.Host, "port": port, "user": src.User, "password": src.Password,
-		"schemas": orEmpty(src.Schemas), "exclude_tables": orEmpty(src.Exclude),
-	}
+	return map[string]any{"base_url": st.BaseURL, "datastores": datastores}
 }
 
 func orEmpty(s []string) []string {
@@ -376,7 +371,7 @@ func (s *Server) captureStart(w http.ResponseWriter, r *http.Request) {
 	opts := capture.Options{Golden: req.Golden}
 	if req.Golden {
 		// expected write-sets come from the upstream (old) stack's DB when configured
-		opts.Source = cfg.Old.MySQL
+		opts.Source = cfg.Old.PrimaryMySQL()
 		opts.Attribution = cfg.Attribution
 		opts.NoiseColumns = cfg.Noise.Columns
 		opts.TablesIgnore = cfg.Noise.TablesIgnore

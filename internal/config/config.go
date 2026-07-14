@@ -23,12 +23,58 @@ func (m *MySQL) DSN() string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/", m.User, m.Password, m.Host, m.Port)
 }
 
-// Stack is one side of the comparison: a running app + the MySQL it writes to.
-// MySQL may be nil for response-diff-only mode.
+// Datastore is one database a stack reads/writes. A stack may own several
+// (legalcare: a lawkit MySQL + a medi PostgreSQL). Old and new are paired by
+// Name: the datastore called "lawkit-db" on old is compared with "lawkit-db"
+// on new. SeedFrom is the source (dev/replica/restore) this datastore is
+// seeded from; Schemas/Exclude scope what gets copied and captured.
+type Datastore struct {
+	Name     string   `yaml:"name" json:"name"`
+	Type     string   `yaml:"type" json:"type"` // "mysql" (postgres: roadmap)
+	Host     string   `yaml:"host" json:"host"`
+	Port     int      `yaml:"port" json:"port"`
+	User     string   `yaml:"user" json:"user"`
+	Password string   `yaml:"password" json:"password"`
+	Schemas  []string `yaml:"schemas" json:"schemas"`
+	Exclude  []string `yaml:"exclude_tables" json:"exclude_tables"`
+	SeedFrom *MySQL   `yaml:"seed_from" json:"seed_from,omitempty"`
+}
+
+func (d *Datastore) Addr() string { return fmt.Sprintf("%s:%d", d.Host, d.Port) }
+
+// MySQL returns a MySQL handle for datastores of type mysql (nil otherwise).
+func (d *Datastore) MySQL() *MySQL {
+	if d == nil || (d.Type != "" && d.Type != "mysql") {
+		return nil
+	}
+	return &MySQL{Host: d.Host, Port: d.Port, User: d.User, Password: d.Password}
+}
+
+// Stack is one side of the comparison: a running app + the datastores it writes.
 type Stack struct {
-	Name    string `yaml:"-"`
-	BaseURL string `yaml:"base_url"`
-	MySQL   *MySQL `yaml:"mysql"`
+	Name       string       `yaml:"-"`
+	BaseURL    string       `yaml:"base_url"`
+	MySQL      *MySQL       `yaml:"mysql"` // legacy single-DB shorthand (promoted to Datastores on load)
+	Datastores []*Datastore `yaml:"datastores"`
+}
+
+// PrimaryMySQL returns the first mysql datastore (single-DB write-set path).
+func (s *Stack) PrimaryMySQL() *MySQL {
+	for _, d := range s.Datastores {
+		if m := d.MySQL(); m != nil {
+			return m
+		}
+	}
+	return nil
+}
+
+func (s *Stack) DatastoreByName(name string) *Datastore {
+	for _, d := range s.Datastores {
+		if d.Name == name {
+			return d
+		}
+	}
+	return nil
 }
 
 type Attribution struct {
@@ -53,8 +99,8 @@ type Corpus struct {
 	Dir string `yaml:"dir"`
 }
 
-// SeedSource: 검증 DB를 채울 원본 (dev DB / read replica / 복원 인스턴스).
-// 접속만 하면 되는 이미 존재하는 DB — 대시보드 [시딩] 버튼이 사용.
+// SeedSource is the legacy top-level `seed_source:` shorthand — folded into the
+// first `new` datastore's SeedFrom on load. New configs use per-datastore seed_from.
 type SeedSource struct {
 	Host     string   `yaml:"host"`
 	Port     int      `yaml:"port"`
@@ -106,11 +152,11 @@ func Load(path string) (*Config, error) {
 	if cfg.New.BaseURL == "" {
 		return nil, fmt.Errorf("new.base_url is required (the stack under test)")
 	}
-	for _, m := range []*MySQL{cfg.Old.MySQL, cfg.New.MySQL} {
-		if m != nil && m.Port == 0 {
-			m.Port = 3306
-		}
-	}
+	// legacy shorthand: `mysql:` (+ top-level seed_source) → a single datastore
+	promoteLegacy(&cfg.Old, nil)
+	promoteLegacy(&cfg.New, cfg.SeedSource)
+	normalizeDatastores(cfg.Old.Datastores)
+	normalizeDatastores(cfg.New.Datastores)
 	if cfg.Attribution.QuietMs == 0 {
 		cfg.Attribution.QuietMs = 300
 	}
@@ -130,4 +176,45 @@ func Load(path string) (*Config, error) {
 		cfg.CompareHeaders[i] = strings.ToLower(h)
 	}
 	return cfg, nil
+}
+
+// promoteLegacy folds the old single-`mysql:` shorthand (and a top-level
+// seed_source, for the `new` stack) into one datastore named "default", so
+// existing configs keep working under the datastore model.
+func promoteLegacy(stack *Stack, seedSource *SeedSource) {
+	if stack.MySQL == nil || len(stack.Datastores) > 0 {
+		return
+	}
+	d := &Datastore{
+		Name: "default", Type: "mysql",
+		Host: stack.MySQL.Host, Port: stack.MySQL.Port,
+		User: stack.MySQL.User, Password: stack.MySQL.Password,
+	}
+	if seedSource != nil && seedSource.Host != "" {
+		d.Schemas = seedSource.Schemas
+		d.Exclude = seedSource.Exclude
+		d.SeedFrom = &MySQL{
+			Host: seedSource.Host, Port: seedSource.Port,
+			User: seedSource.User, Password: seedSource.Password,
+		}
+	}
+	stack.Datastores = []*Datastore{d}
+	stack.MySQL = nil
+}
+
+func normalizeDatastores(datastores []*Datastore) {
+	for i, d := range datastores {
+		if d.Type == "" {
+			d.Type = "mysql"
+		}
+		if d.Port == 0 {
+			d.Port = 3306
+		}
+		if d.Name == "" {
+			d.Name = fmt.Sprintf("db%d", i+1)
+		}
+		if d.SeedFrom != nil && d.SeedFrom.Port == 0 {
+			d.SeedFrom.Port = 3306
+		}
+	}
 }
