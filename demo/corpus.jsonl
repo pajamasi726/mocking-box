@@ -1,0 +1,8 @@
+{"name": "get-wallet-1",         "method": "GET",  "path": "/wallet/1"}
+{"name": "charge-1-5000",        "method": "POST", "path": "/wallet/1/charge",   "body": {"amount": 5000}}
+{"name": "get-after-charge",     "method": "GET",  "path": "/wallet/1"}
+{"name": "charge-2-10000",       "method": "POST", "path": "/wallet/2/charge",   "body": {"amount": 10000}}
+{"name": "get-wallet-2",         "method": "GET",  "path": "/wallet/2"}
+{"name": "withdraw-insufficient","method": "POST", "path": "/wallet/2/withdraw", "body": {"amount": 999999}}
+{"name": "wallet-not-found",     "method": "GET",  "path": "/wallet/999"}
+{"name": "withdraw-1-2000",      "method": "POST", "path": "/wallet/1/withdraw", "body": {"amount": 2000}}

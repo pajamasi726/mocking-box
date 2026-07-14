@@ -1,0 +1,40 @@
+# mocking-box configuration example
+# old/new: the two stacks under comparison. Each needs a reachable HTTP base_url;
+# `mysql` is the DB that stack writes to (omit for response-diff-only mode).
+
+old:
+  base_url: "http://localhost:8081"
+  mysql:
+    host: 127.0.0.1
+    port: 3307
+    user: replayer          # needs REPLICATION SLAVE, REPLICATION CLIENT, PROCESS
+    password: "secret"
+
+new:
+  base_url: "http://localhost:8082"
+  mysql:
+    host: 127.0.0.1
+    port: 3308
+    user: replayer
+    password: "secret"
+
+attribution:
+  quiet_ms: 300             # binlog silence that closes a request's window
+  timeout_ms: 5000          # hard cap per window (async-heavy apps: raise this)
+  check_innodb_trx: true    # also require no active InnoDB transactions
+
+noise:
+  response_paths:           # JSON body paths excluded from response diff
+    - "**.updated_at"
+    - "**.created_at"
+    - "**.trace_id"
+  columns:                  # write-set columns excluded (table.column, * wildcard)
+    - "*.created_at"
+    - "*.updated_at"
+  tables_ignore: []         # tables whose changes are ignored entirely
+
+http_timeout_s: 10
+compare_headers: []         # e.g. ["content-type"] — headers are ignored by default
+
+report:
+  dir: "./report"

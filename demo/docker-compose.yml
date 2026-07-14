@@ -1,0 +1,52 @@
+services:
+  mysql-old:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    command: --server-id=1
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql/my.cnf:/etc/mysql/conf.d/replay.cnf:ro
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  mysql-new:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    command: --server-id=2
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql/my.cnf:/etc/mysql/conf.d/replay.cnf:ro
+    ports:
+      - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+  app-old:
+    build: ./app_old
+    environment:
+      DB_HOST: mysql-old
+    ports:
+      - "8081:8080"
+    depends_on:
+      mysql-old:
+        condition: service_healthy
+
+  app-new:
+    build: ./app_new
+    environment:
+      DB_HOST: mysql-new
+    ports:
+      - "8082:8080"
+    depends_on:
+      mysql-new:
+        condition: service_healthy

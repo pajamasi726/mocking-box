@@ -1,0 +1,23 @@
+[project]
+name = "mocking-box"
+version = "0.1.0"
+description = "Universal differential-testing box: replays captured HTTP traffic against an old and a new backend, then diffs responses AND per-request DB write-sets (via MySQL ROW binlog) — framework/ORM agnostic."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "PyYAML>=6.0",
+    "mysql-replication>=1.0.9",
+    "PyMySQL>=1.1.0",
+    "cryptography>=42.0",
+]
+
+[project.scripts]
+mockingbox = "mockingbox.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["mockingbox*"]

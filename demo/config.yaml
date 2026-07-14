@@ -1,0 +1,26 @@
+# mocking-box demo config — box runs on the host, targets docker-compose demo
+old:
+  base_url: "http://localhost:8081"
+  mysql: { host: 127.0.0.1, port: 3307, user: root, password: root }
+
+new:
+  base_url: "http://localhost:8082"
+  mysql: { host: 127.0.0.1, port: 3308, user: root, password: root }
+
+attribution:
+  quiet_ms: 300
+  timeout_ms: 5000
+
+noise:
+  # response fields that legitimately differ between runs
+  response_paths:
+    - "**.updated_at"
+    - "**.created_at"
+  # write-set columns that legitimately differ (wall-clock timestamps)
+  columns:
+    - "*.updated_at"
+    - "*.created_at"
+  tables_ignore: []
+
+report:
+  dir: "./report"
