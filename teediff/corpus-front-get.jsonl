@@ -1,0 +1,27 @@
+# FRONT GET 엔드포인트 (부작용 GET 제외: crawling-manual/start, callback/order, invitations-GET)
+# 외부경로 = /모듈프리픽스 + 컨트롤러경로. 파라미터는 sweep.py 가 치환({storeId}=229 등).
+{"method":"GET","path":"/user/apis/unrestricted/store/1","auth":false}
+{"method":"GET","path":"/user/apis/unrestricted/store/229","auth":false}
+{"method":"GET","path":"/user/apis/stores","auth":true}
+{"method":"GET","path":"/user/apis/stores/search?keyword=치과","auth":true}
+{"method":"GET","path":"/user/apis/store/{storeId}","auth":true}
+{"method":"GET","path":"/user/apis/user-authority/store/{storeId}","auth":true}
+{"method":"GET","path":"/user/apis/user/","auth":true}
+{"method":"GET","path":"/user/apis/user/stores","auth":true}
+{"method":"GET","path":"/user/apis/user/stores/list","auth":true}
+{"method":"GET","path":"/user/apis/token/info","auth":true}
+{"method":"GET","path":"/user/apis/users/organization/{organizationId}","auth":true}
+{"method":"GET","path":"/user/apis/users/organization/{organizationId}/users","auth":true}
+{"method":"GET","path":"/user/apis/users/organizations/{organizationId}/team","auth":true}
+{"method":"GET","path":"/user/apis/users/organizations/{organizationId}/teams/{teamId}/users","auth":true}
+{"method":"GET","path":"/user/apis/users/organizations/{organizationId}/teams/{teamId}/channel-accounts","auth":true}
+{"method":"GET","path":"/post/apis/unrestricted/reviews?storeId=229&pageNo=1&pageSize=10&replyFilter=ALL","auth":false}
+{"method":"GET","path":"/post/apis/unrestricted/reviews?storeId=1&pageNo=1&pageSize=5&replyFilter=NO_REPLY","auth":false}
+{"method":"GET","path":"/post/apis/post-word/statistics?storeId={storeId}","auth":true}
+{"method":"GET","path":"/product/apis/product/subscriptions/REVIEW_BOOSTER/is-subscribed","auth":true}
+{"method":"GET","path":"/product/apis/product/subscriptions/history/pagination?pageNo=1&pageSize=10","auth":true}
+{"method":"GET","path":"/product/apis/review-boost/present/list/{storeId}","auth":true}
+{"method":"GET","path":"/product/apis/review-boost/review/channel","auth":true}
+{"method":"GET","path":"/notification/apis/review-boost/messages/{storeId}/pagination?pageNo=1&pageSize=10","auth":true}
+{"method":"GET","path":"/crawling/apis/unrestricted/crawler-accounts","auth":false}
+{"method":"GET","path":"/crawling/apis/unrestricted/manual-crawl-sources","auth":false}

@@ -1,0 +1,22 @@
+# FRONT write — 안전 차등: 빈 바디(검증/에러 경로, 상태변경 없음) + DELETE는 없는 id.
+# EXTERNAL(실 SMS/이메일/카카오/결제/present/AI)은 여기 없음 — 발사 금지, 보고서 목록만.
+{"method":"POST","path":"/user/apis/unrestricted/consulting","auth":false,"body":{}}
+{"method":"POST","path":"/user/apis/unrestricted/consultation","auth":false,"body":{}}
+{"method":"POST","path":"/crawling/apis/unrestricted/crawler-accounts","auth":false,"body":{}}
+{"method":"POST","path":"/crawling/apis/unrestricted/manual-crawl-sources","auth":false,"body":{}}
+{"method":"PUT","path":"/post/apis/unrestricted/score","auth":false,"body":{}}
+{"method":"POST","path":"/post/apis/post","auth":true,"body":{}}
+{"method":"POST","path":"/post/apis/crawled-data/store-channel/store","auth":true,"body":{}}
+{"method":"POST","path":"/product/apis/product/subscriptions","auth":true,"body":{}}
+{"method":"PUT","path":"/product/apis/product/subscriptions/update/status","auth":true,"body":{}}
+{"method":"PUT","path":"/product/apis/product/subscriptions/update/product-type","auth":true,"body":{}}
+{"method":"POST","path":"/product/apis/review-boost/present-template","auth":true,"body":{}}
+{"method":"POST","path":"/product/apis/review-boost/inquiry","auth":true,"body":{}}
+{"method":"POST","path":"/user/apis/store","auth":true,"body":{}}
+{"method":"PATCH","path":"/user/apis/store/switch","auth":true,"body":{}}
+{"method":"POST","path":"/user/apis/users/organization","auth":true,"body":{}}
+{"method":"POST","path":"/user/apis/users/organization/user","auth":true,"body":{}}
+{"method":"POST","path":"/user/apis/user/update/phone","auth":true,"body":{}}
+{"method":"POST","path":"/user/apis/sns/sign-in","auth":true,"body":{}}
+{"method":"DELETE","path":"/product/apis/product/subscriptions/delete/99999999","auth":true}
+{"method":"DELETE","path":"/crawling/apis/unrestricted/crawler-accounts/99999999","auth":false}
