@@ -12,3 +12,8 @@ demo-pg/report/
 demo-pg/corpus/
 deploy/corpus/
 deploy/report/
+mockingbox
+teediff/report/
+teediff/*.log
+teediff/teediff-report.jsonl
+demo-booster/report/
