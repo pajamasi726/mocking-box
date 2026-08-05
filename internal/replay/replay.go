@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pajamasi726/mocking-box/internal/config"
@@ -179,6 +180,16 @@ func fireStack(
 		return nil, err
 	}
 	for k, v := range spec.Headers {
+		// Host is not a normal header in Go: http.Request carries it in the Host
+		// field, and Header.Set("Host", ...) is silently ignored when the request
+		// is sent. Replaying against a virtual-host router (an API gateway that
+		// picks the upstream by Host) therefore looked like a routing failure --
+		// the gateway saw the connection's host, not the captured one. Route it
+		// to the field so host-based routing can be exercised.
+		if strings.EqualFold(k, "host") {
+			req.Host = v
+			continue
+		}
 		req.Header.Set(k, v)
 	}
 	if isJSON && req.Header.Get("content-type") == "" {
