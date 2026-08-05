@@ -1,0 +1,145 @@
+# step2 write-set harness: OLD legacy-service vs NEW renew booster, same medilawyer schema.
+# SAFETY: network `mb` is internal:true → ZERO internet egress. Any external call
+# (Naver SENS, AirTable api.airtable.com, AWS SES, Kakao) fails at the network layer.
+# In-transaction external sends are redirected to `stub` (returns 200) so the app_user
+# INSERT is not rolled back. pg-old/pg-new run wal_level=logical for write-set capture.
+name: mb-booster
+
+networks:
+  mb:
+    internal: true          # ← egress kill-switch (customer-harm 0, leak 0)
+
+services:
+  # ── infra (shared, minimal) ──
+  pg-old:
+    image: postgres:16
+    command: ["postgres","-c","wal_level=logical","-c","max_replication_slots=8","-c","max_wal_senders=8"]
+    environment: { POSTGRES_DB: medilawyer, POSTGRES_PASSWORD: gate }
+    volumes: ["./init-old:/docker-entrypoint-initdb.d:ro"]
+    ports: ["15542:5432"]
+    networks: [mb]
+    healthcheck: { test: ["CMD-SHELL","pg_isready -U postgres"], interval: 3s, timeout: 3s, retries: 40 }
+
+  pg-new:
+    image: postgres:16
+    command: ["postgres","-c","wal_level=logical","-c","max_replication_slots=8","-c","max_wal_senders=8"]
+    environment: { POSTGRES_DB: medilawyer, POSTGRES_PASSWORD: gate }
+    volumes: ["./init-new:/docker-entrypoint-initdb.d:ro"]
+    ports: ["15543:5432"]
+    networks: [mb]
+    healthcheck: { test: ["CMD-SHELL","pg_isready -U postgres"], interval: 3s, timeout: 3s, retries: 40 }
+
+  redis:
+    image: redis:7-alpine
+    ports: ["16390:6379"]
+    networks: [mb]
+    healthcheck: { test: ["CMD","redis-cli","ping"], interval: 3s, timeout: 3s, retries: 20 }
+
+  kafka:
+    image: apache/kafka:3.8.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks: [mb]
+    healthcheck: { test: ["CMD-SHELL","/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"], interval: 10s, timeout: 10s, retries: 24 }
+
+  mysql:
+    image: mysql:8.0
+    environment: { MYSQL_ROOT_PASSWORD: gate }
+    volumes: ["./init-mysql:/docker-entrypoint-initdb.d:ro"]
+    networks: [mb]
+    healthcheck: { test: ["CMD-SHELL","mysqladmin ping -uroot -pgate --silent"], interval: 5s, timeout: 3s, retries: 30 }
+
+  stub:
+    build: ./stubs
+    networks: [mb]
+
+  # ── OLD (legacy-service) ── externals → stub, DB → pg-old
+  old:
+    image: legalcare/legacy:local
+    platform: linux/amd64
+    mem_limit: 2g
+    entrypoint:
+      - java
+      - -Dspring.profiles.active=workstation,git,vault
+      - -Dstorage.datasource.core.jdbc-url=jdbc:postgresql://pg-old:5432/medilawyer
+      - -Dstorage.datasource.core.username=postgres
+      - -Dstorage.datasource.core.password=gate
+      - -Dspring.data.redis.host=redis
+      - -Dspring.data.redis.port=6379
+      - -Dspring.redis.host=redis
+      - -Dspring.redis.port=6379
+      - -Dspring.kafka.bootstrap-servers=kafka:9092
+      - -DnaverCloud.sesBaseUrl=http://stub:8099
+      - -Deureka.client.enabled=false
+      - -Dspring.cloud.discovery.enabled=false
+      - -Dspring.cloud.service-registry.auto-registration.enabled=false
+      - -Dspring.flyway.enabled=false
+      - -cp
+      - /app/resources:/app/classes:/app/libs/*
+      - legalcare.medilawyer.MedilawyerApplicationKt
+    environment:
+      STORAGE_DATASOURCE_CORE_JDBC_URL: jdbc:postgresql://pg-old:5432/medilawyer
+      STORAGE_DATASOURCE_CORE_USERNAME: postgres
+      STORAGE_DATASOURCE_CORE_PASSWORD: gate
+    ports: ["10301:41010"]
+    depends_on:
+      pg-old: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      stub: { condition: service_started }
+    networks: [mb]
+
+  # ── NEW (renew booster) ── externals → stub, core DB → pg-new
+  new:
+    image: legalcare/booster:local
+    mem_limit: 3g
+    environment:
+      SPRING_PROFILES_ACTIVE: local,web
+      SERVER_PORT: "18080"
+      JAVA_TOOL_OPTIONS: -Xmx1536m
+      CORE_DB_URL: jdbc:postgresql://pg-new:5432/medilawyer
+      CORE_DB_USERNAME: postgres
+      CORE_DB_PASSWORD: gate
+      MEDICONTENTS_DB_URL: jdbc:postgresql://pg-new:5432/medicontents
+      MEDICONTENTS_DB_USERNAME: postgres
+      MEDICONTENTS_DB_PASSWORD: gate
+      LAWKIT_DB_URL: jdbc:mysql://mysql:3306/lawkit
+      LAWKIT_DB_USERNAME: root
+      LAWKIT_DB_PASSWORD: gate
+      REDIS_HOST: redis
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_HOST: stub
+      MONGO_URI: mongodb://stub:27017/crawling
+      JWT_SECRET: f9raBLU/NcGISlDZBdRpzRxd+F1Zvn6BlxhCeS8Vp4E=
+      BOOSTER_SCHEDULING_ENABLED: "false"
+      TRANSITION_LEGACY_URL: http://stub:8099
+      TRANSITION_ML_DELEGATOR_URL: http://stub:8099
+      TRANSITION_AI_DELEGATOR_URL: http://stub:8099
+      TRANSITION_REVIEWED_HOSPITAL_URL: http://stub:8099/hospital
+      AIRTABLE_URL: http://stub:8099
+      AIRTABLE_BASE_ID: stubbase
+      AIRTABLE_API_KEY: stubkey
+      NAVER_CLOUD_URL: http://stub:8099/alimtalk
+      NAVER_CLOUD_SMS_SMS_URL: http://stub:8099/sms
+      AWS_CLIENT_EMAILURL: http://stub:8099
+      SLACK_WEBHOOK_REVIEW_BOOST_URL: http://stub:8099
+    ports: ["10302:18080"]
+    depends_on:
+      pg-new: { condition: service_healthy }
+      mysql: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+      stub: { condition: service_started }
+    networks: [mb]
