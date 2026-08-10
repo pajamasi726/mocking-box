@@ -1,0 +1,41 @@
+판정	결과값	클래스	필드	구타입	신파일:라인
+PASS	누락=0 명시null=0	OrganizationRegisterationReq	storeId	Long	db/dto/organization/dto/OrganizationRegisterationReq.java:19
+PASS	누락=0 명시null=0	AppUserChannelAccountLoginReq	storeId	Long	db/dto/appUserChannelAccount/AppUserChannelAccountLoginReq.java:26
+PASS	누락=0 명시null=0	OrganizationAppUserAddReq	appUserId	Long	db/dto/admin/OrganizationAppUserAddReq.java:26
+PASS	누락=false 명시null=false	SeoHospitalUpdateReq	publicSeoEnabled	Boolean	db/dto/admin/SeoHospitalUpdateReq.java:23
+PASS	누락=0 명시null=0	MessageButtonReq	order	Int	db/dto/reviewBoost/MessageButtonReq.java:26
+PASS	누락=false 명시null=false	GiftSaveReq	isValid	Boolean	db/dto/reviewBoost/GiftSaveReq.java:28
+PASS	누락=false 명시null=false	SaveThreadCommentFromAirtableRequest	dbSave	Boolean	db/dto/airtable/SaveThreadCommentFromAirtableRequest.java:34
+PASS	누락=false 명시null=false	SaveThreadReplyFromAirtableRequest	dbSave	Boolean	db/dto/airtable/SaveThreadReplyFromAirtableRequest.java:36
+PASS	누락=0 명시null=0	SaveThreadFromAirtableRequest	storeId	Long	db/dto/airtable/SaveThreadFromAirtableRequest.java:29
+PASS	누락=false 명시null=false	SaveThreadFromAirtableRequest	dbSave	Boolean	db/dto/airtable/SaveThreadFromAirtableRequest.java:47
+PASS	누락=false 명시null=false	TeamAppUserPermissionUpdateReq	permissionWriting	Boolean	db/dto/teamAppUser/TeamAppUserPermissionUpdateReq.java:19
+PASS	누락=false 명시null=false	TeamAppUserPermissionUpdateReq	permissionReading	Boolean	db/dto/teamAppUser/TeamAppUserPermissionUpdateReq.java:21
+PASS	누락=0 명시null=0	TeamChannelAccountLoginReq	storeId	Long	db/dto/teamAppUser/TeamChannelAccountLoginReq.java:26
+PASS	누락=false 명시null=false	TeamAppUserRegistrationReq	permissionWriting	Boolean	db/dto/teamAppUser/TeamAppUserRegistrationReq.java:17
+PASS	누락=false 명시null=false	TeamAppUserRegistrationReq	permissionReading	Boolean	db/dto/teamAppUser/TeamAppUserRegistrationReq.java:19
+PASS	누락=0 명시null=0	TeamRegistrationReq	storeId	Long	db/dto/team/TeamRegistrationReq.java:19
+PASS	누락=0 명시null=0	ConsumerScheduleCrawlingTaskWithTargets	timestamp	Long	db/dto/kafka/ConsumerScheduleCrawlingTaskWithTargets.java:44
+PASS	누락=0 명시null=0	ConsumerThreadDisplayStatusModified	storeId	Long	db/dto/kafka/ConsumerThreadDisplayStatusModified.java:29
+PASS	누락=0 명시null=0	PostWordAddReq	contentFirstIndex	Int	db/dto/kafka/PostWordAddReq.java:29
+PASS	누락=0 명시null=0	PostWordAddReq	contentLastIndex	Int	db/dto/kafka/PostWordAddReq.java:31
+PASS	누락=0 명시null=0	NewPostAddReq	score	Long	db/dto/kafka/NewPostAddReq.java:36
+PASS	누락=false 명시null=false	NewPostAddReq	isInsulting	Boolean	db/dto/kafka/NewPostAddReq.java:59
+PASS	누락=false 명시null=false	NewPostAddReq	isDefamatory	Boolean	db/dto/kafka/NewPostAddReq.java:62
+PASS	누락=0 명시null=0	ProducerTaskUpdate	batchSize	Int	db/dto/kafka/ProducerTaskUpdate.java:43
+PASS	누락=0 명시null=0	ProducerTaskUpdate	batchInterval	Int	db/dto/kafka/ProducerTaskUpdate.java:45
+PASS	누락=0 명시null=0	NaverSearchResult	total	Int	db/dto/external/NaverSearchResult.java:23
+PASS	누락=0 명시null=0	NaverSearchResult	start	Int	db/dto/external/NaverSearchResult.java:25
+PASS	누락=0 명시null=0	NaverSearchResult	display	Int	db/dto/external/NaverSearchResult.java:27
+PASS	누락=false 명시null=false	KakaoBusinessSearchResultMeta	isEnd	Boolean	db/dto/external/KakaoBusinessSearchResultMeta.java:38
+PASS	누락=0 명시null=0	KakaoBusinessSearchResultMeta	pageableCount	Int	db/dto/external/KakaoBusinessSearchResultMeta.java:41
+PASS	누락=0 명시null=0	KakaoBusinessSearchResultMeta	totalCount	Int	db/dto/external/KakaoBusinessSearchResultMeta.java:43
+PASS	누락=0 명시null=0	AiBoostCreationResult	score	Long	db/dto/external/AiBoostCreationResult.java:28
+PASS	누락=false 명시null=false	InviteTeamPermissionReq	permissionWriting	Boolean	db/dto/organizationAppUser/InviteOrganizationAppUserReq.java:34
+PASS	누락=false 명시null=false	InviteTeamPermissionReq	permissionReading	Boolean	db/dto/organizationAppUser/InviteOrganizationAppUserReq.java:36
+PASS	누락=0 명시null=0	MatchStoreReq	storeId	Long	db/dto/appUserStore/MatchStoreReq.java:18
+PASS	누락=false 명시null=false	MessageResDto	useSmsFailover	Boolean	db/dto/bizmessage/AlimTalkResDto.java:57
+PASS	누락=0 명시null=0	NewStoreChannelReq	storeId	Long	db/dto/store/dto/NewStoreChannelReq.java:18
+PASS	누락=0 명시null=0	InternalStoreRegistrationRequestModel	hospitalOriginId	Long	db/dto/store/dto/InternalStoreRegistrationRequestModel.java:24
+
+합계: PASS(=JVM기본값으로 통과) 38 / THROW 0 / ERROR 0

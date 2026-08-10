@@ -1,0 +1,2382 @@
+[
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/front/CertificateController.java",
+  "line": 28,
+  "class": "CertificateController",
+  "method": "POST",
+  "path": "/apis/unrestricted/token/reissue"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/front/CertificateController.java",
+  "line": 34,
+  "class": "CertificateController",
+  "method": "POST",
+  "path": "/apis/unrestricted/token/reissue-with-cookie"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/front/CertificateController.java",
+  "line": 42,
+  "class": "CertificateController",
+  "method": "POST",
+  "path": "/apis/unrestricted/token/reissue-with-cookie-domain"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalLawkitUserController.java",
+  "line": 28,
+  "class": "InternalLawkitUserController",
+  "method": "POST",
+  "path": "/internal/lawkit/token/issue"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalLawkitUserController.java",
+  "line": 34,
+  "class": "InternalLawkitUserController",
+  "method": "POST",
+  "path": "/internal/lawkit/token/revoke"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalReviewedUserController.java",
+  "line": 28,
+  "class": "InternalReviewedUserController",
+  "method": "POST",
+  "path": "/internal/reviewed/token/issue"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalReviewedUserController.java",
+  "line": 34,
+  "class": "InternalReviewedUserController",
+  "method": "POST",
+  "path": "/internal/reviewed/token/revoke"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalTeamController.java",
+  "line": 28,
+  "class": "InternalTeamController",
+  "method": "POST",
+  "path": "/internal/team/token/issue"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalTeamController.java",
+  "line": 34,
+  "class": "InternalTeamController",
+  "method": "POST",
+  "path": "/internal/team/token/revoke"
+ },
+ {
+  "file": "apps/booster-app/modules/certification/src/main/java/legalcare/medilawyer/certificate/controller/api/internal/InternalUserController.java",
+  "line": 25,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/unrestricted/otp/validate"
+ },
+ {
+  "file": "apps/booster-app/modules/chrono/src/main/java/legalcare/medilawyer/chrono/controller/api/internal/InternalChronoController.java",
+  "line": 29,
+  "class": "InternalChronoController",
+  "method": "POST",
+  "path": "/internal/chrono/hospital/rankings/generate"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 35,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/crawler-accounts"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 44,
+  "class": "CrawlingController",
+  "method": "GET",
+  "path": "/apis/unrestricted/crawler-accounts"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 52,
+  "class": "CrawlingController",
+  "method": "PUT",
+  "path": "/apis/unrestricted/crawler-accounts/{id}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 61,
+  "class": "CrawlingController",
+  "method": "DELETE",
+  "path": "/apis/unrestricted/crawler-accounts/{id}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 69,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/manual-crawl-sources"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 78,
+  "class": "CrawlingController",
+  "method": "GET",
+  "path": "/apis/unrestricted/manual-crawl-sources"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 86,
+  "class": "CrawlingController",
+  "method": "PUT",
+  "path": "/apis/unrestricted/manual-crawl-sources/{id}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 95,
+  "class": "CrawlingController",
+  "method": "DELETE",
+  "path": "/apis/unrestricted/manual-crawl-sources/{id}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 103,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/manual-crawl"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 110,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/review-booster/receive-patient-info/{hospital-id}/{request-date}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 119,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/review-booster/receive-patient-info/{hospital-id}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 128,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/review-booster/medicontents/patient-info/{hospital-id}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingController.java",
+  "line": 137,
+  "class": "CrawlingController",
+  "method": "POST",
+  "path": "/apis/unrestricted/dentweb/sync/health"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingManualController.java",
+  "line": 26,
+  "class": "CrawlingManualController",
+  "method": "GET",
+  "path": "/apis/crawling-manual/start/{channel}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingManualController.java",
+  "line": 38,
+  "class": "CrawlingManualController",
+  "method": "GET",
+  "path": "/apis/crawling-manual/start/{channel}/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/CrawlingManualController.java",
+  "line": 53,
+  "class": "CrawlingManualController",
+  "method": "POST",
+  "path": "/apis/crawling-manual/repair/non-place-id/{channelId}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/FileController.java",
+  "line": 21,
+  "class": "FileController",
+  "method": "GET",
+  "path": "/apis/file/unrestricted/review-boost/receipt/download"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/front/TestController.java",
+  "line": 31,
+  "class": "TestController",
+  "method": "GET",
+  "path": "/apis/test/unrestricted/naver/blog/keyword"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalMedicontentsController.java",
+  "line": 20,
+  "class": "InternalMedicontentsController",
+  "method": "GET",
+  "path": "/internal/medicontents/patient/info/{patientId}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalMedicontentsController.java",
+  "line": 25,
+  "class": "InternalMedicontentsController",
+  "method": "DELETE",
+  "path": "/internal/medicontents/patient/{dentalPatientId}/images/file-stream"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalNotificationController.java",
+  "line": 30,
+  "class": "InternalNotificationController",
+  "method": "POST",
+  "path": "/internal/notification/boost-message/receipts"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalPostController.java",
+  "line": 29,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/crawling-data/{storeId}/{channel}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalPostController.java",
+  "line": 35,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/community-id/{channelId}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalPostController.java",
+  "line": 41,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/store/{storeId}/channel"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalPostController.java",
+  "line": 47,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/store-channel/{channelId}/channel-place-id/{channelPlaceId}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalPostController.java",
+  "line": 52,
+  "class": "InternalPostController",
+  "method": "POST",
+  "path": "/internal/post/stores/active-platforms"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalPostController.java",
+  "line": 57,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/store/id"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalProductController.java",
+  "line": 29,
+  "class": "InternalProductController",
+  "method": "GET",
+  "path": "/internal/product/boost/message/receipts/{messageId}"
+ },
+ {
+  "file": "apps/booster-app/modules/crawling/src/main/java/legalcare/medilawyer/crawling/controller/api/internal/InternalUserController.java",
+  "line": 25,
+  "class": "InternalUserController",
+  "method": "GET",
+  "path": "/internal/user/store/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/front/AiAnalysisController.java",
+  "line": 21,
+  "class": "AiAnalysisController",
+  "method": "POST",
+  "path": "/apis/ai-analysis/admin"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/front/TestController.java",
+  "line": 19,
+  "class": "TestController",
+  "method": "POST",
+  "path": "/apis/test/unrestricted/test"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalLegacyController.java",
+  "line": 27,
+  "class": "InternalLegacyController",
+  "method": "POST",
+  "path": "/internal/legacy/jibun"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalPostController.java",
+  "line": 36,
+  "class": "InternalPostController",
+  "method": "POST",
+  "path": "/internal/post/similarity"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalReviewedAdminController.java",
+  "line": 27,
+  "class": "InternalReviewedAdminController",
+  "method": "POST",
+  "path": "/internal/reviewed/admin/search/hospital-info"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalReviewedAdminController.java",
+  "line": 32,
+  "class": "InternalReviewedAdminController",
+  "method": "POST",
+  "path": "/internal/reviewed/admin/hospital-detail"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalReviewedAdminController.java",
+  "line": 41,
+  "class": "InternalReviewedAdminController",
+  "method": "GET",
+  "path": "/internal/reviewed/admin/unrestricted/hmc"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalReviewedAdminController.java",
+  "line": 47,
+  "class": "InternalReviewedAdminController",
+  "method": "POST",
+  "path": "/internal/reviewed/admin/similarity"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalReviewedHospitalController.java",
+  "line": 21,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/hospital/jibun"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 36,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/airtable"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 43,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/alimTalk"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 50,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/unrestricted/slack"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 56,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/make-sms"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 62,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/email"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 68,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/otp"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 74,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/{service-type}/otp"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 80,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/channel/sign-in"
+ },
+ {
+  "file": "apps/booster-app/modules/external/src/main/java/legalcare/medilawyer/external/controller/api/internal/InternalUserController.java",
+  "line": 86,
+  "class": "InternalUserController",
+  "method": "GET",
+  "path": "/internal/user/official/naver/channel"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 53,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/organization-user"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 71,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/crawling/storeChannel"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 91,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/crawling/storeChannels"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 106,
+  "class": "AdminController",
+  "method": "PATCH",
+  "path": "/api/v1/admin/store-channel-match"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 126,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/organizations/{organizationId}/teams/{teamId}/stores/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 144,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/stores/{storeId}/communities-keywords"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 161,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/stores/{storeId}/communities/{communityId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 178,
+  "class": "AdminController",
+  "method": "DELETE",
+  "path": "/api/v1/admin/stores/{storeId}/communities/{communityId}/keywords/{keywordId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminController.java",
+  "line": 194,
+  "class": "AdminController",
+  "method": "GET",
+  "path": "/api/v1/admin/stores/{storeId}/communities-keywords"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminSeoController.java",
+  "line": 31,
+  "class": "AdminSeoController",
+  "method": "GET",
+  "path": "/api/v1/admin/seo/hospitals"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/admin/controller/AdminSeoController.java",
+  "line": 46,
+  "class": "AdminSeoController",
+  "method": "PATCH",
+  "path": "/api/v1/admin/seo/hospitals/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/airtable/controller/AirtableController.java",
+  "line": 21,
+  "class": "AirtableController",
+  "method": "POST",
+  "path": "/api/v1/airtable/saveThread"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/airtable/controller/AirtableController.java",
+  "line": 26,
+  "class": "AirtableController",
+  "method": "POST",
+  "path": "/api/v1/airtable/saveThreadComment"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/airtable/controller/AirtableController.java",
+  "line": 31,
+  "class": "AirtableController",
+  "method": "POST",
+  "path": "/api/v1/airtable/saveThreadReply"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUser/controller/AppUserController.java",
+  "line": 30,
+  "class": "AppUserController",
+  "method": "GET",
+  "path": "/api/v1/app-users/me"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUser/controller/AppUserController.java",
+  "line": 43,
+  "class": "AppUserController",
+  "method": "GET",
+  "path": "/api/v1/users/me/stores"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.java",
+  "line": 37,
+  "class": "AppUserChannelAccountController",
+  "method": "GET",
+  "path": "/api/v1/app-user-channel-account/list"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.java",
+  "line": 51,
+  "class": "AppUserChannelAccountController",
+  "method": "POST",
+  "path": "/api/v1/app-user-channel-account/login"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.java",
+  "line": 71,
+  "class": "AppUserChannelAccountController",
+  "method": "POST",
+  "path": "/api/v1/app-user-channel-account/login/kakao/sms"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.java",
+  "line": 91,
+  "class": "AppUserChannelAccountController",
+  "method": "POST",
+  "path": "/api/v1/app-user-channel-account/relogin"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUserStore/controller/AppUserStoreController.java",
+  "line": 31,
+  "class": "AppUserStoreController",
+  "method": "GET",
+  "path": "/api/v1/app-user-store/list"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/appUserStore/controller/AppUserStoreController.java",
+  "line": 45,
+  "class": "AppUserStoreController",
+  "method": "PATCH",
+  "path": "/api/v1/app-user-store/match"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 74,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 89,
+  "class": "OrganizationController",
+  "method": "PATCH",
+  "path": "/api/v1/organization/{organizationId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 106,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/users"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 126,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/users"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 146,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 165,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 182,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/teams"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 200,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 218,
+  "class": "OrganizationController",
+  "method": "PATCH",
+  "path": "/api/v1/organizations/{organizationId}/users/{targetUserId}/role"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 235,
+  "class": "OrganizationController",
+  "method": "PATCH",
+  "path": "/api/v1/organizations/{organizationId}/teams/users/{targetUserId}/permission"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 253,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/invitations"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 272,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/invitations/{invitationToken}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 284,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/invitations/{invitationToken}/accept"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 298,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/users/{targetUserId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 318,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "/api/v1/organizations/{organizationId}/users/{targetAppUserId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 339,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/users/{targetAppUserId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 361,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 376,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/login"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 397,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/kakao/sms"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 419,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/naver/captcha"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/organization/controller/OrganizationController.java",
+  "line": 444,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/relogin"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/post/controller/PostController.java",
+  "line": 32,
+  "class": "PostController",
+  "method": "GET",
+  "path": "/api/v1/posts"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/postReply/controller/PostReplyController.java",
+  "line": 30,
+  "class": "PostReplyController",
+  "method": "POST",
+  "path": "/api/v1/post-reply"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/postReplyAiRecommend/controller/PostReplyAiRecommendController.java",
+  "line": 25,
+  "class": "PostReplyAiRecommendController",
+  "method": "POST",
+  "path": "/api/v1/post-reply-ai-recommend"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/postWord/controller/PostWordController.java",
+  "line": 30,
+  "class": "PostWordController",
+  "method": "GET",
+  "path": "/api/v1/post-word/statistics"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/productPost/controller/ProductController.java",
+  "line": 29,
+  "class": "ProductController",
+  "method": "POST",
+  "path": "/api/v1/products/{productName}/purchases"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 61,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/check"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 73,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/store/search"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 86,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/store/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 97,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/store/register"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 110,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/store/store-channel/completed"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 124,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/store/store-channel"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 137,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/team"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 153,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/stores/{storeId}/channels/{channelId}/auth"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 171,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/channels"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 186,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/posts/statistics"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 218,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/posts/statistics/period-count"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/store/controller/StoreController.java",
+  "line": 239,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/organization-team"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/storeChannel/controller/StoreChannelController.java",
+  "line": 28,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/naver"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/storeChannel/controller/StoreChannelController.java",
+  "line": 40,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/unofficial/naver"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/storeChannel/controller/StoreChannelController.java",
+  "line": 51,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/kakao"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/storeChannel/controller/StoreChannelController.java",
+  "line": 63,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/modoodoc"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/storeChannel/controller/StoreChannelController.java",
+  "line": 75,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/google"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 38,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/keyword/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 48,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/averageScore/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 58,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/messageCount/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 68,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/reviewWriteRate/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 78,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/presentCount/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 88,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/presentHistories/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/http/team/controller/TeamController.java",
+  "line": 104,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/presentHistories/{teamId}/excel"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalAdminWebController.java",
+  "line": 38,
+  "class": "InternalAdminWebController",
+  "method": "GET",
+  "path": "/internal/admin/web/stores/{storeId}/organization-team"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalAdminWebController.java",
+  "line": 43,
+  "class": "InternalAdminWebController",
+  "method": "GET",
+  "path": "/internal/admin/web/teams/{teamId}/message-templates"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalAdminWebController.java",
+  "line": 49,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/team-message-templates"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalAdminWebController.java",
+  "line": 54,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/request-settings/statuses"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalAdminWebController.java",
+  "line": 62,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/stores/{storeId}/hospital-message-template"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalCrawlingReviewBoostController.java",
+  "line": 25,
+  "class": "InternalCrawlingReviewBoostController",
+  "method": "POST",
+  "path": "/internal/crawling/review-boost/stores/{storeId}/messages"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalProductReviewBoostController.java",
+  "line": 18,
+  "class": "InternalProductReviewBoostController",
+  "method": "PUT",
+  "path": "/internal/product/review-boost/stores/{storeId}/request-setting"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 35,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/hospital/store/register"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 44,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/customers"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 50,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/auth-bypass/stores"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 55,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/auth-bypass/app-users"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 60,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/auth-bypass"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 66,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/review-boost/google-place/statuses"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/internal/controller/InternalReviewedHospitalController.java",
+  "line": 72,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/review-boost/google-place"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/publicSeo/controller/PublicHospitalController.java",
+  "line": 25,
+  "class": "PublicHospitalController",
+  "method": "GET",
+  "path": "/api/v1/public/hospitals"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/publicSeo/controller/PublicHospitalController.java",
+  "line": 33,
+  "class": "PublicHospitalController",
+  "method": "GET",
+  "path": "/api/v1/public/hospitals/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 47,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/message-templates"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 59,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/message-templates/{messageTemplateId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 74,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/message-templates"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 88,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 102,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 120,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/messages/{messageId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 134,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 149,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages/without-notification"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 166,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages/{messageId}/posts"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 182,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/gifts"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 194,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts/{giftId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 209,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 222,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts/{giftId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 236,
+  "class": "BoostController",
+  "method": "DELETE",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts/{giftId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 250,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages/{messageId}/posts/{postId}/customers/{customerId}/gifts/{giftId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/apis/reviewBoost/BoostController.java",
+  "line": 268,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/customers/{customerId}"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/auth/api/controller/AuthController.java",
+  "line": 24,
+  "class": "AuthController",
+  "method": "POST",
+  "path": "/api/v1/auth/sign-up"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/auth/api/controller/AuthController.java",
+  "line": 32,
+  "class": "AuthController",
+  "method": "POST",
+  "path": "/api/v1/auth/login"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/auth/api/controller/OtpController.java",
+  "line": 23,
+  "class": "OtpController",
+  "method": "POST",
+  "path": "/api/v1/otp/send"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/client/kafka/controller/KafkaController.java",
+  "line": 31,
+  "class": "KafkaController",
+  "method": "POST",
+  "path": "/api/v1/kafka/review"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/client/kafka/controller/KafkaController.java",
+  "line": 42,
+  "class": "KafkaController",
+  "method": "POST",
+  "path": "/api/v1/kafka/add/thread/crawling/data"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/client/kafka/controller/KafkaController.java",
+  "line": 56,
+  "class": "KafkaController",
+  "method": "POST",
+  "path": "/api/v1/kafka/notice/crawl/thread/completion"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/client/ml/controller/MlController.java",
+  "line": 26,
+  "class": "MlController",
+  "method": "GET",
+  "path": "/api/v1/ml/capture-image"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 38,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/register/targets"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 54,
+  "class": "EventSchedulerController",
+  "method": "PATCH",
+  "path": "/api/v1/event-scheduler/update/targets"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 70,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/add/targets"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 86,
+  "class": "EventSchedulerController",
+  "method": "DELETE",
+  "path": "/api/v1/event-scheduler/delete/targets"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 102,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/register/task"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 118,
+  "class": "EventSchedulerController",
+  "method": "PATCH",
+  "path": "/api/v1/event-scheduler/update/task"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 134,
+  "class": "EventSchedulerController",
+  "method": "DELETE",
+  "path": "/api/v1/event-scheduler/delete/task"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/eventScheduler/controller/EventSchedulerController.java",
+  "line": 150,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/schedule/task"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/health/HealthCheck.java",
+  "line": 12,
+  "class": "HealthCheck",
+  "method": "GET",
+  "path": "/api/v1/health"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/notice/api/controller/NoticeController.java",
+  "line": 43,
+  "class": "NoticeController",
+  "method": "POST",
+  "path": "/api/v1/notice"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/notice/api/controller/NoticeController.java",
+  "line": 66,
+  "class": "NoticeController",
+  "method": "POST",
+  "path": "/api/v1/negative-review-alimtalk"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/schedule/controller/ScheduledController.java",
+  "line": 30,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/schedule/controller/ScheduledController.java",
+  "line": 43,
+  "class": "ScheduledController",
+  "method": "GET",
+  "path": "/api/v1/schedule/status"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/schedule/controller/ScheduledController.java",
+  "line": 65,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule/status"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/schedule/controller/ScheduledController.java",
+  "line": 81,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule/alimtalk/new-negative-post"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/schedule/controller/ScheduledController.java",
+  "line": 95,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule/alimtalk/new-positive-post"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/security/JwtController.java",
+  "line": 37,
+  "class": "JwtController",
+  "method": "POST",
+  "path": "/api/v1/jwt/create"
+ },
+ {
+  "file": "apps/booster-app/modules/legacy/src/main/java/legalcare/medilawyer/legacy/security/JwtController.java",
+  "line": 54,
+  "class": "JwtController",
+  "method": "POST",
+  "path": "/api/v1/jwt/refresh"
+ },
+ {
+  "file": "apps/booster-app/modules/medicontents/src/main/java/legalcare/medilawyer/medicontents/controller/api/front/ProxyController.java",
+  "line": 30,
+  "class": "ProxyController",
+  "method": "ANY",
+  "path": "/apis/**"
+ },
+ {
+  "file": "apps/booster-app/modules/medicontents/src/main/java/legalcare/medilawyer/medicontents/controller/api/front/ProxyController.java",
+  "line": 125,
+  "class": "ProxyController",
+  "method": "GET",
+  "path": "/apis/**/is-admin"
+ },
+ {
+  "file": "apps/booster-app/modules/medicontents/src/main/java/legalcare/medilawyer/medicontents/controller/api/internal/InternalSearchController.java",
+  "line": 27,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/contents/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/medicontents/src/main/java/legalcare/medilawyer/medicontents/controller/api/internal/InternalSearchController.java",
+  "line": 32,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/contents/join/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/medicontents/src/main/java/legalcare/medilawyer/medicontents/controller/api/internal/InternalSearchController.java",
+  "line": 37,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/contents/boost-stats/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/front/NotificationController.java",
+  "line": 27,
+  "class": "NotificationController",
+  "method": "POST",
+  "path": "/apis/notification/unrestricted/inquiry"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/front/NotificationController.java",
+  "line": 33,
+  "class": "NotificationController",
+  "method": "PUT",
+  "path": "/apis/notification/send/email"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/front/NotificationController.java",
+  "line": 41,
+  "class": "NotificationController",
+  "method": "PUT",
+  "path": "/apis/notification/send/alimtalk"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/front/ReviewBoostController.java",
+  "line": 33,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/messages/{store-id}/pagination"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/front/ReviewBoostController.java",
+  "line": 46,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/messages/{store-id}/excel"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/front/ReviewBoostV2Controller.java",
+  "line": 25,
+  "class": "ReviewBoostV2Controller",
+  "method": "GET",
+  "path": "/apis/v2/review-boost/stores/{storeId}/message-template"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalContractController.java",
+  "line": 31,
+  "class": "InternalContractController",
+  "method": "PUT",
+  "path": "/internal/contract/send/slack/instance"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalContractController.java",
+  "line": 37,
+  "class": "InternalContractController",
+  "method": "PUT",
+  "path": "/internal/contract/send/slack"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalContractController.java",
+  "line": 43,
+  "class": "InternalContractController",
+  "method": "PUT",
+  "path": "/internal/contract/send/teams/instance"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalContractController.java",
+  "line": 49,
+  "class": "InternalContractController",
+  "method": "PUT",
+  "path": "/internal/contract/send/teams"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalContractController.java",
+  "line": 55,
+  "class": "InternalContractController",
+  "method": "PUT",
+  "path": "/internal/contract/send/kakao"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalContractController.java",
+  "line": 61,
+  "class": "InternalContractController",
+  "method": "PUT",
+  "path": "/internal/contract/send/mail"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalPostController.java",
+  "line": 27,
+  "class": "InternalPostController",
+  "method": "PUT",
+  "path": "/internal/post/send/alimtalk"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalProductController.java",
+  "line": 27,
+  "class": "InternalProductController",
+  "method": "PUT",
+  "path": "/internal/product/send/slack/notifications/present-send"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalReviewedUserController.java",
+  "line": 31,
+  "class": "InternalReviewedUserController",
+  "method": "PUT",
+  "path": "/internal/reviewed/user/inquiry/send/slack"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalReviewedUserController.java",
+  "line": 36,
+  "class": "InternalReviewedUserController",
+  "method": "PUT",
+  "path": "/internal/reviewed/user/inquiry"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalReviewedUserController.java",
+  "line": 41,
+  "class": "InternalReviewedUserController",
+  "method": "PUT",
+  "path": "/internal/reviewed/user/store/application/send/slack"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalUserController.java",
+  "line": 41,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/alimTalk"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalUserController.java",
+  "line": 48,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/slack"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalUserController.java",
+  "line": 54,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/make-sms"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalUserController.java",
+  "line": 60,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/email"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalUserController.java",
+  "line": 66,
+  "class": "InternalUserController",
+  "method": "POST",
+  "path": "/internal/user/{service-type}/otp"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/controller/api/internal/InternalUserController.java",
+  "line": 72,
+  "class": "InternalUserController",
+  "method": "PUT",
+  "path": "/internal/user/consultation/send/slack"
+ },
+ {
+  "file": "apps/booster-app/modules/notification/src/main/java/legalcare/medilawyer/notification/reviewboost/controller/ReviewBoostV2Controller.java",
+  "line": 35,
+  "class": "ReviewBoostV2Controller",
+  "method": "POST",
+  "path": "/api/v2/boost1/organizations/{organizationId}/teams/{teamId}/messages"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/AdminEnterpriseController.java",
+  "line": 16,
+  "class": "AdminEnterpriseController",
+  "method": "POST",
+  "path": "/apis/admin/enterprise/daily-report"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/CrawledDataController.java",
+  "line": 23,
+  "class": "CrawledDataController",
+  "method": "POST",
+  "path": "/apis/crawled-data/store-channel/store"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/CrawledDataController.java",
+  "line": 35,
+  "class": "CrawledDataController",
+  "method": "POST",
+  "path": "/apis/crawled-data/test"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/PostController.java",
+  "line": 34,
+  "class": "PostController",
+  "method": "PUT",
+  "path": "/apis/unrestricted/score"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/PostController.java",
+  "line": 44,
+  "class": "PostController",
+  "method": "GET",
+  "path": "/apis/unrestricted/reviews"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/PostController.java",
+  "line": 51,
+  "class": "PostController",
+  "method": "POST",
+  "path": "/apis/post"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/PostController.java",
+  "line": 57,
+  "class": "PostController",
+  "method": "POST",
+  "path": "/apis/ai-reply"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/PostController.java",
+  "line": 63,
+  "class": "PostController",
+  "method": "GET",
+  "path": "/apis/post-word/statistics"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/front/PostController.java",
+  "line": 72,
+  "class": "PostController",
+  "method": "POST",
+  "path": "/apis/comments/{moderationActionType}/actions"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalAdminWebController.java",
+  "line": 30,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/revieworks/monthly-reports/reviews"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalAdminWebController.java",
+  "line": 37,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/revieworks/monthly-reports/boards"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalEmbeddingController.java",
+  "line": 20,
+  "class": "InternalEmbeddingController",
+  "method": "POST",
+  "path": "/internal/embedding/review/score"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalEmbeddingController.java",
+  "line": 20,
+  "class": "InternalEmbeddingController",
+  "method": "POST",
+  "path": "/internal/embedding/review/score/"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalExternalController.java",
+  "line": 23,
+  "class": "InternalExternalController",
+  "method": "POST",
+  "path": "/internal/external/analysis/info"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalExternalController.java",
+  "line": 28,
+  "class": "InternalExternalController",
+  "method": "POST",
+  "path": "/internal/external/post-analysis/complete"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalNotificationController.java",
+  "line": 28,
+  "class": "InternalNotificationController",
+  "method": "POST",
+  "path": "/internal/notification/ai-review-post/list"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalProductController.java",
+  "line": 23,
+  "class": "InternalProductController",
+  "method": "GET",
+  "path": "/internal/product/boost/post/enhanced/{messageId}"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalReviewedHospitalController.java",
+  "line": 31,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/hospital/review"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalReviewedHospitalController.java",
+  "line": 36,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/hospital/review/analysis"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalReviewedHospitalController.java",
+  "line": 41,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/hospital/review/analysis/post"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalReviewedHospitalController.java",
+  "line": 46,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/hospital/review/treatment/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 26,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/boost-stats/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 30,
+  "class": "InternalSearchController",
+  "method": "POST",
+  "path": "/internal/search/review"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 35,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/review-list"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 40,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 48,
+  "class": "InternalSearchController",
+  "method": "GET",
+  "path": "/internal/search/store-post-aggregations"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 56,
+  "class": "InternalSearchController",
+  "method": "POST",
+  "path": "/internal/search/store-post-aggregations/by-store-ids"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 65,
+  "class": "InternalSearchController",
+  "method": "POST",
+  "path": "/internal/search/v2/store-post-aggregations/by-store-ids"
+ },
+ {
+  "file": "apps/booster-app/modules/post/src/main/java/legalcare/medilawyer/post/controller/api/internal/InternalSearchController.java",
+  "line": 72,
+  "class": "InternalSearchController",
+  "method": "POST",
+  "path": "/internal/search/review-ranking-aggregations"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 34,
+  "class": "ProductController",
+  "method": "POST",
+  "path": "/apis/product/subscriptions"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 41,
+  "class": "ProductController",
+  "method": "PUT",
+  "path": "/apis/product/subscriptions/update/status"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 48,
+  "class": "ProductController",
+  "method": "PUT",
+  "path": "/apis/product/subscriptions/update/product-type"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 55,
+  "class": "ProductController",
+  "method": "DELETE",
+  "path": "/apis/product/subscriptions/delete/{subscribeProductId}"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 63,
+  "class": "ProductController",
+  "method": "GET",
+  "path": "/apis/product/subscriptions-list/{productFilterType}"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 70,
+  "class": "ProductController",
+  "method": "GET",
+  "path": "/apis/product/subscriptions/history/pagination"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 77,
+  "class": "ProductController",
+  "method": "GET",
+  "path": "/apis/product/subscriptions/{productType}/is-subscribed"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ProductController.java",
+  "line": 84,
+  "class": "ProductController",
+  "method": "POST",
+  "path": "/apis/product/subscriptions/{productType}/subscribed-stores"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 33,
+  "class": "ReviewBoostController",
+  "method": "POST",
+  "path": "/apis/review-boost/present-template"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 40,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/present/list/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 46,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/review/channel"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 51,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/unrestricted/callback/order"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 61,
+  "class": "ReviewBoostController",
+  "method": "POST",
+  "path": "/apis/review-boost/send/present"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 68,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/receipt/{receiptId}/message/{messageId}/sent-present"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 77,
+  "class": "ReviewBoostController",
+  "method": "GET",
+  "path": "/apis/review-boost/unrestricted/inquiry"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 83,
+  "class": "ReviewBoostController",
+  "method": "POST",
+  "path": "/apis/review-boost/unrestricted/inquiry/{messageId}/platform-click"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/front/ReviewBoostController.java",
+  "line": 93,
+  "class": "ReviewBoostController",
+  "method": "POST",
+  "path": "/apis/review-boost/inquiry"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 48,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/subscriptions/product-types"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 56,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/subscriptions/products"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 65,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/store-infos/statuses"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 73,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/store-infos"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 82,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/store-infos/present"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 91,
+  "class": "InternalAdminWebController",
+  "method": "GET",
+  "path": "/internal/admin/web/review-boost/common-presents"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 97,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/receipt-infos/statuses"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 105,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/receipt-infos"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 114,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/google-review-channels/statuses"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 122,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/google-review-channels"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 130,
+  "class": "InternalAdminWebController",
+  "method": "GET",
+  "path": "/internal/admin/web/review-boost/match-analysis"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalAdminWebController.java",
+  "line": 138,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/match-analysis/{id}/review"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalNotificationController.java",
+  "line": 29,
+  "class": "InternalNotificationController",
+  "method": "POST",
+  "path": "/internal/notification/review-boost/present-order/count"
+ },
+ {
+  "file": "apps/booster-app/modules/product/src/main/java/legalcare/medilawyer/product/controller/api/internal/InternalUserController.java",
+  "line": 26,
+  "class": "InternalUserController",
+  "method": "GET",
+  "path": "/internal/user/subscriptions/{productFilterType}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/AuthorityController.java",
+  "line": 20,
+  "class": "AuthorityController",
+  "method": "GET",
+  "path": "/apis/user-authority/store/{store-id}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 29,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "apis/users/organization/user"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 35,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "apis/users/organization"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 41,
+  "class": "OrganizationController",
+  "method": "PUT",
+  "path": "apis/users/organization/{organizationId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 47,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "apis/users/organization/{organizationId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 53,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "apis/users/organization/{organizationId}/users"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 59,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "apis/users/organizations/{organizationId}/invitations"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 66,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "apis/users/organizations/{organizationId}/invitations/{invitationToken}/accept"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/OrganizationController.java",
+  "line": 74,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "apis/users/organizations/{organizationId}/users/{targetAppUserId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/StoreController.java",
+  "line": 29,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/apis/unrestricted/store/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/StoreController.java",
+  "line": 38,
+  "class": "StoreController",
+  "method": "PATCH",
+  "path": "/apis/store/switch"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/StoreController.java",
+  "line": 45,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/apis/stores"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/StoreController.java",
+  "line": 52,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/apis/stores/search"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/StoreController.java",
+  "line": 58,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/apis/store/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/StoreController.java",
+  "line": 64,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/apis/store"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 28,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "apis/users/organizations/{organizationId}/teams/{teamId}/users"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 36,
+  "class": "TeamController",
+  "method": "POST",
+  "path": "apis/users/organizations/{organizationId}/team"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 45,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "apis/users/organizations/{organizationId}/team"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 51,
+  "class": "TeamController",
+  "method": "DELETE",
+  "path": "apis/users/organizations/{organizationId}/team/{teamId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 58,
+  "class": "TeamController",
+  "method": "POST",
+  "path": "apis/users/organizations/{organizationId}/teams/{teamId}/users/{targetUserId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 72,
+  "class": "TeamController",
+  "method": "DELETE",
+  "path": "apis/users/organizations/{organizationId}/teams/{teamId}/users/{targetAppUserId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/TeamController.java",
+  "line": 84,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "apis/users/organizations/{organizationId}/teams/{teamId}/channel-accounts"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 32,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/sign-up"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 39,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/sign-in"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 45,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/unrestricted/sign-in-with-cookie"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 53,
+  "class": "UserController",
+  "method": "GET",
+  "path": "/apis/user/"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 59,
+  "class": "UserController",
+  "method": "GET",
+  "path": "/apis/user/stores"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 65,
+  "class": "UserController",
+  "method": "GET",
+  "path": "/apis/user/stores/list"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 71,
+  "class": "UserController",
+  "method": "PATCH",
+  "path": "/apis/organizations/{organizationId}/users/{targetUserId}/role/{organizationRole}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 82,
+  "class": "UserController",
+  "method": "PATCH",
+  "path": "/apis/organizations/{organizationId}/teams/users/{targetUserId}/permission"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 94,
+  "class": "UserController",
+  "method": "GET",
+  "path": "/apis/organizations/{organizationId}/invitations/{invitationToken}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 100,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/unrestricted/send-otp"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 106,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/organizations/{organizationId}/teams/{teamId}/channel-accounts/login"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 117,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/organizations/{organizationId}/teams/{teamId}/channel-accounts/kakao/sms"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 128,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/unrestricted/consulting"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 135,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/unrestricted/consultation"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 142,
+  "class": "UserController",
+  "method": "GET",
+  "path": "/apis/token/info"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 147,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/sns/sign-in"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/front/UserController.java",
+  "line": 153,
+  "class": "UserController",
+  "method": "POST",
+  "path": "/apis/user/update/phone"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalAiDelegatorController.java",
+  "line": 17,
+  "class": "InternalAiDelegatorController",
+  "method": "GET",
+  "path": "/internal/ai-delegator/user-agent/{store-id}/{user-id}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalCrawlingController.java",
+  "line": 29,
+  "class": "InternalCrawlingController",
+  "method": "POST",
+  "path": "/internal/crawling/user-role"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalCrawlingController.java",
+  "line": 34,
+  "class": "InternalCrawlingController",
+  "method": "GET",
+  "path": "/internal/crawling/review-boost/message-info/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalCrawlingController.java",
+  "line": 39,
+  "class": "InternalCrawlingController",
+  "method": "GET",
+  "path": "/internal/crawling/review-boost/pg-login-info/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalCrawlingController.java",
+  "line": 44,
+  "class": "InternalCrawlingController",
+  "method": "GET",
+  "path": "/internal/crawling/attribute/{attributeType}/{storeChannelId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalExternalController.java",
+  "line": 20,
+  "class": "InternalExternalController",
+  "method": "POST",
+  "path": "/internal/external/user-role"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalNotificationController.java",
+  "line": 25,
+  "class": "InternalNotificationController",
+  "method": "GET",
+  "path": "/internal/notification/user-authority/{user-id}/store/{store-id}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalNotificationController.java",
+  "line": 32,
+  "class": "InternalNotificationController",
+  "method": "GET",
+  "path": "/internal/notification/is-admin/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalNotificationController.java",
+  "line": 37,
+  "class": "InternalNotificationController",
+  "method": "GET",
+  "path": "/internal/notification/enterprise/user-info"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 33,
+  "class": "InternalPostController",
+  "method": "POST",
+  "path": "/internal/post/team-channel-account"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 38,
+  "class": "InternalPostController",
+  "method": "POST",
+  "path": "/internal/post/team"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 43,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 47,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/store/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 52,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/is-admin/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 57,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/is-owner-or-admin/{storeId}/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 62,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/has-permission-reading/{storeId}/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 67,
+  "class": "InternalPostController",
+  "method": "POST",
+  "path": "/internal/post/user-role"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 72,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/team/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalPostController.java",
+  "line": 77,
+  "class": "InternalPostController",
+  "method": "GET",
+  "path": "/internal/post/enterprise/user-info"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalProductController.java",
+  "line": 31,
+  "class": "InternalProductController",
+  "method": "GET",
+  "path": "/internal/product/is-admin/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalProductController.java",
+  "line": 36,
+  "class": "InternalProductController",
+  "method": "GET",
+  "path": "/internal/product/user-authority/{user-id}/store/{store-id}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalProductController.java",
+  "line": 43,
+  "class": "InternalProductController",
+  "method": "GET",
+  "path": "/internal/product/store/{storeId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalProductController.java",
+  "line": 48,
+  "class": "InternalProductController",
+  "method": "POST",
+  "path": "/internal/product/subscribe-product-history/user-store-info"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalProductController.java",
+  "line": 53,
+  "class": "InternalProductController",
+  "method": "GET",
+  "path": "/internal/product/store-id/{userId}"
+ },
+ {
+  "file": "apps/booster-app/modules/user/src/main/java/legalcare/medilawyer/userservice/controller/api/internal/InternalProductController.java",
+  "line": 58,
+  "class": "InternalProductController",
+  "method": "POST",
+  "path": "/internal/product/store/channel/place/{store-id}"
+ }
+]

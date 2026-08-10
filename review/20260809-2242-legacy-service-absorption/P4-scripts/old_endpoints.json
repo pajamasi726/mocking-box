@@ -1,0 +1,1034 @@
+[
+ {
+  "file": "module-client/core-client/src/main/kotlin/legalcare/medilawyer/client/ml/controller/MlController.kt",
+  "line": 22,
+  "class": "MlController",
+  "method": "GET",
+  "path": "/api/v1/ml/capture-image",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 34,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/organization-user",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 49,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/crawling/storeChannel",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 70,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/crawling/storeChannels",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 86,
+  "class": "AdminController",
+  "method": "PATCH",
+  "path": "/api/v1/admin/store-channel-match",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 103,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/organizations/{organizationId}/teams/{teamId}/stores/{storeId}",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 120,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/stores/{storeId}/communities-keywords",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 138,
+  "class": "AdminController",
+  "method": "POST",
+  "path": "/api/v1/admin/stores/{storeId}/communities/{communityId}",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 156,
+  "class": "AdminController",
+  "method": "DELETE",
+  "path": "/api/v1/admin/stores/{storeId}/communities/{communityId}/keywords/{keywordId}",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminController.kt",
+  "line": 174,
+  "class": "AdminController",
+  "method": "GET",
+  "path": "/api/v1/admin/stores/{storeId}/communities-keywords",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminSeoController.kt",
+  "line": 26,
+  "class": "AdminSeoController",
+  "method": "GET",
+  "path": "/api/v1/admin/seo/hospitals",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/admin/controller/AdminSeoController.kt",
+  "line": 40,
+  "class": "AdminSeoController",
+  "method": "PATCH",
+  "path": "/api/v1/admin/seo/hospitals/{storeId}",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/airtable/controller/AirtableController.kt",
+  "line": 21,
+  "class": "AirtableController",
+  "method": "POST",
+  "path": "/api/v1/airtable/saveThread",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/airtable/controller/AirtableController.kt",
+  "line": 26,
+  "class": "AirtableController",
+  "method": "POST",
+  "path": "/api/v1/airtable/saveThreadComment",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/airtable/controller/AirtableController.kt",
+  "line": 31,
+  "class": "AirtableController",
+  "method": "POST",
+  "path": "/api/v1/airtable/saveThreadReply",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUser/controller/AppUserController.kt",
+  "line": 36,
+  "class": "AppUserController",
+  "method": "GET",
+  "path": "/api/v1/app-users/me",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUser/controller/AppUserController.kt",
+  "line": 50,
+  "class": "AppUserController",
+  "method": "GET",
+  "path": "/api/v1/users/me/stores",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.kt",
+  "line": 31,
+  "class": "AppUserChannelAccountController",
+  "method": "GET",
+  "path": "/api/v1/app-user-channel-account/list",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.kt",
+  "line": 45,
+  "class": "AppUserChannelAccountController",
+  "method": "POST",
+  "path": "/api/v1/app-user-channel-account/login",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.kt",
+  "line": 67,
+  "class": "AppUserChannelAccountController",
+  "method": "POST",
+  "path": "/api/v1/app-user-channel-account/login/kakao/sms",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUserChannelAccount/controller/AppUserChannelAccountController.kt",
+  "line": 90,
+  "class": "AppUserChannelAccountController",
+  "method": "POST",
+  "path": "/api/v1/app-user-channel-account/relogin",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUserStore/controller/AppUserStoreController.kt",
+  "line": 41,
+  "class": "AppUserStoreController",
+  "method": "GET",
+  "path": "/api/v1/app-user-store/list",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/appUserStore/controller/AppUserStoreController.kt",
+  "line": 56,
+  "class": "AppUserStoreController",
+  "method": "PATCH",
+  "path": "/api/v1/app-user-store/match",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 47,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 64,
+  "class": "OrganizationController",
+  "method": "PATCH",
+  "path": "/api/v1/organization/{organizationId}",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 82,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/users",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 107,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/users",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 132,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 152,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 169,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/teams",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 187,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 207,
+  "class": "OrganizationController",
+  "method": "PATCH",
+  "path": "/api/v1/organizations/{organizationId}/users/{targetUserId}/role",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 226,
+  "class": "OrganizationController",
+  "method": "PATCH",
+  "path": "/api/v1/organizations/{organizationId}/teams/users/{targetUserId}/permission",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 244,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/invitations",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 264,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/invitations/{invitationToken}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 278,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/invitations/{invitationToken}/accept",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 292,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/users/{targetUserId}",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 313,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "/api/v1/organizations/{organizationId}/users/{targetAppUserId}",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 332,
+  "class": "OrganizationController",
+  "method": "DELETE",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/users/{targetAppUserId}",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 353,
+  "class": "OrganizationController",
+  "method": "GET",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 369,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/login",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 394,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/kakao/sms",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 418,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/naver/captcha",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/organization/controller/OrganizationController.kt",
+  "line": 441,
+  "class": "OrganizationController",
+  "method": "POST",
+  "path": "/api/v1/organizations/{organizationId}/teams/{teamId}/channel-accounts/relogin",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/post/controller/PostController.kt",
+  "line": 27,
+  "class": "PostController",
+  "method": "GET",
+  "path": "/api/v1/posts",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/postReply/controller/PostReplyController.kt",
+  "line": 33,
+  "class": "PostReplyController",
+  "method": "POST",
+  "path": "/api/v1/post-reply",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/postReplyAiRecommend/controller/PostReplyAiRecommendController.kt",
+  "line": 25,
+  "class": "PostReplyAiRecommendController",
+  "method": "POST",
+  "path": "/api/v1/post-reply-ai-recommend",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/postWord/controller/PostWordController.kt",
+  "line": 27,
+  "class": "PostWordController",
+  "method": "GET",
+  "path": "/api/v1/post-word/statistics",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/productPost/controller/ProductController.kt",
+  "line": 30,
+  "class": "ProductController",
+  "method": "POST",
+  "path": "/api/v1/products/{productName}/purchases",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 39,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/check",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 52,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/store/search",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 66,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/store/{storeId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 78,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/store/register",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 91,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/store/store-channel/completed",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 108,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/store/store-channel",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 125,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/team",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 144,
+  "class": "StoreController",
+  "method": "POST",
+  "path": "/api/v1/stores/{storeId}/channels/{channelId}/auth",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 163,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/channels",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 178,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/posts/statistics",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 207,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/posts/statistics/period-count",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/store/controller/StoreController.kt",
+  "line": 227,
+  "class": "StoreController",
+  "method": "GET",
+  "path": "/api/v1/stores/{storeId}/organization-team",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/storeChannel/controller/StoreChannelController.kt",
+  "line": 25,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/naver",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/storeChannel/controller/StoreChannelController.kt",
+  "line": 38,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/unofficial/naver",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/storeChannel/controller/StoreChannelController.kt",
+  "line": 50,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/kakao",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/storeChannel/controller/StoreChannelController.kt",
+  "line": 63,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/modoodoc",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/storeChannel/controller/StoreChannelController.kt",
+  "line": 76,
+  "class": "StoreChannelController",
+  "method": "GET",
+  "path": "/api/v1/store-channel/search/google",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 32,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/keyword/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 37,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/averageScore/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 42,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/messageCount/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 47,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/reviewWriteRate/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 52,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/presentCount/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 57,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/presentHistories/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/http/team/controller/TeamController.kt",
+  "line": 70,
+  "class": "TeamController",
+  "method": "GET",
+  "path": "/api/v1/team/presentHistories/{teamId}/excel",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalAdminWebController.kt",
+  "line": 31,
+  "class": "InternalAdminWebController",
+  "method": "GET",
+  "path": "/internal/admin/web/stores/{storeId}/organization-team",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalAdminWebController.kt",
+  "line": 38,
+  "class": "InternalAdminWebController",
+  "method": "GET",
+  "path": "/internal/admin/web/teams/{teamId}/message-templates",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalAdminWebController.kt",
+  "line": 45,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/team-message-templates",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalAdminWebController.kt",
+  "line": 52,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/request-settings/statuses",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalAdminWebController.kt",
+  "line": 60,
+  "class": "InternalAdminWebController",
+  "method": "POST",
+  "path": "/internal/admin/web/review-boost/stores/{storeId}/hospital-message-template",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalCrawlingReviewBoostController.kt",
+  "line": 22,
+  "class": "InternalCrawlingReviewBoostController",
+  "method": "POST",
+  "path": "/internal/crawling/review-boost/stores/{storeId}/messages",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalProductReviewBoostController.kt",
+  "line": 15,
+  "class": "InternalProductReviewBoostController",
+  "method": "PUT",
+  "path": "/internal/product/review-boost/stores/{storeId}/request-setting",
+  "ann": "PutMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 29,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/hospital/store/register",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 34,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/customers",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 39,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/auth-bypass/stores",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 46,
+  "class": "InternalReviewedHospitalController",
+  "method": "GET",
+  "path": "/internal/reviewed/auth-bypass/app-users",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 53,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/auth-bypass",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 60,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/review-boost/google-place/statuses",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/internal/controller/InternalReviewedHospitalController.kt",
+  "line": 67,
+  "class": "InternalReviewedHospitalController",
+  "method": "POST",
+  "path": "/internal/reviewed/review-boost/google-place",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/publicSeo/controller/PublicHospitalController.kt",
+  "line": 19,
+  "class": "PublicHospitalController",
+  "method": "GET",
+  "path": "/api/v1/public/hospitals",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/publicSeo/controller/PublicHospitalController.kt",
+  "line": 26,
+  "class": "PublicHospitalController",
+  "method": "GET",
+  "path": "/api/v1/public/hospitals/{storeId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 19,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/message-templates",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 32,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/message-templates/{messageTemplateId}",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 47,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/message-templates",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 60,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 75,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 93,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/messages/{messageId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 109,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 125,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages/without-notification",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 142,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages/{messageId}/posts",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 159,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/gifts",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 172,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts/{giftId}",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 187,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 201,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts/{giftId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 216,
+  "class": "BoostController",
+  "method": "DELETE",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/gifts/{giftId}",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 231,
+  "class": "BoostController",
+  "method": "POST",
+  "path": "/api/v1/boost1/organizations/{organizationId}/teams/{teamId}/messages/{messageId}/posts/{postId}/customers/{customerId}/gifts/{giftId}",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/BoostController.kt",
+  "line": 249,
+  "class": "BoostController",
+  "method": "GET",
+  "path": "/api/v1/boost1/customers/{customerId}",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/apis/reviewBoost/v2/controller/ReviewBoostV2Controller.kt",
+  "line": 22,
+  "class": "ReviewBoostV2Controller",
+  "method": "POST",
+  "path": "/api/v2/boost1/organizations/{organizationId}/teams/{teamId}/messages",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/auth/api/controller/AuthController.kt",
+  "line": 20,
+  "class": "AuthController",
+  "method": "POST",
+  "path": "/api/v1/auth/sign-up",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/auth/api/controller/AuthController.kt",
+  "line": 27,
+  "class": "AuthController",
+  "method": "POST",
+  "path": "/api/v1/auth/login",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/auth/api/controller/OtpController.kt",
+  "line": 18,
+  "class": "OtpController",
+  "method": "POST",
+  "path": "/api/v1/otp/send",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 24,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/register/targets",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 40,
+  "class": "EventSchedulerController",
+  "method": "PATCH",
+  "path": "/api/v1/event-scheduler/update/targets",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 56,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/add/targets",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 72,
+  "class": "EventSchedulerController",
+  "method": "DELETE",
+  "path": "/api/v1/event-scheduler/delete/targets",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 88,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/register/task",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 105,
+  "class": "EventSchedulerController",
+  "method": "PATCH",
+  "path": "/api/v1/event-scheduler/update/task",
+  "ann": "PatchMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 122,
+  "class": "EventSchedulerController",
+  "method": "DELETE",
+  "path": "/api/v1/event-scheduler/delete/task",
+  "ann": "DeleteMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/eventScheduler/controller/EventSchedulerController.kt",
+  "line": 139,
+  "class": "EventSchedulerController",
+  "method": "POST",
+  "path": "/api/v1/event-scheduler/schedule/task",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/kafka/controller/KafkaController.kt",
+  "line": 26,
+  "class": "KafkaController",
+  "method": "POST",
+  "path": "/api/v1/kafka/review",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/kafka/controller/KafkaController.kt",
+  "line": 38,
+  "class": "KafkaController",
+  "method": "POST",
+  "path": "/api/v1/kafka/add/thread/crawling/data",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/kafka/controller/KafkaController.kt",
+  "line": 50,
+  "class": "KafkaController",
+  "method": "POST",
+  "path": "/api/v1/kafka/notice/crawl/thread/completion",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/notice/api/controller/NoticeController.kt",
+  "line": 36,
+  "class": "NoticeController",
+  "method": "POST",
+  "path": "/api/v1/notice",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/notice/api/controller/NoticeController.kt",
+  "line": 64,
+  "class": "NoticeController",
+  "method": "POST",
+  "path": "/api/v1/negative-review-alimtalk",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/schedule/controller/ScheduledController.kt",
+  "line": 20,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/schedule/controller/ScheduledController.kt",
+  "line": 36,
+  "class": "ScheduledController",
+  "method": "GET",
+  "path": "/api/v1/schedule/status",
+  "ann": "GetMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/schedule/controller/ScheduledController.kt",
+  "line": 61,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule/status",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/schedule/controller/ScheduledController.kt",
+  "line": 79,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule/alimtalk/new-negative-post",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/schedule/controller/ScheduledController.kt",
+  "line": 95,
+  "class": "ScheduledController",
+  "method": "POST",
+  "path": "/api/v1/schedule/alimtalk/new-positive-post",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/security/JwtController.kt",
+  "line": 24,
+  "class": "JwtController",
+  "method": "POST",
+  "path": "/api/v1/jwt/create",
+  "ann": "PostMapping"
+ },
+ {
+  "file": "module-core/core-api/src/main/kotlin/legalcare/medilawyer/security/JwtController.kt",
+  "line": 41,
+  "class": "JwtController",
+  "method": "POST",
+  "path": "/api/v1/jwt/refresh",
+  "ann": "PostMapping"
+ }
+]
